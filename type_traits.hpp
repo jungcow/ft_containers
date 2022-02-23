@@ -5,10 +5,10 @@
 
 namespace ft
 {
-	struct true_type { };
-	struct false_type { };
+	struct true_type {};
+	struct false_type {};
 
-	template <bool Cond, class T = void>
+	template <bool, class T = void>
 	struct enable_if {};
 
 	template <class T>
@@ -18,14 +18,14 @@ namespace ft
 	};
 
 
-	template <class, class>
-	struct is_convertible {
+	template <typename, typename>
+	struct is_same {
 		enum { value = 0 };
 		typedef false_type type;
 	};
 
-	template <class _Tp>
-	struct is_convertible<_Tp, _Tp> {
+	template <typename T>
+	struct is_same<T, T> {
 		enum { value = 1 };
 		typedef true_type type;
 	};

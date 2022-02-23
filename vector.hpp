@@ -28,8 +28,8 @@ namespace ft
 		typedef typename allocator_type::const_pointer		const_pointer;
 		typedef typename allocator_type::difference_type	difference_type;
 
-		typedef __wrap_iter<pointer> 						iterator;
-		typedef __wrap_iter<const_pointer>					const_iterator;
+		typedef __wrap_iter<pointer, ft::vector<value_type> > 			iterator;
+		typedef __wrap_iter<const_pointer, ft::vector<value_type> >		const_iterator;
 		// typedef reverse_iterator<iterator>					reverse_iterator;
 		// typedef reverse_iterator<const_iterator>			const_reverse_iterator;
 		/*

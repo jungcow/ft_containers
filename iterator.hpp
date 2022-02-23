@@ -72,14 +72,77 @@ namespace ft
 		typedef random_access_iterator_tag	iterator_category;
 	};
 
+
+	
+
+	/*
+	**	여기의 Iterator 템플릿 인수는 해당 컨테이너에서 쓰이는 iterator를 템플릿 인자로 받아야 한다. -> 이 Iterator가 base가 되므로
+	**	-> base를 이용한 operator 오버로딩을 하므로
+	*/
+	// template <class Iterator>
+	// class reverse_iterator : public ft::iterator<typename ft::iterator_traits<Iterator>::Category,
+	// 											typename ft::iterator_traits<Iterator>::value_type,
+	// 											typename ft::iterator_traits<Iterator>::difference_type,
+	// 											typename ft::iterator_traits<Iterator>::pointer,
+	// 											typename ft::iterator_traits<Iterator>::reference>
+	// {
+	// protected:
+	// 	Iterator __base;
+	// public:
+	// 	reverse_iterator() : __base() {};
+	// 	virtual ~reverse_iterator() : __base() {};
+
+	// 	template <class OtherIter>
+	// 	explicit reverse_iterator(const reverse_iterator<OtherIter>& other) : __base(other.base()) {};
+
+	// 	template <class OtherIter>
+	// 	reverse_iterator &operator=(const reverse_iterator<OtherIter>& other) {
+	// 		if (this != other)
+	// 			__base = other.base();
+	// 		return *this;
+	// 	}
+
+
+	// 	//TODO: 왜 reference를 반환하지 않지? reverse_iterator&로 반환하는게 더 낫지 않나?
+	// 	//TODO: 왜 const를 붙여주지 않는거지?? 결과값이 상숫값이 안되는 이유는?
+	// 	const reverse_iterator operator+(reverse_iterator::difference_type n) const {
+	// 		return (__base - n);
+	// 	}
+
+	// 	const reverse_iterator operator-(reverse_iterator::difference_type n) const {
+	// 		return (__base + n);
+	// 	}
+		
+	// 	const reverse_iterator& operator*
+
+	// 	Iterator &base(void) const {
+	// 		return __base;
+	// 	}
+	// };
+	
+	// /*
+	// ** Non-member overload of reverse_iterator;
+	// */
+	// template <class Iterator>
+	// reverse_iterator<Iterator> operator+(typename reverse_iterator<Iterator>::difference_type n,
+	// 									const reverse_iterator<Iterator>& rfs) {
+	// 	return (rfs + n);
+	// }
+	// template <class Iterator>
+	// typename reverse_iterator<Iterator>::difference_type operator-(
+	// 	const reverse_iterator<Iterator>& lhs,
+	// 	const reverse_iterator<Iterator>& rfs) {
+	// 	return (lhs - rfs);
+	// }
+
 	/**
 	 * vector 컨테이너가 사용하는 iterator wrapper 클래스 템플릿 이다.
 	 * 뭘 위해 있나? => 이는 클래스의 중복되는 정의를 줄이고자 wrapper로 감싼 것 같다.
 	 * const와 그냥 iterator가 있으므로, const형 그리고 그냥을 따로 정의해야 할텐데,
 	 * 이를 wrapper의 템플릿 인자에 const_pointer 또는 pointer를 넘겨 정의하는 것으로
-	 * 해결하였다.
+	 * 해결하였다. Container를 템플릿 인자로 바는 이유는 Copy Constructor를 보면 알 수 있다.
 	 */
-	template <class Iter>
+	template <class Iter, class Container>
 	class __wrap_iter
 	{
 	public:
@@ -112,14 +175,17 @@ namespace ft
 
 		/**
 		 * Copy Constructor
-		 * std::enable_if<...>::type* = nullptr
-		 * enable_if의 첫번째 템플릿 인자로 true 오고 두번째 인자를 적어주지 않을 때 -> 이 때 두번째 템플릿 인자의
-		 * default type이 void이므로 std::enable_if<...>::type* 은 void*가 된다.
-		 * 여기서 type이 정의되지 않을 때(enable_if에 false가 전달 될 때) nullptr이 기본 '값'으로 참조된다.
+		 * ft::is_same의 두번째 템플릿 인자는 복사 생성에 이용하는 iterator의 type을 의미한다.
+		 * i) const_iterator = iterator (O)
+		 * ii) iterator = const_iterator (X)
+		 * 위와 같은 상황을 고려하여 is_same 두번째 인자에 const가 올 때에는 허용을 하도록 해야 한다(위 첫번째 경우에 해당한다.)
+		 * _Up는 무조건 비상수 iterator, Container::pointer는 상수든 아니든 Container의 pointer를 가져오기 때문에 비상수.
+		 * 때문에 is_same의 value가 1이 되면서 enable_if의 type이 Container로 정의되어 진다.
 		 */
 		template <class _Up>
-		__wrap_iter(const __wrap_iter<_Up> &__u, 
-			typename std::enable_if<std::is_convertible<_Up, iterator_type>::value>::type* = nullptr) : __iter(__u.base()) {
+		__wrap_iter(__wrap_iter<_Up, typename ft::enable_if<
+				ft::is_same<_Up, typename Container::pointer>::value, Container
+			>::type> &__u) : __iter(__u.base()) {
 				std::cout << "[ copy constructor of iterator ]" << std::endl;
 				if (typeid(_Up) == typeid(Iter))
 					std::cout << "same" << std::endl;
