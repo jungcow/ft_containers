@@ -225,7 +225,7 @@ namespace ft
 			tmp += n;
 			return tmp;
 		}
-		__wrap_iter operator-(const difference_type& n) const{
+		__wrap_iter operator-(difference_type n) const{
 			std::cout << "operator-" << std::endl;
 			__wrap_iter tmp = *this;
 			tmp -= n;
@@ -252,6 +252,13 @@ namespace ft
 			this->__iter -= n;
 			return *this;
 		}
+
+		const iterator_type& base(void) const {
+			return __iter;
+		}
+
+		template <class Iter1, class Cont>
+		friend __wrap_iter<Iter1, Cont> operator+(typename __wrap_iter<Iter1, Cont>::difference_type n, const __wrap_iter<Iter1, Cont>& iter);
 
 	private:
 		/**
