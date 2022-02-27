@@ -4,18 +4,19 @@
 - [x] iterator
 - [x] iterator_traits
   - [x] specialization for pointer and const pointer
-- [ ] reverse_iterator
+- [x] reverse_iterator
   - [x] reverse_iterator::base
-  - [ ] reverse_iterator::operator*
-  - [ ] reverse_iterator::operator+
-  - [ ] reverse_iterator::operator++
-  - [ ] reverse_iterator::operator+=
-  - [ ] reverse_iterator::operator-
-  - [ ] reverse_iterator::operator--
-  - [ ] reverse_iterator::operator-=
-  - [ ] reverse_iterator::operator->
+  - [x] reverse_iterator::operator*
+  - [x] reverse_iterator::operator+
+  - [x] reverse_iterator::operator++
+  - [x] reverse_iterator::operator+=
+  - [x] reverse_iterator::operator-
+  - [x] reverse_iterator::operator--
+  - [x] reverse_iterator::operator-=
+  - [x] reverse_iterator::operator->
   <!-- - [ ] reverse_iterator::operator= c++11 -->
-  - [ ] reverse_iterator::operator[]
+  - [x] reverse_iterator::operator[]
+  - [x] relational operator(`==`, `!=`, `>`, `<`, `>=`, `<=`) (**non-member function**)
 - [x] __wrap_iter (for vector or random access iterator)
   - [x] default constructor
   - [x] copy constructor

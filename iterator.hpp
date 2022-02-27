@@ -79,58 +79,146 @@ namespace ft
 	**	-> base를 이용한 operator 오버로딩을 하므로
 	*/
 	template <class Iterator>
-	class reverse_iterator : public ft::iterator<typename ft::iterator_traits<Iterator>::Category,
+	class reverse_iterator : public ft::iterator<typename ft::iterator_traits<Iterator>::iterator_category,
 												typename ft::iterator_traits<Iterator>::value_type,
 												typename ft::iterator_traits<Iterator>::difference_type,
 												typename ft::iterator_traits<Iterator>::pointer,
 												typename ft::iterator_traits<Iterator>::reference>
 	{
-	protected:
-		Iterator __base;
 	public:
-		reverse_iterator() : __base() {};
-		virtual ~reverse_iterator() : __base() {};
+		typedef Iterator								iterator_type;
+		typedef ft::iterator_traits<iterator_type>		traits_type;
+		typedef typename traits_type::iterator_category	iterator_category;
+		typedef typename traits_type::value_type		value_type;
+		typedef typename traits_type::difference_type	difference_type;
+		typedef typename traits_type::pointer			pointer;
+		typedef typename traits_type::reference			reference;
+	
+	protected:
+		iterator_type __base;
+
+	public:
+		reverse_iterator() : __base() {
+				std::cout << "[ 'reverse' default constructor of iterator ]" << std::endl;
+		};
+		virtual ~reverse_iterator() {
+				std::cout << "[ 'reverse' Destructor of iterator ]" << std::endl;
+		};
+
+		explicit reverse_iterator(const iterator_type& other) : __base(other) {};
 
 		template <class OtherIter>
-		reverse_iterator(const reverse_iterator<OtherIter>& other) : __base(other.base()) {};
+		reverse_iterator(const reverse_iterator<OtherIter>& other) : __base(other.base()) {
+				std::cout << "[ 'reverse' copy constructor of iterator ]" << std::endl;
+		};
 
-		template <class OtherIter>
-		reverse_iterator &operator=(const reverse_iterator<OtherIter>& other) {
-			if (this != other)
-				__base = other.base();
+		reverse_iterator::reference operator*(void) const { return *__base; }
+		reference operator[](difference_type n) const { return __base[-n - 1]; }
+		pointer operator->(void) const { return &(this->operator*()); }
+
+		reverse_iterator& operator++() {
+			__base--;
 			return *this;
 		}
+		reverse_iterator operator++(int) {
+			reverse_iterator rit = *this;
+			++(*this);
+			return rit;
+		}
 
+		reverse_iterator& operator--() {
+			__base++;
+			return *this;
+		}
+		reverse_iterator operator--(int) {
+			reverse_iterator rit = *this;
+			--(*this);
+			return rit;
+		}
 
 		//TODO: 왜 reference를 반환하지 않지? reverse_iterator&로 반환하는게 더 낫지 않나?
 		//TODO: 왜 const를 붙여주지 않는거지?? 결과값이 상숫값이 안되는 이유는?
-		const reverse_iterator operator+(reverse_iterator::difference_type n) const {
-			return (__base - n);
+		//TODO: -> 상수가 아닌 reverse_iterator에 대입이 가능해야 하므로
+		reverse_iterator operator+(difference_type n) const {
+			return (reverse_iterator(__base - n));
+		}
+		reverse_iterator operator-(difference_type n) const {
+			return (reverse_iterator(__base + n));
 		}
 
-		const reverse_iterator operator-(reverse_iterator::difference_type n) const {
-			return (__base + n);
+		reverse_iterator operator+=(difference_type n) {
+			return (__base -= n);
 		}
-		
-		// const reverse_iterator& operator*
+		reverse_iterator operator-=(difference_type n) {
+			return (__base += n);
+		}
 
-		Iterator &base(void) const {
+		const iterator_type &base(void) const {
 			return __base;
 		}
+
+	private:
+		template <class _Up> friend class reverse_iterator;
+	
+		template <class Iter>
+		friend bool operator>(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);	
+		template <class Iter>
+		friend bool operator>=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);	
+		template <class Iter>
+		friend bool operator==(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);	
+		template <class Iter>
+		friend bool operator<(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);	
+		template <class Iter>
+		friend bool operator<=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);	
+		template <class Iter>
+		friend bool operator!=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);
 	};
 	
 	/*
 	** Non-member overload of reverse_iterator;
 	*/
 	template <class Iterator>
-	reverse_iterator<Iterator> operator+(typename reverse_iterator<Iterator>::difference_type n,
-										const reverse_iterator<Iterator>& rfs) {
+	reverse_iterator<Iterator> 
+	operator+(typename reverse_iterator<Iterator>::difference_type n, const reverse_iterator<Iterator>& rfs) {
 		return (rfs + n);
 	}
+
 	template <class Iterator>
 	typename reverse_iterator<Iterator>::difference_type
 	operator-(const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rfs) {
-		return (lhs - rfs);
+		return (lhs.base() - rfs.base());
+	}
+
+	template <class Iter>
+	inline bool operator>(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs) {
+		std::cout << "operator >" << std::endl;
+		return (lhs.base() < rhs.base());
+	}
+	template <class Iter>
+	inline bool operator>=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs) {
+		std::cout << "operator >=" << std::endl;
+
+		return (lhs.base() <= rhs.base());
+	}
+	template <class Iter>
+	inline bool operator==(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs) {
+		std::cout << "operator ==" << std::endl;
+		return (lhs.base() == rhs.base());
+	}
+	template <class Iter>
+	inline bool operator<(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs) {
+		std::cout << "operator <" << std::endl;
+		return (rhs > lhs);
+	}
+	template <class Iter>
+	inline bool operator<=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs) {
+		std::cout << "operator <=" << std::endl;
+		return (rhs >= lhs);
+	}
+	template <class Iter>
+	inline bool operator!=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs) {
+		std::cout << "operator !=" << std::endl;
+		return !(lhs == rhs);
 	}
 
 	/**
@@ -213,9 +301,6 @@ namespace ft
 			--(*this);
 			return tmp;
 		}
-
-		iterator_type base(void) const { return __iter; }
-
 		/**
 		 * 반환값이 상수가 아닌 이유 -> iterator에 iter + n의 반환값을 대입할 수 있어야 하기 때문
 		 */
@@ -281,11 +366,6 @@ namespace ft
 		friend bool operator<=(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs);	
 		template <class Iter1, class Iter2, class Cont>
 		friend bool operator!=(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs);
-
-		template <class Iter1, class Cont>
-		friend __wrap_iter<Iter1, Cont> operator+(typename __wrap_iter<Iter1, Cont>::difference_type n, const __wrap_iter<Iter1, Cont>& iter);
-		// template <class Iter, class Cont>
-		// friend const __wrap_iter operator+(const int & n, const __wrap_iter<Iter, Cont>& rfs);
 	};
 
 	/**
