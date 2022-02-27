@@ -1,11 +1,22 @@
 ## TODO 
 ### Iterator
 
-- [ ] iterator
-- [ ] iterator_traits
-  - [ ] specialization for pointer and const pointer
+- [x] iterator
+- [x] iterator_traits
+  - [x] specialization for pointer and const pointer
 - [ ] reverse_iterator
-- [ ] __wrap_iter (for vector or random access iterator)
+  - [x] reverse_iterator::base
+  - [ ] reverse_iterator::operator*
+  - [ ] reverse_iterator::operator+
+  - [ ] reverse_iterator::operator++
+  - [ ] reverse_iterator::operator+=
+  - [ ] reverse_iterator::operator-
+  - [ ] reverse_iterator::operator--
+  - [ ] reverse_iterator::operator-=
+  - [ ] reverse_iterator::operator->
+  <!-- - [ ] reverse_iterator::operator= c++11 -->
+  - [ ] reverse_iterator::operator[]
+- [x] __wrap_iter (for vector or random access iterator)
   - [x] default constructor
   - [x] copy constructor
   - [x] conversion constructor
@@ -18,9 +29,15 @@
   - [x] dereference operator(`*`, `->`)
   - [x] index operator(**member function**)
   - [x] relational operator(`==`, `!=`, `>`, `<`, `>=`, `<=`) (**non-member function**)
-  - [ ] compound assignment operator(`+=`, `-=`)
-  - [ ] addition operator(`+`)
-  - [ ] substraction operator(`-`)
+  - [x] compound assignment operator(`+=`, `-=`)
+    - [x] a += n;
+    - [x] a -= n;
+  - [x] addition operator(`+`)
+    - [x] a + n
+    - [x] n + a(non-member)
+  - [x] substraction operator(`-`)
+    - [x] a - n
+    - [x] a1 - a2
 
 
 ### Vector
