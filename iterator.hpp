@@ -1,7 +1,8 @@
 #ifndef _ITERATOR_H__
 #define _ITERATOR_H__
 
-#include <cstddef> // ptrdiff_t
+#include <cstddef>  // ptrdiff_t
+
 #include "type_traits.hpp"
 
 namespace ft
@@ -10,69 +11,71 @@ namespace ft
 	 * iterator_category를 이루는 iterator tag들이다.
 	 * 오로지 type을 구분하기 위함으로 사용되고, 따라서 내부는 비어 있다.
 	 */
-	struct input_iterator_tag {};
-	struct output_iterator_tag {};
-	struct forword_iterator_tag : public input_iterator_tag {};
-	struct bidirectional_iterator_tag : public forword_iterator_tag {};
-	struct random_access_iterator_tag : public bidirectional_iterator_tag {};
-	
+	struct input_iterator_tag {
+	};
+	struct output_iterator_tag {
+	};
+	struct forword_iterator_tag : public input_iterator_tag {
+	};
+	struct bidirectional_iterator_tag : public forword_iterator_tag {
+	};
+	struct random_access_iterator_tag : public bidirectional_iterator_tag {
+	};
+
 	/**
 	 * iterator 클래스 템플릿은 타입 정보만을 가지고 있다.
 	 */
 	template <class Category,
 			  class T,
 			  class Distance = ptrdiff_t,
-			  class Pointer = T *,
-			  class Reference = T &>
+			  class Pointer = T*,
+			  class Reference = T&>
 	class iterator
 	{
 	public:
-		typedef Category		iterator_category;
-		typedef T				value_type;
-		typedef Distance		difference_type;
-		typedef Pointer			pointer;
-		typedef Reference		reference;
+		typedef Category iterator_category;
+		typedef T value_type;
+		typedef Distance difference_type;
+		typedef Pointer pointer;
+		typedef Reference reference;
 	};
 
 	/**
 	 * iterator_traits 클래스 템플릿은 iterator 클래스 템플릿과 비슷하나 차이점이 있다.
 	 * iterator_traits는 특수화를 통해 iterator가 지원하지 않는 범주를 포함한다. 템플릿 인자를 iterator로
-	 * 받고 있는 함수에 pointer를 넣게 되면 해당 함수에선 위 iterator에서 제공하는 type들을 사용하려 할 때 
-	 * 에러가 발생한다.(이는 pointer에 해당 type들이 정의되지 않았기 때문) 따라서 템플릿 인자로 
+	 * 받고 있는 함수에 pointer를 넣게 되면 해당 함수에선 위 iterator에서 제공하는 type들을 사용하려 할 때
+	 * 에러가 발생한다.(이는 pointer에 해당 type들이 정의되지 않았기 때문) 따라서 템플릿 인자로
 	 * iterator_traits를 받아서 해당 pointer에 대한 type들을 정의하여 사용할 수 있도록 한다.
 	 */
 	template <class Iter>
 	struct iterator_traits {
-		typedef typename Iter::difference_type		difference_type;
-		typedef typename Iter::value_type			value_type;
-		typedef typename Iter::pointer				pointer;
-		typedef typename Iter::reference			reference;
-		typedef typename Iter::iterator_category	iterator_category;
+		typedef typename Iter::difference_type difference_type;
+		typedef typename Iter::value_type value_type;
+		typedef typename Iter::pointer pointer;
+		typedef typename Iter::reference reference;
+		typedef typename Iter::iterator_category iterator_category;
 	};
 
 	/*
 	**	pointer or const pointer에 대한 iterator_traits의 specialization
 	*/
 	template <class T>
-	struct iterator_traits<T *> {
-		typedef ptrdiff_t					difference_type;
-		typedef T							value_type;
-		typedef T *							pointer;
-		typedef T &							reference;
-		typedef random_access_iterator_tag	iterator_category;
+	struct iterator_traits<T*> {
+		typedef ptrdiff_t difference_type;
+		typedef T value_type;
+		typedef T* pointer;
+		typedef T& reference;
+		typedef random_access_iterator_tag iterator_category;
 	};
 
 	template <class T>
-	struct iterator_traits<const T *> {
-		typedef ptrdiff_t					difference_type;
-		typedef T							value_type;
-		typedef const T *					pointer;
-		typedef const T &					reference;
-		typedef random_access_iterator_tag	iterator_category;
+	struct iterator_traits<const T*> {
+		typedef ptrdiff_t difference_type;
+		typedef T value_type;
+		typedef const T* pointer;
+		typedef const T& reference;
+		typedef random_access_iterator_tag iterator_category;
 	};
-
-
-	
 
 	/*
 	**	여기의 Iterator 템플릿 인수는 해당 컨테이너에서 쓰이는 iterator를 템플릿 인자로 받아야 한다. -> 이 Iterator가 base가 되므로
@@ -80,143 +83,164 @@ namespace ft
 	*/
 	template <class Iterator>
 	class reverse_iterator : public ft::iterator<typename ft::iterator_traits<Iterator>::iterator_category,
-												typename ft::iterator_traits<Iterator>::value_type,
-												typename ft::iterator_traits<Iterator>::difference_type,
-												typename ft::iterator_traits<Iterator>::pointer,
-												typename ft::iterator_traits<Iterator>::reference>
+												 typename ft::iterator_traits<Iterator>::value_type,
+												 typename ft::iterator_traits<Iterator>::difference_type,
+												 typename ft::iterator_traits<Iterator>::pointer,
+												 typename ft::iterator_traits<Iterator>::reference>
 	{
 	public:
-		typedef Iterator								iterator_type;
-		typedef ft::iterator_traits<iterator_type>		traits_type;
-		typedef typename traits_type::iterator_category	iterator_category;
-		typedef typename traits_type::value_type		value_type;
-		typedef typename traits_type::difference_type	difference_type;
-		typedef typename traits_type::pointer			pointer;
-		typedef typename traits_type::reference			reference;
-	
+		typedef Iterator iterator_type;
+		typedef ft::iterator_traits<iterator_type> traits_type;
+		typedef typename traits_type::iterator_category iterator_category;
+		typedef typename traits_type::value_type value_type;
+		typedef typename traits_type::difference_type difference_type;
+		typedef typename traits_type::pointer pointer;
+		typedef typename traits_type::reference reference;
+
 	protected:
 		iterator_type __base;
 
 	public:
-		reverse_iterator() : __base() {
-				std::cout << "[ 'reverse' default constructor of iterator ]" << std::endl;
+		reverse_iterator() : __base()
+		{
+			std::cout << "[ 'reverse' default constructor of iterator ]" << std::endl;
 		};
-		virtual ~reverse_iterator() {
-				std::cout << "[ 'reverse' Destructor of iterator ]" << std::endl;
+		virtual ~reverse_iterator()
+		{
+			std::cout << "[ 'reverse' Destructor of iterator ]" << std::endl;
 		};
 
-		explicit reverse_iterator(const iterator_type& other) : __base(other) {};
+		explicit reverse_iterator(const iterator_type& other) : __base(other){};
 
 		template <class OtherIter>
-		reverse_iterator(const reverse_iterator<OtherIter>& other) : __base(other.base()) {
-				std::cout << "[ 'reverse' copy constructor of iterator ]" << std::endl;
+		reverse_iterator(const reverse_iterator<OtherIter>& other) : __base(other.base())
+		{
+			std::cout << "[ 'reverse' copy constructor of iterator ]" << std::endl;
 		};
 
 		reverse_iterator::reference operator*(void) const { return *__base; }
 		reference operator[](difference_type n) const { return __base[-n - 1]; }
 		pointer operator->(void) const { return &(this->operator*()); }
 
-		reverse_iterator& operator++() {
+		reverse_iterator& operator++()
+		{
 			__base--;
 			return *this;
 		}
-		reverse_iterator operator++(int) {
+		reverse_iterator operator++(int)
+		{
 			reverse_iterator rit = *this;
 			++(*this);
 			return rit;
 		}
 
-		reverse_iterator& operator--() {
+		reverse_iterator& operator--()
+		{
 			__base++;
 			return *this;
 		}
-		reverse_iterator operator--(int) {
+		reverse_iterator operator--(int)
+		{
 			reverse_iterator rit = *this;
 			--(*this);
 			return rit;
 		}
 
-		//TODO: 왜 reference를 반환하지 않지? reverse_iterator&로 반환하는게 더 낫지 않나?
-		//TODO: 왜 const를 붙여주지 않는거지?? 결과값이 상숫값이 안되는 이유는?
-		//TODO: -> 상수가 아닌 reverse_iterator에 대입이 가능해야 하므로
-		reverse_iterator operator+(difference_type n) const {
+		// TODO: 왜 reference를 반환하지 않지? reverse_iterator&로 반환하는게 더 낫지 않나?
+		// TODO: 왜 const를 붙여주지 않는거지?? 결과값이 상숫값이 안되는 이유는?
+		// TODO: -> 상수가 아닌 reverse_iterator에 대입이 가능해야 하므로
+		reverse_iterator operator+(difference_type n) const
+		{
 			return (reverse_iterator(__base - n));
 		}
-		reverse_iterator operator-(difference_type n) const {
+		reverse_iterator operator-(difference_type n) const
+		{
 			return (reverse_iterator(__base + n));
 		}
 
-		reverse_iterator operator+=(difference_type n) {
+		reverse_iterator operator+=(difference_type n)
+		{
 			return (__base -= n);
 		}
-		reverse_iterator operator-=(difference_type n) {
+		reverse_iterator operator-=(difference_type n)
+		{
 			return (__base += n);
 		}
 
-		const iterator_type &base(void) const {
+		const iterator_type& base(void) const
+		{
 			return __base;
 		}
 
 	private:
-		template <class _Up> friend class reverse_iterator;
-	
+		template <class _Up>
+		friend class reverse_iterator;
+
 		template <class Iter>
-		friend bool operator>(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);	
+		friend bool operator>(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);
 		template <class Iter>
-		friend bool operator>=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);	
+		friend bool operator>=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);
 		template <class Iter>
-		friend bool operator==(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);	
+		friend bool operator==(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);
 		template <class Iter>
-		friend bool operator<(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);	
+		friend bool operator<(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);
 		template <class Iter>
-		friend bool operator<=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);	
+		friend bool operator<=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);
 		template <class Iter>
 		friend bool operator!=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs);
 	};
-	
+
 	/*
 	** Non-member overload of reverse_iterator;
 	*/
 	template <class Iterator>
-	reverse_iterator<Iterator> 
-	operator+(typename reverse_iterator<Iterator>::difference_type n, const reverse_iterator<Iterator>& rfs) {
+	reverse_iterator<Iterator>
+	operator+(typename reverse_iterator<Iterator>::difference_type n, const reverse_iterator<Iterator>& rfs)
+	{
 		return (rfs + n);
 	}
 
 	template <class Iterator>
 	typename reverse_iterator<Iterator>::difference_type
-	operator-(const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rfs) {
+	operator-(const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rfs)
+	{
 		return (lhs.base() - rfs.base());
 	}
 
 	template <class Iter>
-	inline bool operator>(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs) {
+	inline bool operator>(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs)
+	{
 		std::cout << "operator >" << std::endl;
 		return (lhs.base() < rhs.base());
 	}
 	template <class Iter>
-	inline bool operator>=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs) {
+	inline bool operator>=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs)
+	{
 		std::cout << "operator >=" << std::endl;
 
 		return (lhs.base() <= rhs.base());
 	}
 	template <class Iter>
-	inline bool operator==(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs) {
+	inline bool operator==(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs)
+	{
 		std::cout << "operator ==" << std::endl;
 		return (lhs.base() == rhs.base());
 	}
 	template <class Iter>
-	inline bool operator<(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs) {
+	inline bool operator<(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs)
+	{
 		std::cout << "operator <" << std::endl;
 		return (rhs > lhs);
 	}
 	template <class Iter>
-	inline bool operator<=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs) {
+	inline bool operator<=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs)
+	{
 		std::cout << "operator <=" << std::endl;
 		return (rhs >= lhs);
 	}
 	template <class Iter>
-	inline bool operator!=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs) {
+	inline bool operator!=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs)
+	{
 		std::cout << "operator !=" << std::endl;
 		return !(lhs == rhs);
 	}
@@ -232,13 +256,13 @@ namespace ft
 	class __wrap_iter
 	{
 	public:
-		typedef Iter									iterator_type;
-		typedef ft::iterator_traits<iterator_type>		traits_type;
-		typedef typename traits_type::iterator_category	iterator_category;
-		typedef typename traits_type::value_type		value_type;
-		typedef typename traits_type::difference_type	difference_type;
-		typedef typename traits_type::pointer			pointer;
-		typedef typename traits_type::reference			reference;
+		typedef Iter iterator_type;
+		typedef ft::iterator_traits<iterator_type> traits_type;
+		typedef typename traits_type::iterator_category iterator_category;
+		typedef typename traits_type::value_type value_type;
+		typedef typename traits_type::difference_type difference_type;
+		typedef typename traits_type::pointer pointer;
+		typedef typename traits_type::reference reference;
 
 	private:
 		iterator_type __iter;
@@ -247,17 +271,19 @@ namespace ft
 		/**
 		 * 	Constructor
 		 */
-		__wrap_iter() {
+		__wrap_iter()
+		{
 			std::cout << "[ Default constructor of iterator ]" << std::endl;
 		};
 		// TODO: __iter는 단지 data를 가리키고 있을 뿐 -> 따라서 desctructor에서도 할 일이 없나?
-		virtual ~__wrap_iter() {
+		virtual ~__wrap_iter()
+		{
 			std::cout << "[ Destructor of iterator ]" << std::endl;
 		};
 
 		// TODO: 원본에는 explicit 키워드가 안붙어져 있다.
 		// TODO: 인자를 하나만 받을 때는 암시적 변환에 주의해야 하므로 ft 버전엔 붙여줄지 말지 고민해보자.
-		explicit __wrap_iter(iterator_type &other) : __iter(other) {};
+		__wrap_iter(iterator_type& other) : __iter(other){};
 
 		/**
 		 * Copy Constructor
@@ -270,33 +296,36 @@ namespace ft
 		 */
 		template <class _Up>
 		__wrap_iter(const __wrap_iter<_Up, typename ft::enable_if<
-				ft::is_same<_Up, typename Container::pointer>::value, Container
-			>::type> &other) : __iter(other.base()) {
-				std::cout << "[ copy constructor of iterator ]" << std::endl;
-			};
+											   ft::is_same<_Up, typename Container::pointer>::value, Container>::type>& other) : __iter(other.base())
+		{
+			std::cout << "[ copy constructor of iterator ]" << std::endl;
+		};
 
-		reference operator*() const { return *__iter;}
+		reference operator*() const { return *__iter; }
 		pointer operator->() const { return &(this->operator*()); }
 		reference operator[](const int& num) const { return __iter[num]; }
 
-
-		__wrap_iter& operator++() {
+		__wrap_iter& operator++()
+		{
 			++__iter;
 			return *this;
 		}
 
-		__wrap_iter operator++(int) {
+		__wrap_iter operator++(int)
+		{
 			__wrap_iter tmp = *this;
 			++(*this);
 			return tmp;
 		}
 
-		__wrap_iter& operator--() {
+		__wrap_iter& operator--()
+		{
 			--__iter;
 			return *this;
 		}
 
-		__wrap_iter operator--(int) {
+		__wrap_iter operator--(int)
+		{
 			__wrap_iter tmp = *this;
 			--(*this);
 			return tmp;
@@ -304,13 +333,15 @@ namespace ft
 		/**
 		 * 반환값이 상수가 아닌 이유 -> iterator에 iter + n의 반환값을 대입할 수 있어야 하기 때문
 		 */
-		__wrap_iter operator+(difference_type n) const{
+		__wrap_iter operator+(difference_type n) const
+		{
 			std::cout << "operator+" << std::endl;
 			__wrap_iter tmp = *this;
 			tmp += n;
 			return tmp;
 		}
-		__wrap_iter operator-(difference_type n) const{
+		__wrap_iter operator-(difference_type n) const
+		{
 			std::cout << "operator-" << std::endl;
 			__wrap_iter tmp = *this;
 			tmp -= n;
@@ -321,24 +352,28 @@ namespace ft
 		 * non-member function으로 해도 될 것 같은데 일단 member function으로 오버로딩 해보자.
 		 */
 		template <class OtherIter, class Cont>
-		typename __wrap_iter<OtherIter, Cont>::difference_type 
-		operator-(const __wrap_iter<OtherIter, Cont>& rfs) const{
+		typename __wrap_iter<OtherIter, Cont>::difference_type
+		operator-(const __wrap_iter<OtherIter, Cont>& rfs) const
+		{
 			std::cout << "iter1 - iter2" << std::endl;
 			return this->base() - rfs.base();
 		}
 
-		__wrap_iter operator+=(difference_type n) {
+		__wrap_iter operator+=(difference_type n)
+		{
 			std::cout << "operator+=" << std::endl;
 			this->__iter += n;
 			return *this;
 		}
-		__wrap_iter operator-=(difference_type n) {
+		__wrap_iter operator-=(difference_type n)
+		{
 			std::cout << "operator-=" << std::endl;
 			this->__iter -= n;
 			return *this;
 		}
 
-		const iterator_type& base(void) const {
+		const iterator_type& base(void) const
+		{
 			return __iter;
 		}
 
@@ -352,18 +387,19 @@ namespace ft
 		 * 왜 접근하려 하나? -> 아래의 non-member function 때문에
 		 * non-member에선 private에 접근할 수 없으므로
 		 */
-		template <class _Up, class Cont> friend class __wrap_iter;
-		
+		template <class _Up, class Cont>
+		friend class __wrap_iter;
+
 		template <class Iter1, class Iter2, class Cont>
-		friend bool operator>(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs);	
+		friend bool operator>(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs);
 		template <class Iter1, class Iter2, class Cont>
-		friend bool operator>=(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs);	
+		friend bool operator>=(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs);
 		template <class Iter1, class Iter2, class Cont>
-		friend bool operator==(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs);	
+		friend bool operator==(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs);
 		template <class Iter1, class Iter2, class Cont>
-		friend bool operator<(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs);	
+		friend bool operator<(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs);
 		template <class Iter1, class Iter2, class Cont>
-		friend bool operator<=(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs);	
+		friend bool operator<=(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs);
 		template <class Iter1, class Iter2, class Cont>
 		friend bool operator!=(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs);
 	};
@@ -373,39 +409,46 @@ namespace ft
 	 * inline을 통해 해당 코드에 바로 아래 정의된 함수 코드가 들어가게 된다.(compile-time에)
 	 */
 	template <class Iter1, class Iter2, class Cont>
-	inline bool operator>(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs) {
+	inline bool operator>(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs)
+	{
 		std::cout << "operator >" << std::endl;
 		return (lhs.base() > rhs.base());
 	}
 	template <class Iter1, class Iter2, class Cont>
-	inline bool operator>=(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs) {
+	inline bool operator>=(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs)
+	{
 		std::cout << "operator >=" << std::endl;
 
 		return (lhs.base() >= rhs.base());
 	}
 	template <class Iter1, class Iter2, class Cont>
-	inline bool operator==(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs) {
+	inline bool operator==(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs)
+	{
 		std::cout << "operator ==" << std::endl;
 		return (lhs.base() == rhs.base());
 	}
 	template <class Iter1, class Iter2, class Cont>
-	inline bool operator<(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs) {
+	inline bool operator<(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs)
+	{
 		std::cout << "operator <" << std::endl;
 		return (rhs > lhs);
 	}
 	template <class Iter1, class Iter2, class Cont>
-	inline bool operator<=(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs) {
+	inline bool operator<=(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs)
+	{
 		std::cout << "operator <=" << std::endl;
 		return (rhs >= lhs);
 	}
 	template <class Iter1, class Iter2, class Cont>
-	inline bool operator!=(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs) {
+	inline bool operator!=(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs)
+	{
 		std::cout << "operator !=" << std::endl;
 		return !(lhs == rhs);
 	}
 
 	template <class Iter, class Cont>
-	inline __wrap_iter<Iter, Cont> operator+(typename __wrap_iter<Iter, Cont>::difference_type n, const __wrap_iter<Iter, Cont>& iter) {
+	inline __wrap_iter<Iter, Cont> operator+(typename __wrap_iter<Iter, Cont>::difference_type n, const __wrap_iter<Iter, Cont>& iter)
+	{
 		std::cout << "non-member operator+" << std::endl;
 		return iter + n;
 	}
