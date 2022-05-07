@@ -283,7 +283,7 @@ namespace ft
 
 		// TODO: 원본에는 explicit 키워드가 안붙어져 있다.
 		// TODO: 인자를 하나만 받을 때는 암시적 변환에 주의해야 하므로 ft 버전엔 붙여줄지 말지 고민해보자.
-		__wrap_iter(iterator_type& other) : __iter(other){};
+		explicit __wrap_iter(iterator_type& other) : __iter(other){};
 
 		/**
 		 * Copy Constructor

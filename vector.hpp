@@ -1,6 +1,8 @@
 #ifndef _VECTOR_H__
 #define _VECTOR_H__
 
+#include <exception>
+#include <limits>
 #include <memory>
 #include <vector>
 
@@ -34,13 +36,14 @@ namespace ft
 		pointer _end;
 		size_type _capacity;
 		size_type _size;
+		allocator_type _allocator;
 
 	public:
 		/*
 		** Constructor
 		*/
 		explicit vector(const allocator_type &alloc = allocator_type())
-			: _capacity(1), _size(0), _begin(NULL), _end(NULL)
+			: _capacity(1), _size(0), _begin(NULL), _end(NULL), _allocator(alloc)
 		{
 			std::cout << "vector default constructor\n";
 			_data = NULL;
@@ -48,14 +51,15 @@ namespace ft
 
 		explicit vector(size_type n, const value_type &v = value_type(),
 						const allocator_type &alloc = allocator_type())
-			: _capacity(n), _size(n)
+			: _capacity(n), _size(n), _allocator(alloc)
 		{
 			std::cout << "vector size constructor\n";
 
 			// TODO: 이 생성자는 속도를 높이기 위해 첫 번째 요소만 생성한 후 나머지 n-1개의 요소는 복사 생성자를 호출하여 생성한다.
-			std::allocator<T> allocator = get_allocator();
-			_data = allocator.allocate((sizeof(value_type) * n));
-			allocator.construct(_data, v);
+			_data = _allocator.allocate((sizeof(value_type) * n));
+			for (size_type i = 0; i < _size; i++) {
+				_allocator.construct(&_data[i], v);
+			}
 			_begin = &_data[0];
 			_end = &_data[n];  // TODO: allocator에 의해 n보다 더 큰게 할당되서 가능한건가?
 		}
@@ -64,7 +68,7 @@ namespace ft
 		vector(InputIterator first, InputIterator last,
 			   const allocator_type &alloc = allocator_type(),
 			   typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type * = nullptr)
-			: _size(), _capacity(1)
+			: _size(), _capacity(1), _allocator(alloc)
 		{
 			// TODO: Forward와 input iterator를 구분하여 forward일 때 최적화를 시켜주도록 하자.
 			/**
@@ -75,32 +79,170 @@ namespace ft
 			typename iterator::difference_type d = last - first;
 			_size = d;
 			_capacity = d;
-			_data = get_allocator().allocate(sizeof(value_type) * d);
+			_data = _allocator.allocate(sizeof(value_type) * d);
 
 			for (size_type i = 0; first != last; first++, i++) {
-				get_allocator().construct(&_data[i], *first);
+				_allocator.construct(&_data[i], *first);
 			}
 			_begin = &_data[0];
 			_end = &_data[_size];
 			// ft::iterator_traits<iterator>::differency_type d = last - first;
-			// _data = get_allocator().allocate((sizeof(value_type) * d));
+			// _data = _allocator.allocate((sizeof(value_type) * d));
 			// memcpy()
 		}
 
-		// vector(const vector &x) { *this = x; }
+		vector(const vector &other) : _allocator(get_allocator())
+		{
+			_data = _allocator.allocate(sizeof(value_type) * _size);
+			*this = other;
+		}
+
+		vector &operator=(const vector &other)
+		{
+			for (size_type i = 0; i < other._size; i++) {
+				_allocator.destroy(&_data[i]);
+			}
+			reserve(other._capacity);
+			for (size_type i = 0; i < other._size; i++) {
+				_allocator.construct(&_data[i], other[i]);
+				std::cout << other[i] << std::endl;
+			}
+			this->_size = other._size;
+			return *this;
+		}
 
 		virtual ~vector()
 		{
 			std::cout << "vector destructor" << std::endl;
-			get_allocator().destroy(_data);
-			get_allocator().deallocate(_data, _capacity);
+			for (size_type i = 0; i < _size; i++) {
+				_allocator.destroy(&_data[i]);
+			}
+			_allocator.deallocate(_data, _capacity);
 		}
 
-		size_type capacity() const throw() {
+		reference operator[](size_type n)
+		{
+			return _data[n];
+		}
+		const_reference operator[](size_type n) const
+		{
+			return _data[n];
+		}
+		template <class InputIterator>
+		void assign(InputIterator first, InputIterator last,
+					typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
+		{
+			typename ft::iterator_traits<InputIterator>::difference_type distance = last - first;
+			if (distance > _capacity) {
+				reserve(distance);
+			}
+			for (size_type i = 0; i < distance; i++) {
+				_allocator.destroy(&_data[i]);
+			}
+			for (size_type i = 0; i < distance && first != end; i++, first++) {
+				_allocator.construct(&_data[i], *first);
+			}
+			_size = distance;
+		}
+
+		void assign(size_type n, const value_type &val)
+		{
+			if (n > max_size()) {
+				throw std::length_error("assign: Exceed on max size");
+			}
+			if (n > _capacity) {
+				reserve(n);
+			}
+			for (size_type i = 0; i < n; i++) {
+				_allocator.destroy(&_data[i]);
+			}
+			for (size_type i = 0; i < n; i++) {
+				_allocator.construct(&_data[i], val);
+			}
+			_size = n;
+		}
+		reference at(size_type n) throw(std::out_of_range)
+		{
+			if (n + 1 > _size) {
+				throw std::out_of_range("at: Out of bounds");
+			}
+			return _data[n];
+		}
+		const_reference at(size_type n) const throw(std::out_of_range)
+		{
+			if (n + 1 > _size) {
+				throw std::out_of_range("at: Out of bounds");
+			}
+			return _data[n];
+		}
+
+		void clear() throw()
+		{
+			_size = 0;
+		}
+
+		iterator erase(iterator position)
+		{
+			for (; (position + 1) != end(); position++) {
+				*position = *(position + 1);
+			}
+			_allocator.destroy(&(*position));
+			_size -= 1;
+		}
+		iterator erase(iterator first, iterator last)
+		{
+			typename iterator::difference_type distance = last - first;
+			for (; first != last; first++) {
+				if (first + distance != end()) {
+					*first = *(first + distance);
+				}
+			}
+			for (; last != end(); last++) {
+				_allocator.destroy(&(*last));
+			}
+			_size -= distance;
+		}
+		iterator insert(iterator position, const value_type &val)
+		{
+			iterator last;
+			for (; last != position; last--) {
+				*last = *(last - 1);
+			}
+		}
+		void insert(iterator position, size_type n, const value_type &val);
+		template <class InputIterator>
+		void insert(iterator position, InputIterator first, InputIterator last);
+
+		void reserve(size_type n) throw(std::length_error)
+		{
+			if (n > max_size())
+				throw std::length_error("reserve: Exceed on max size");
+			if (n > _capacity) {
+				for (size_type i = 0; i < _size; i++) {
+					_allocator.destroy(&_data[i]);
+				}
+				_allocator.deallocate(_data, _capacity);
+				_data = _allocator.allocate(sizeof(value_type) * n);
+				_capacity = n;
+			}
+		}
+
+		size_type max_size(void) throw()
+		{
+			return _allocator.max_size();
+		}
+
+		size_type capacity() const throw()
+		{
 			return _capacity;
 		}
+		size_type size() const throw()
+		{
+			return _size;
+		}
 
-		bool empty() const throw() {
+		bool empty() const throw()
+		{
 			return _size == 0;
 		}
 
@@ -141,7 +283,7 @@ namespace ft
 
 		allocator_type get_allocator(void) const throw()
 		{
-			return allocator_type();
+			return this->allocator;
 		};
 	};
 };
