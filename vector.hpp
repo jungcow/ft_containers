@@ -45,7 +45,6 @@ namespace ft
 		explicit vector(const allocator_type &alloc = allocator_type())
 			: _capacity(1), _size(0), _begin(NULL), _end(NULL), _allocator(alloc)
 		{
-			std::cout << "vector default constructor\n";
 			_data = NULL;
 		};
 
@@ -53,8 +52,6 @@ namespace ft
 						const allocator_type &alloc = allocator_type())
 			: _capacity(n), _size(n), _allocator(alloc)
 		{
-			std::cout << "vector size constructor\n";
-
 			// TODO: 이 생성자는 속도를 높이기 위해 첫 번째 요소만 생성한 후 나머지 n-1개의 요소는 복사 생성자를 호출하여 생성한다.
 			_data = _allocator.allocate((sizeof(value_type) * n));
 			for (size_type i = 0; i < _size; i++) {
@@ -74,9 +71,9 @@ namespace ft
 			/**
 			 * forward iterator일 땐, begin과 end에 단순히 대입하는 것으로?? 한번에??
 			 */
-			std::cout << "vector iterator constructor\n";
 
 			typename iterator::difference_type d = last - first;
+			// std::cout << "allocation size: " << d << std::endl;
 			_size = d;
 			_capacity = d;
 			_data = _allocator.allocate(sizeof(value_type) * d);
@@ -105,7 +102,6 @@ namespace ft
 			reserve(other._capacity);
 			for (size_type i = 0; i < other._size; i++) {
 				_allocator.construct(&_data[i], other[i]);
-				std::cout << other[i] << std::endl;
 			}
 			this->_size = other._size;
 			return *this;
@@ -113,7 +109,6 @@ namespace ft
 
 		virtual ~vector()
 		{
-			std::cout << "vector destructor" << std::endl;
 			for (size_type i = 0; i < _size; i++) {
 				_allocator.destroy(&_data[i]);
 			}
@@ -136,13 +131,15 @@ namespace ft
 			if (distance > _capacity) {
 				reserve(distance);
 			}
-			for (size_type i = 0; i < distance; i++) {
+			for (size_type i = 0; i < _size; i++) {
 				_allocator.destroy(&_data[i]);
 			}
-			for (size_type i = 0; i < distance && first != end; i++, first++) {
+			for (size_type i = 0; i < distance && first != last; i++, first++) {
 				_allocator.construct(&_data[i], *first);
 			}
 			_size = distance;
+			_begin = &_data[0];
+			_end = &_data[_size];
 		}
 
 		void assign(size_type n, const value_type &val)
@@ -153,13 +150,15 @@ namespace ft
 			if (n > _capacity) {
 				reserve(n);
 			}
-			for (size_type i = 0; i < n; i++) {
+			for (size_type i = 0; i < _size; i++) {
 				_allocator.destroy(&_data[i]);
 			}
 			for (size_type i = 0; i < n; i++) {
 				_allocator.construct(&_data[i], val);
 			}
 			_size = n;
+			_begin = &_data[0];
+			_end = &_data[_size];
 		}
 		reference at(size_type n) throw(std::out_of_range)
 		{
@@ -183,14 +182,17 @@ namespace ft
 
 		iterator erase(iterator position)
 		{
+			iterator ret = position + 1;
 			for (; (position + 1) != end(); position++) {
 				*position = *(position + 1);
 			}
 			_allocator.destroy(&(*position));
 			_size -= 1;
+			return ret;
 		}
 		iterator erase(iterator first, iterator last)
 		{
+			iterator ret = last;
 			typename iterator::difference_type distance = last - first;
 			for (; first != last; first++) {
 				if (first + distance != end()) {
@@ -201,6 +203,7 @@ namespace ft
 				_allocator.destroy(&(*last));
 			}
 			_size -= distance;
+			return ret;
 		}
 		iterator insert(iterator position, const value_type &val)
 		{
@@ -283,8 +286,20 @@ namespace ft
 
 		allocator_type get_allocator(void) const throw()
 		{
-			return this->allocator;
+			return this->_allocator;
 		};
+
+		void push_back(const value_type &val) {}
+		void pop_back() {}
+
+		void resize(size_type n, value_type val = value_type()) {}
+
+		reverse_iterator rbegin() {}
+		const_reverse_iterator rbegin() const {}
+		reverse_iterator rend() {}
+		const_reverse_iterator rend() const {}
+
+		void swap(vector &x) {}
 	};
 };
 #endif

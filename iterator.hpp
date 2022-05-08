@@ -101,22 +101,13 @@ namespace ft
 		iterator_type __base;
 
 	public:
-		reverse_iterator() : __base()
-		{
-			std::cout << "[ 'reverse' default constructor of iterator ]" << std::endl;
-		};
-		virtual ~reverse_iterator()
-		{
-			std::cout << "[ 'reverse' Destructor of iterator ]" << std::endl;
-		};
+		reverse_iterator() : __base(){};
+		virtual ~reverse_iterator(){};
 
 		explicit reverse_iterator(const iterator_type& other) : __base(other){};
 
 		template <class OtherIter>
-		reverse_iterator(const reverse_iterator<OtherIter>& other) : __base(other.base())
-		{
-			std::cout << "[ 'reverse' copy constructor of iterator ]" << std::endl;
-		};
+		reverse_iterator(const reverse_iterator<OtherIter>& other) : __base(other.base()){};
 
 		reverse_iterator::reference operator*(void) const { return *__base; }
 		reference operator[](difference_type n) const { return __base[-n - 1]; }
@@ -210,38 +201,31 @@ namespace ft
 	template <class Iter>
 	inline bool operator>(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs)
 	{
-		std::cout << "operator >" << std::endl;
 		return (lhs.base() < rhs.base());
 	}
 	template <class Iter>
 	inline bool operator>=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs)
 	{
-		std::cout << "operator >=" << std::endl;
-
 		return (lhs.base() <= rhs.base());
 	}
 	template <class Iter>
 	inline bool operator==(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs)
 	{
-		std::cout << "operator ==" << std::endl;
 		return (lhs.base() == rhs.base());
 	}
 	template <class Iter>
 	inline bool operator<(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs)
 	{
-		std::cout << "operator <" << std::endl;
 		return (rhs > lhs);
 	}
 	template <class Iter>
 	inline bool operator<=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs)
 	{
-		std::cout << "operator <=" << std::endl;
 		return (rhs >= lhs);
 	}
 	template <class Iter>
 	inline bool operator!=(const reverse_iterator<Iter>& lhs, const reverse_iterator<Iter>& rhs)
 	{
-		std::cout << "operator !=" << std::endl;
 		return !(lhs == rhs);
 	}
 
@@ -271,19 +255,13 @@ namespace ft
 		/**
 		 * 	Constructor
 		 */
-		__wrap_iter()
-		{
-			std::cout << "[ Default constructor of iterator ]" << std::endl;
-		};
+		__wrap_iter(){};
 		// TODO: __iter는 단지 data를 가리키고 있을 뿐 -> 따라서 desctructor에서도 할 일이 없나?
-		virtual ~__wrap_iter()
-		{
-			std::cout << "[ Destructor of iterator ]" << std::endl;
-		};
+		virtual ~__wrap_iter(){};
 
 		// TODO: 원본에는 explicit 키워드가 안붙어져 있다.
 		// TODO: 인자를 하나만 받을 때는 암시적 변환에 주의해야 하므로 ft 버전엔 붙여줄지 말지 고민해보자.
-		explicit __wrap_iter(iterator_type& other) : __iter(other){};
+		__wrap_iter(const iterator_type& other) : __iter(other){};
 
 		/**
 		 * Copy Constructor
@@ -296,10 +274,7 @@ namespace ft
 		 */
 		template <class _Up>
 		__wrap_iter(const __wrap_iter<_Up, typename ft::enable_if<
-											   ft::is_same<_Up, typename Container::pointer>::value, Container>::type>& other) : __iter(other.base())
-		{
-			std::cout << "[ copy constructor of iterator ]" << std::endl;
-		};
+											   ft::is_same<_Up, typename Container::pointer>::value, Container>::type>& other) : __iter(other.base()){};
 
 		reference operator*() const { return *__iter; }
 		pointer operator->() const { return &(this->operator*()); }
@@ -335,14 +310,12 @@ namespace ft
 		 */
 		__wrap_iter operator+(difference_type n) const
 		{
-			std::cout << "operator+" << std::endl;
 			__wrap_iter tmp = *this;
 			tmp += n;
 			return tmp;
 		}
 		__wrap_iter operator-(difference_type n) const
 		{
-			std::cout << "operator-" << std::endl;
 			__wrap_iter tmp = *this;
 			tmp -= n;
 			return tmp;
@@ -355,19 +328,16 @@ namespace ft
 		typename __wrap_iter<OtherIter, Cont>::difference_type
 		operator-(const __wrap_iter<OtherIter, Cont>& rfs) const
 		{
-			std::cout << "iter1 - iter2" << std::endl;
 			return this->base() - rfs.base();
 		}
 
 		__wrap_iter operator+=(difference_type n)
 		{
-			std::cout << "operator+=" << std::endl;
 			this->__iter += n;
 			return *this;
 		}
 		__wrap_iter operator-=(difference_type n)
 		{
-			std::cout << "operator-=" << std::endl;
 			this->__iter -= n;
 			return *this;
 		}
@@ -411,45 +381,37 @@ namespace ft
 	template <class Iter1, class Iter2, class Cont>
 	inline bool operator>(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs)
 	{
-		std::cout << "operator >" << std::endl;
 		return (lhs.base() > rhs.base());
 	}
 	template <class Iter1, class Iter2, class Cont>
 	inline bool operator>=(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs)
 	{
-		std::cout << "operator >=" << std::endl;
-
 		return (lhs.base() >= rhs.base());
 	}
 	template <class Iter1, class Iter2, class Cont>
 	inline bool operator==(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs)
 	{
-		std::cout << "operator ==" << std::endl;
 		return (lhs.base() == rhs.base());
 	}
 	template <class Iter1, class Iter2, class Cont>
 	inline bool operator<(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs)
 	{
-		std::cout << "operator <" << std::endl;
 		return (rhs > lhs);
 	}
 	template <class Iter1, class Iter2, class Cont>
 	inline bool operator<=(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs)
 	{
-		std::cout << "operator <=" << std::endl;
 		return (rhs >= lhs);
 	}
 	template <class Iter1, class Iter2, class Cont>
 	inline bool operator!=(const __wrap_iter<Iter1, Cont>& lhs, const __wrap_iter<Iter2, Cont>& rhs)
 	{
-		std::cout << "operator !=" << std::endl;
 		return !(lhs == rhs);
 	}
 
 	template <class Iter, class Cont>
 	inline __wrap_iter<Iter, Cont> operator+(typename __wrap_iter<Iter, Cont>::difference_type n, const __wrap_iter<Iter, Cont>& iter)
 	{
-		std::cout << "non-member operator+" << std::endl;
 		return iter + n;
 	}
 };
