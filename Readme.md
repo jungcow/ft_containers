@@ -63,7 +63,7 @@
   - [x] get_allocator
   - [ ] insert
     - [ ] push_back
-  - [ ] max_size
+  - [x] max_size
   - [x] operator=
   - [x] operator[]
   - [ ] pop_back
