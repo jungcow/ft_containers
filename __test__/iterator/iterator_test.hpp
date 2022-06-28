@@ -1,7 +1,7 @@
 #ifndef __ITERATOR_TEST_H__
 #define __ITERATOR_TEST_H__
 
-#include "../tester_base.hpp"
+#include "../method_tester.hpp"
 
 class IteratorTest
 {
@@ -13,12 +13,13 @@ public:
 	 */
 
 	template <class Result, class T>
-	MemberFunctionTest<Result, T>* given(Result (T::*pm)())
+	MethodTester<Result, T> given(Result (T::*pm)())
 	{
-		MemberFunctionTest<Result, T>* mft;
+		// MethodTester<Result, T>* mft;
 
-		mft = new MemberFunctionTest<Result, T>(pm);
-		return mft;
+		// mft = new MethodTester<Result, T>(pm);
+		// return mft;
+		return (MethodTester<Result, T>(pm));
 	}
 	/**
 	 * overload: given(2)
@@ -26,21 +27,22 @@ public:
 	 * description: member function이 const member function인지 아닌지에 따라 오버로딩 함
 	 */
 	template <class Result, class T>
-	MemberFunctionTest<Result, T>* given(Result (T::*pm)() const)
+	MethodTester<Result, T> given(Result (T::*pm)() const)
 	{
-		MemberFunctionTest<Result, T>* mft;
+		// MethodTester<Result, T>* mft;
 
-		mft = new MemberFunctionTest<Result, T>(pm);
-		return mft;
+		// mft = new MethodTester<Result, T>(pm);
+		// return mft;
+		return (MethodTester<Result, T>(pm));
 	}
 
-	template <typename... Args>
-	IteratorTest* when(Args... args)
-	{
-		std::cout << "hihi" << std::endl;
-		mem_func(args...);
-		return this;
-	}
+	// template <typename... Args>
+	// IteratorTest* when(Args... args)
+	// {
+	// 	std::cout << "hihi" << std::endl;
+	// 	mem_func(args...);
+	// 	return this;
+	// }
 };
 
 #endif

@@ -17,6 +17,10 @@ public:
 	{
 		tester = new TesterType();
 	}
+	~Tester()
+	{
+		delete tester;
+	}
 
 	TesterType* operator->()
 	{
