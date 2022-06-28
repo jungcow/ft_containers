@@ -1,5 +1,5 @@
-#ifndef __TESTER_BASE_H__
-#define __TESTER_BASE_H__
+#ifndef __CONST_METHOD_TESTER_H__
+#define __CONST_METHOD_TESTER_H__
 
 #include <chrono>
 #include <functional>
@@ -9,19 +9,19 @@
 #include "./tester_result.hpp"
 
 template <class Result, class T>
-class MethodTester : public MethodTesterBase<Result, T>
+class ConstMethodTester : public MethodTesterBase<Result, T>
 {
 private:
-	typedef Result (T::*t_pMemFunc)();
-	t_pMemFunc pMemfunc;
+	typedef Result (T::*t_pMemFuncConst)() const;
+	t_pMemFuncConst pMemfuncConst;
 
 public:
-	MethodTester(t_pMemFunc pm) : pMemfunc(pm) {}
+	ConstMethodTester(t_pMemFuncConst pm) : pMemfuncConst(pm) {}
 
-	Result operator()(T* pObj)
+	const Result operator()(T* pObj) const
 	{
-		std::cout << "operator () overloaded in methodTester" << std::endl;
-		return (pObj->*pMemfunc)();
+		std::cout << "operator () overloaded in const methodtester" << std::endl;
+		return (pObj->*pMemfuncConst)();
 	}
 
 	TesterResult<Result>* when(void)
@@ -30,17 +30,17 @@ public:
 		T* tmp;
 
 		this->startTime = steady_clock::now();
-		Result result = (tmp->*pMemfunc)();
+		Result result = (tmp->*pMemfuncConst)();
 		this->endTime = steady_clock::now();
 
 		return (new TesterResult<Result>(result, this->endTime - this->startTime));
 	}
 	// template <typename... Args>
 	// template <typename T>
-	// MethodTester* when(T args)
+	// ConstMethodTester* when(T args)
 	// {
 	// 	std::cout << "hihi" << std::endl;
-	// 	pMemfunc(args);
+	// 	t_pMemFuncConst(args);
 	// 	return this;
 	// }
 };

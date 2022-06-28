@@ -1,10 +1,11 @@
-#ifndef __ITERATOR_TEST_H__
-#define __ITERATOR_TEST_H__
+#ifndef __TESTER_TYPE_BASE_H__
+#define __TESTER_TYPE_BASE_H__
 
-#include "../const_method_tester.hpp"
-#include "../method_tester.hpp"
+#include "const_method_tester.hpp"
+#include "method_tester.hpp"
 
-class IteratorTest
+#if 0
+class TesterTypeBase
 {
 public:
 	/**
@@ -28,5 +29,6 @@ public:
 		return (new ConstMethodTester<Result, T>(pm));
 	}
 };
+#endif
 
 #endif

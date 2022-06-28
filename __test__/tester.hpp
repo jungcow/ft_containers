@@ -7,8 +7,6 @@ template <class TesterType>
 class Tester
 {
 private:
-	std::chrono::steady_clock::time_point begin;
-	std::chrono::steady_clock::time_point end;
 
 	TesterType* tester;
 
