@@ -16,41 +16,41 @@
   - [ ] copy constructor
   - [ ] destructor
   - member function
-    - [ ] range assign
-    - [ ] fill assign
-    - [ ] at
-    - [ ] const at
-    - [ ] back
-    - [ ] const back
-    - [ ] begin
-    - [ ] const begin
-    - [ ] capacity
-    - [ ] clear
-    - [ ] empty
-    - [ ] end
-    - [ ] const end
+    - [x] range assign
+    - [x] fill assign
+    - [x] at
+    - [x] const at
+    - [x] back
+    - [x] const back
+    - [x] begin
+    - [x] const begin
+    - [x] capacity
+    - [x] clear
+    - [x] empty
+    - [x] end
+    - [x] const end
     - [x] erase(1)
     - [x] erase(2)
-    - [ ] front
-    - [ ] const front
-    - [ ] get_allocator
-    - [ ] single element insert
-    - [ ] fill insert
-    - [ ] range insert
-    - [ ] max_size
-    - [ ] operator=
-    - [ ] operator[]
-    - [ ] const operator[]
-    - [ ] pop_back
-    - [ ] push_back
-    - [ ] rbegin
-    - [ ] const rbegin
-    - [ ] rend
-    - [ ] const rend
-    - [ ] reserve
-    - [ ] resize
-    - [ ] size
-    - [ ] swap
+    - [x] front
+    - [x] const front
+    - [x] get_allocator
+    - [x] single element insert
+    - [x] fill insert
+    - [x] range insert
+    - [x] max_size
+    - [x] operator=
+    - [x] operator[]
+    - [x] const operator[]
+    - [x] pop_back
+    - [x] push_back
+    - [x] rbegin
+    - [x] const rbegin
+    - [x] rend
+    - [x] const rend
+    - [x] reserve
+    - [x] resize
+    - [x] size
+    - [x] swap
   - non-member function
     - [ ] operator==
     - [ ] operator!=
