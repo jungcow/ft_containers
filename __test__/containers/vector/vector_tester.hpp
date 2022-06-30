@@ -4,8 +4,8 @@
 #include <iostream>
 
 #include "./method/vector_assign.hpp"
-#if 0
 #include "./method/vector_at.hpp"
+#if 0
 #include "./method/vector_back.hpp"
 #include "./method/vector_begin.hpp"
 #include "./method/vector_capacity.hpp"
@@ -39,6 +39,8 @@ namespace Test
 
 		VectorMethod::Erase erase() { return (VectorMethod::Erase()); }
 		VectorMethod::Assign assign() { return (VectorMethod::Assign()); }
+		VectorMethod::At at() { return (VectorMethod::At()); }
+		VectorMethod::AtConst at_const() { return (VectorMethod::AtConst()); }
 	};
 }
 

@@ -3,10 +3,8 @@
 
 #include "../../global/tester_result.hpp"
 #include "../../global/tester_util.hpp"
-#include "../../global/type.hpp"
 #include "../base/method_base.hpp"
 #include "../base/vector_given_base.hpp"
-#include "type.hpp"
 
 namespace Test
 {
@@ -35,7 +33,7 @@ public:
 	template <class InputIterator>
 	Test::TesterResult<void> when(InputIterator first, InputIterator last)
 	{
-		return (Test::TesterUtil()
+		return (Test::TesterUtil<void>()
 					.impl<Cont,
 						  InputIterator,
 						  InputIterator>(this->c, &Cont::assign, first, last));
@@ -43,7 +41,7 @@ public:
 
 	Test::TesterResult<void> when(typename __base::size_type n, typename __base::value_type& val)
 	{
-		return (Test::TesterUtil()
+		return (Test::TesterUtil<void>()
 					.impl<Cont,
 						  typename __base::size_type,
 						  typename __base::const_reference>(this->c, &Cont::assign, n, val));

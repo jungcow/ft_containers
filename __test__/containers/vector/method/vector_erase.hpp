@@ -3,7 +3,6 @@
 
 #include "../../global/tester_result.hpp"
 #include "../../global/tester_util.hpp"
-#include "../../global/type.hpp"
 #include "../base/method_base.hpp"
 #include "../base/vector_given_base.hpp"
 
@@ -32,18 +31,16 @@ public:
 
 	Test::TesterResult<typename __base::iterator> when(typename __base::iterator position)
 	{
-		return (Test::TesterUtil()
-					.impl<Cont,
-						  typename __base::iterator,
-						  typename __base::const_iterator>(this->c, &Cont::erase, position));
+		return (Test::TesterUtil<typename __base::iterator>()
+					.template impl<Cont,
+								   typename __base::const_iterator>(this->c, &Cont::erase, position));
 	}
 	Test::TesterResult<typename __base::iterator> when(typename __base::iterator first, typename __base::iterator last)
 	{
-		return (Test::TesterUtil()
-					.impl<Cont,
-						  typename __base::iterator,
-						  typename __base::const_iterator,
-						  typename __base::const_iterator>(this->c, &Cont::erase, first, last));
+		return (Test::TesterUtil<typename __base::iterator>()
+					.template impl<Cont,
+								   typename __base::const_iterator,
+								   typename __base::const_iterator>(this->c, &Cont::erase, first, last));
 	}
 };
 

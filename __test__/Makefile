@@ -5,12 +5,12 @@ INC			=	-I./global \
 				-I./containers/base\
 				-I./containers/vector\
 				-I./containers/vector/method\
-				-I./containers/map	
+				-I./containers/map
 
 CXX			=	clang++
 
 CXXFLAGS	=	-pedantic\
-				-std=c++11
+				-std=c++11 #-D TYPE=1
 
 LFLAGS		=	#-lgtest -lgtest_main
 

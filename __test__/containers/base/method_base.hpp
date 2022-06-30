@@ -11,9 +11,9 @@ namespace Test
 	{
 	public:
 		template <class Cont>
-		Test::Base::VectorGivenBase<Cont>* given(Cont c)
+		Test::Base::VectorGivenBase<Cont> given(Cont c)
 		{
-			return new Base::VectorGivenBase<Cont>(c);
+			return Base::VectorGivenBase<Cont>(c);
 		}
 	};
 }

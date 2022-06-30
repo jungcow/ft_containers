@@ -3,6 +3,7 @@
 
 #include "containers/vector/vector_tester.hpp"
 #include "global/tester.hpp"
+#include "type.hpp"
 
 using namespace Test;
 
@@ -64,4 +65,18 @@ int main(void)
 			  << std::endl;
 	std::cout << "size: " << vec.size() << std::endl;
 	std::cout << "vec[3]: " << vec[3] << std::endl;
+
+	std::cout << "\n[ At Tester ]" << std::endl;
+	std::cout << vtester->at()
+					 .given(vec)
+					 .when(3)
+					 .info<NANOSECONDS>()
+			  << std::endl;
+	const std::vector<double> atconstvec(3, 3);
+	size_t i = 0;
+	std::cout << vtester->at_const()
+					 .given(atconstvec)
+					 .when(i)
+					 .info<NANOSECONDS>()
+			  << std::endl;
 }
