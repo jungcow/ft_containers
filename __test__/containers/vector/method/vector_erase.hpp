@@ -4,8 +4,8 @@
 #include "../../global/tester_result.hpp"
 #include "../../global/tester_util.hpp"
 #include "../../global/type.hpp"
-#include "../base/given_base.hpp"
 #include "../base/method_base.hpp"
+#include "../base/vector_given_base.hpp"
 
 namespace Test
 {
@@ -22,37 +22,36 @@ namespace Test
 }
 
 template <class Cont>
-class VectorUtil::EraseGiven : public Test::Base::GivenBase<Cont>
+class Test::VectorUtil::EraseGiven : public Test::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef typename Cont::iterator iterator;
-	typedef typename Cont::const_iterator const_iterator;
+	typedef Test::Base::VectorGivenBase<Cont> __base;
 
 public:
-	EraseGiven(Cont& input) : Test::Base::GivenBase<Cont>(input) {}
+	EraseGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
 
-	Test::TesterResult<iterator> when(iterator position)
+	Test::TesterResult<typename __base::iterator> when(typename __base::iterator position)
 	{
 		return (Test::TesterUtil()
 					.impl<Cont,
-						  iterator,
-						  const_iterator>(this->c, &Cont::erase, position));
+						  typename __base::iterator,
+						  typename __base::const_iterator>(this->c, &Cont::erase, position));
 	}
-	Test::TesterResult<iterator> when(iterator first, iterator last)
+	Test::TesterResult<typename __base::iterator> when(typename __base::iterator first, typename __base::iterator last)
 	{
 		return (Test::TesterUtil()
 					.impl<Cont,
-						  iterator,
-						  const_iterator,
-						  const_iterator>(this->c, &Cont::erase, first, last));
+						  typename __base::iterator,
+						  typename __base::const_iterator,
+						  typename __base::const_iterator>(this->c, &Cont::erase, first, last));
 	}
 };
 
-class VectorMethod::Erase : public MethodBase
+class Test::VectorMethod::Erase : public Test::MethodBase
 {
 public:
 	template <class Cont>
-	VectorUtil::EraseGiven<Cont> given(Cont& c)
+	Test::VectorUtil::EraseGiven<Cont> given(Cont& c)
 	{
 		return (VectorUtil::EraseGiven<Cont>(c));
 	}

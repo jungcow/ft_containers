@@ -4,8 +4,8 @@
 #include "../../global/tester_result.hpp"
 #include "../../global/tester_util.hpp"
 #include "../../global/type.hpp"
-#include "../base/given_base.hpp"
 #include "../base/method_base.hpp"
+#include "../base/vector_given_base.hpp"
 #include "type.hpp"
 
 namespace Test
@@ -23,15 +23,13 @@ namespace Test
 }
 
 template <class Cont>
-class VectorUtil::AssignGiven : public Test::Base::GivenBase<Cont>
+class Test::VectorUtil::AssignGiven : public Test::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef typename Cont::size_type size_type;
-	typedef typename Cont::value_type value_type;
-	typedef typename Cont::const_reference const_reference;
+	typedef Test::Base::VectorGivenBase<Cont> __base;
 
 public:
-	AssignGiven(Cont& input) : Test::Base::GivenBase<Cont>(input) {}
+	AssignGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: exception 관리
 	template <class InputIterator>
@@ -43,18 +41,16 @@ public:
 						  InputIterator>(this->c, &Cont::assign, first, last));
 	}
 
-	Test::TesterResult<void> when(size_type n, value_type& val)
+	Test::TesterResult<void> when(typename __base::size_type n, typename __base::value_type& val)
 	{
-		// std::cout << "const_reference: " << type(const_reference()) << std::endl;
-		// std::cout << "value_type&: " << type(val) << std::endl;
 		return (Test::TesterUtil()
 					.impl<Cont,
-						  size_type,
-						  const_reference>(this->c, &Cont::assign, n, val));
+						  typename __base::size_type,
+						  typename __base::const_reference>(this->c, &Cont::assign, n, val));
 	}
 };
 
-class VectorMethod::Assign : public MethodBase
+class Test::VectorMethod::Assign : public MethodBase
 {
 public:
 	template <class Cont>

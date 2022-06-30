@@ -56,6 +56,7 @@ int main(void)
 	std::cout << "vec[3]: " << vec[3] << std::endl;
 
 	std::vector<double> assign_vec(1000, 8.8);
+
 	std::cout << vtester->assign()
 					 .given(vec)
 					 .when(assign_vec.begin(), assign_vec.end())

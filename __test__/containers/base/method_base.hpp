@@ -3,18 +3,19 @@
 
 #include <chrono>
 
-#include "./given_base.hpp"
+#include "./vector_given_base.hpp"
 
-using namespace Test;
-
-class MethodBase
+namespace Test
 {
-public:
-	template <class Cont>
-	Base::GivenBase<Cont>* given(Cont c)
+	class MethodBase
 	{
-		return new Base::GivenBase<Cont>(c);
-	}
-};
+	public:
+		template <class Cont>
+		Test::Base::VectorGivenBase<Cont>* given(Cont c)
+		{
+			return new Base::VectorGivenBase<Cont>(c);
+		}
+	};
+}
 
 #endif
