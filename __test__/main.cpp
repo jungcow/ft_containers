@@ -1,60 +1,83 @@
-#include <gtest/gtest.h>
-
 #include <iostream>
+#include <vector>
 
-#include "iterator/iterator_test.hpp"
-#include "tester.hpp"
+#include "containers/vector/vector_tester.hpp"
+#include "global/tester.hpp"
 
-class A
+using namespace Test;
+
+void hello(void)
 {
-public:
-	static const int i = 3;
-
-	double getInt()
-	{
-		int k = 0;
-		while (k < 50000000)
-		{
-			k++;
-		}
-		return k;
-	}
-};
-
-TEST(ExampleSuite, Example)
-{
-	Tester<IteratorTest> iterator_tester;
-	typedef std::reverse_iterator<int *> rev_iter;
-
-	std::cout << '\n';
-
-	iterator_tester->given(&rev_iter::base)->when();
-	iterator_tester->given(&A::getInt)->when();
-
-	int *i;
-	if (iterator_tester->given(&rev_iter::base)->when()->then(i))
-		std::cout << "pass" << std::endl;
-	else
-		std::cout << "fail" << std::endl;
-
-	if (iterator_tester->given(&A::getInt)->when()->then(50000000))
-		std::cout << "pass" << std::endl;
-	else
-		std::cout << "fail" << std::endl;
-	std::cout << iterator_tester->given(&A::getInt)->when()->info<>() << std::endl;
-	std::cout << iterator_tester->given(&A::getInt)->when()->info<MILLISECONDS>() << std::endl;
-	std::cout << iterator_tester->given(&A::getInt)->when()->info<MICROSECONDS>() << std::endl;
-	std::cout << iterator_tester->given(&A::getInt)->when()->info<NANOSECONDS>() << std::endl;
-	/**
-	 * another usage:
-	 * MethodTester<double, A> *mt;
-	 * mt = iterator_tester->given(&A::getInt);
-	 * (*mt)(&a);
-	 */
+	system("leaks container_tester");
 }
 
-int main(int argc, char **argv)
+int main(void)
 {
-	testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+#if LEAKS
+	atexit(hello);
+#endif
+
+	Tester<VectorTester> vtester;
+	std::vector<double> vec(10, 8);
+	std::vector<double>::iterator vi;
+	std::vector<double>::iterator from;
+	std::vector<double>::iterator to;
+
+	vi = vec.begin() + 1;
+	from = vec.begin() + 2;
+	to = vec.end() - 3;
+
+	std::cout << vec.size() << std::endl;
+
+	std::cout << vtester->erase()
+					 .given(vec)
+					 .when(vi)
+					 .info<NANOSECONDS>()
+			  << std::endl;
+
+	std::cout << vec.size() << std::endl;
+
+	std::cout << vtester->erase()
+					 .given(vec)
+					 .when(from, to)
+					 .info<NANOSECONDS>()
+			  << std::endl;
+
+	std::cout << vec.size() << std::endl;
 }
+
+#if 0
+.PHONY		: all re clean fclean
+NAME			=	ScalarConversion
+CXX				=	clang++
+CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98
+
+SRCS			=	main.cpp \
+						ScalarType.cpp \
+						detectScalarType.cpp \
+						convertScalarType.cpp \
+						outputScalarType.cpp
+
+OBJS			=	$(SRCS:.cpp=.o)
+
+DEPS			=	$(OBJS:.o=.d)
+
+all				:	$(NAME)
+
+$(NAME)		:	$(OBJS)
+					$(CXX) $(CXXFLAGS) $^ -o $@
+
+%.o				:	%.cpp
+					$(CXX) $(CXXFLAGS) -c $< -o $@ -MD
+
+clean			:
+					rm -rf $(OBJS) $(DEPS)
+
+fclean		:	clean
+					rm -rf $(NAME)
+
+re				:	fclean all
+
+-include $(DEPS)
+
+#endif

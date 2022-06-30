@@ -2,11 +2,12 @@
 #define __TESTER_INFO_H__
 
 #include <chrono>
+#include <string>
 #include <type_traits>
 
-typedef std::chrono::milliseconds	MILLISECONDS;
-typedef std::chrono::microseconds	MICROSECONDS;
-typedef std::chrono::nanoseconds	NANOSECONDS;
+typedef std::chrono::milliseconds MILLISECONDS;
+typedef std::chrono::microseconds MICROSECONDS;
+typedef std::chrono::nanoseconds NANOSECONDS;
 
 class TesterInfo
 {

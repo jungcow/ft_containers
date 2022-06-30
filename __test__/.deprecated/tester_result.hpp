@@ -1,7 +1,7 @@
 #ifndef __TESTER_RESULT_H__
 #define __TESTER_RESULT_H__
 
-#include <algorithm>
+// #include <algorithm>
 #include <chrono>
 
 #include "tester_info.hpp"
@@ -24,12 +24,11 @@ public:
 		return false;
 	}
 
-	// bool then_if(Result a, /* functor f*/ void f)
-	// {
-	// }
-	// bool then_if(Result a, /* functor f*/ void f)
-	// {
-	// }
+	template <typename F>
+	bool then_if(Result a, F pred)
+	{
+		return pred(a);
+	}
 
 	template <class timeunit = std::chrono::duration<double> >
 	std::string info()

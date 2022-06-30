@@ -1,17 +1,65 @@
 ## TODO
 
 ### Unit Test Library 구현하기
-#### 멤버 함수 테스터
-  - given 메서드
-    - [ ] 각 테스터 타입에 추가되는 테스트 종류 구현(중요도:하)
-  - when 메서드
-    - [x] 인자가 없는 member function tester 구현
-    - [ ] n개의 인자가 오는 member function tester 구현
-  - then 메서드
-    - [ ] then_if메서드 구현 - 커스텀 비교 함수를 통한 검증 구현 (find_if 참고)
-  - info 메서드
+#### 테스터 뼈대 구성
+- [ ] non-member 함수 테스터 뼈대 구성
+- then 메서드
+  - [ ] then_if메서드 구현 - 커스텀 비교 함수를 통한 검증 구현 (find_if 참고)
+- info 메서드
+  - 반환하는 정보를 좀 더 다듬기(형식이 보이게끔)
 - 타입정보 테스터
   - [ ] 가능한지 보고 어떻게 구성하는게 나을찌 구상해보기
+- vector
+  - [ ] default constructor
+  - [ ] fill constructor
+  - [ ] range constructor
+  - [ ] copy constructor
+  - [ ] destructor
+  - member function
+    - [ ] range assign
+    - [ ] fill assign
+    - [ ] at
+    - [ ] const at
+    - [ ] back
+    - [ ] const back
+    - [ ] begin
+    - [ ] const begin
+    - [ ] capacity
+    - [ ] clear
+    - [ ] empty
+    - [ ] end
+    - [ ] const end
+    - [x] erase(1)
+    - [x] erase(2)
+    - [ ] front
+    - [ ] const front
+    - [ ] get_allocator
+    - [ ] single element insert
+    - [ ] fill insert
+    - [ ] range insert
+    - [ ] max_size
+    - [ ] operator=
+    - [ ] operator[]
+    - [ ] const operator[]
+    - [ ] pop_back
+    - [ ] push_back
+    - [ ] rbegin
+    - [ ] const rbegin
+    - [ ] rend
+    - [ ] const rend
+    - [ ] reserve
+    - [ ] resize
+    - [ ] size
+    - [ ] swap
+  - non-member function
+    - [ ] operator==
+    - [ ] operator!=
+    - [ ] operaotr<
+    - [ ] operator<=
+    - [ ] operator>
+    - [ ] operator>=
+    - [ ] swap
+
 
 #### Makefile 구성하기
   - [ ] Makefile Safe 플래그 구현 -> 비정상적인 종료를 방지 (되면 하고, 안되면 하지 말고)

@@ -7,7 +7,6 @@ template <class TesterType>
 class Tester
 {
 private:
-
 	TesterType* tester;
 
 public:
