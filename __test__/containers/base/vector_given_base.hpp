@@ -2,6 +2,7 @@
 #define __GIVEN_BASE_H__
 
 #include <chrono>
+#include "type.hpp"
 
 namespace Test
 {

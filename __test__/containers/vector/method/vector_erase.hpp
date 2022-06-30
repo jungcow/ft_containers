@@ -29,12 +29,15 @@ private:
 public:
 	EraseGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
 
+	// TODO: UB 관리
 	Test::TesterResult<typename __base::iterator> when(typename __base::iterator position)
 	{
 		return (Test::TesterUtil<typename __base::iterator>()
 					.template impl<Cont,
 								   typename __base::const_iterator>(this->c, &Cont::erase, position));
 	}
+
+	// TODO: UB 관리
 	Test::TesterResult<typename __base::iterator> when(typename __base::iterator first, typename __base::iterator last)
 	{
 		return (Test::TesterUtil<typename __base::iterator>()

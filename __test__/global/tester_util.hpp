@@ -75,6 +75,26 @@ namespace Test
 			this->endTime = std::chrono::steady_clock::now();
 			return (Test::TesterResult<Result>(result, this->endTime - this->startTime));
 		}
+		/**
+		 * method with three parameter(1)
+		 * const method with three parameter(2)
+		 */
+		template <class Cont, class Arg1, class Arg2, class Arg3>
+		Test::TesterResult<Result> impl(Cont& c, Result (Cont::*pm)(Arg1, Arg2, Arg3), Arg1 a1, Arg2 a2, Arg3 a3)
+		{
+			this->startTime = std::chrono::steady_clock::now();
+			Result result = (c.*pm)(a1, a2, a3);
+			this->endTime = std::chrono::steady_clock::now();
+			return (Test::TesterResult<Result>(result, this->endTime - this->startTime));
+		}
+		template <class Cont, class Arg1, class Arg2, class Arg3>
+		Test::TesterResult<Result> impl(Cont& c, Result (Cont::*pm)(Arg1, Arg2, Arg3) const, Arg1 a1, Arg2 a2, Arg3 a3)
+		{
+			this->startTime = std::chrono::steady_clock::now();
+			Result result = (c.*pm)(a1, a2, a3);
+			this->endTime = std::chrono::steady_clock::now();
+			return (Test::TesterResult<Result>(result, this->endTime - this->startTime));
+		}
 	};
 	template <>
 	class TesterUtil<void>
@@ -144,6 +164,27 @@ namespace Test
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			(c.*pm)(a1, a2);
+			this->endTime = std::chrono::steady_clock::now();
+			return (Test::TesterResult<void>(this->endTime - this->startTime));
+		}
+
+		/**
+		 * method with three parameter(1)
+		 * const method with three parameter(2)
+		 */
+		template <class Cont, class Arg1, class Arg2, class Arg3>
+		Test::TesterResult<void> impl(Cont& c, void (Cont::*pm)(Arg1, Arg2, Arg3), Arg1 a1, Arg2 a2, Arg3 a3)
+		{
+			this->startTime = std::chrono::steady_clock::now();
+			(c.*pm)(a1, a2, a3);
+			this->endTime = std::chrono::steady_clock::now();
+			return (Test::TesterResult<void>(this->endTime - this->startTime));
+		}
+		template <class Cont, class Arg1, class Arg2, class Arg3>
+		Test::TesterResult<void> impl(Cont& c, void (Cont::*pm)(Arg1, Arg2, Arg3) const, Arg1 a1, Arg2 a2, Arg3 a3)
+		{
+			this->startTime = std::chrono::steady_clock::now();
+			(c.*pm)(a1, a2, a3);
 			this->endTime = std::chrono::steady_clock::now();
 			return (Test::TesterResult<void>(this->endTime - this->startTime));
 		}

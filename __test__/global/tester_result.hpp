@@ -44,12 +44,19 @@ namespace Test
 	class TesterResult<void> : public TesterInfo
 	{
 	private:
-		// 	Result result;
 		std::chrono::duration<double> sec;
 
 	public:
 		TesterResult() : sec(-1) {}
 		TesterResult(const std::chrono::duration<double>& timespan) : sec(timespan) {}
+
+		template <class timeunit = std::chrono::duration<double> >
+		std::string info()
+		{
+			if (sec.count() < 0)
+				return (std::string("This test doesn't check time duration"));
+			return (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
+		}
 
 		// 	bool then(Result a)
 		// 	{
@@ -63,14 +70,6 @@ namespace Test
 		// 	{
 		// 		return pred(a);
 		// 	}
-
-			template <class timeunit = std::chrono::duration<double> >
-			std::string info()
-			{
-				if (sec.count() < 0)
-					return (std::string("This test doesn't check time duration"));
-				return (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
-			}
 	};
 }
 
