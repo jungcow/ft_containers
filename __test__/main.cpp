@@ -17,6 +17,7 @@ int main(void)
 	atexit(hello);
 #endif
 
+	std::cout << "\n[ Erase Tester ]" << std::endl;
 	Tester<VectorTester> vtester;
 	std::vector<double> vec(10, 8);
 	std::vector<double>::iterator vi;
@@ -28,7 +29,6 @@ int main(void)
 	to = vec.end() - 3;
 
 	std::cout << vec.size() << std::endl;
-
 	std::cout << vtester->erase()
 					 .given(vec)
 					 .when(vi)
@@ -36,48 +36,31 @@ int main(void)
 			  << std::endl;
 
 	std::cout << vec.size() << std::endl;
-
 	std::cout << vtester->erase()
 					 .given(vec)
 					 .when(from, to)
 					 .info<NANOSECONDS>()
 			  << std::endl;
-
 	std::cout << vec.size() << std::endl;
+
+	std::cout << "\n[ Assign Tester ]" << std::endl;
+	size_t ai = 20;
+	double ad = 3.3;
+
+	std::cout << vtester->assign()
+					 .given(vec)
+					 .when(ai, ad)
+					 .info<NANOSECONDS>()
+			  << std::endl;
+	std::cout << "size: " << vec.size() << std::endl;
+	std::cout << "vec[3]: " << vec[3] << std::endl;
+
+	std::vector<double> assign_vec(1000, 8.8);
+	std::cout << vtester->assign()
+					 .given(vec)
+					 .when(assign_vec.begin(), assign_vec.end())
+					 .info<NANOSECONDS>()
+			  << std::endl;
+	std::cout << "size: " << vec.size() << std::endl;
+	std::cout << "vec[3]: " << vec[3] << std::endl;
 }
-
-#if 0
-.PHONY		: all re clean fclean
-NAME			=	ScalarConversion
-CXX				=	clang++
-CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98
-
-SRCS			=	main.cpp \
-						ScalarType.cpp \
-						detectScalarType.cpp \
-						convertScalarType.cpp \
-						outputScalarType.cpp
-
-OBJS			=	$(SRCS:.cpp=.o)
-
-DEPS			=	$(OBJS:.o=.d)
-
-all				:	$(NAME)
-
-$(NAME)		:	$(OBJS)
-					$(CXX) $(CXXFLAGS) $^ -o $@
-
-%.o				:	%.cpp
-					$(CXX) $(CXXFLAGS) -c $< -o $@ -MD
-
-clean			:
-					rm -rf $(OBJS) $(DEPS)
-
-fclean		:	clean
-					rm -rf $(NAME)
-
-re				:	fclean all
-
--include $(DEPS)
-
-#endif

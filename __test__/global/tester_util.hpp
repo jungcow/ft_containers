@@ -15,10 +15,73 @@ namespace Test
 		std::chrono::steady_clock::time_point endTime;
 
 	public:
+		//============================ void ===============================
 		/**
 		 * method with no parameter(1)
 		 * const method with no parameter(2)
 		 */
+		template <class Cont>
+		Test::TesterResult<void> impl(Cont& c, void (Cont::*pm)())
+		{
+			this->startTime = std::chrono::steady_clock::now();
+			(c.*pm)();
+			this->endTime = std::chrono::steady_clock::now();
+			return (Test::TesterResult<void>(this->endTime - this->startTime));
+		}
+		template <class Cont>
+		Test::TesterResult<void> impl(Cont& c, void (Cont::*pm)() const)
+		{
+			this->startTime = std::chrono::steady_clock::now();
+			(c.*pm)();
+			this->endTime = std::chrono::steady_clock::now();
+			return (Test::TesterResult<void>(this->endTime - this->startTime));
+		}
+
+		/**
+		 * method with one parameter(1)
+		 * const method with one parameter(2)
+		 */
+		template <class Cont, class Arg>
+		Test::TesterResult<void> impl(Cont& c, void (Cont::*pm)(Arg), Arg a)
+		{
+			this->startTime = std::chrono::steady_clock::now();
+			(c.*pm)(a);
+			this->endTime = std::chrono::steady_clock::now();
+			return (Test::TesterResult<void>(this->endTime - this->startTime));
+		}
+		template <class Cont, class Arg>
+		Test::TesterResult<void> impl(Cont& c, void (Cont::*pm)(Arg) const, Arg a)
+		{
+			this->startTime = std::chrono::steady_clock::now();
+			(c.*pm)(a);
+			this->endTime = std::chrono::steady_clock::now();
+			return (Test::TesterResult<void>(this->endTime - this->startTime));
+		}
+
+	public:
+		/**
+		 * method with two parameter(1)
+		 * const method with two parameter(2)
+		 */
+		template <class Cont, class Arg1, class Arg2>
+		Test::TesterResult<void> impl(Cont& c, void (Cont::*pm)(Arg1, Arg2), Arg1 a1, Arg2 a2)
+		{
+			this->startTime = std::chrono::steady_clock::now();
+			(c.*pm)(a1, a2);
+			this->endTime = std::chrono::steady_clock::now();
+			return (Test::TesterResult<void>(this->endTime - this->startTime));
+		}
+		template <class Cont, class Arg1, class Arg2>
+		Test::TesterResult<void> impl(Cont& c, void (Cont::*pm)(Arg1, Arg2) const, Arg1 a1, Arg2 a2)
+		{
+			this->startTime = std::chrono::steady_clock::now();
+			(c.*pm)(a1, a2);
+			this->endTime = std::chrono::steady_clock::now();
+			return (Test::TesterResult<void>(this->endTime - this->startTime));
+		}
+
+		//============================ non-void ===============================
+
 		template <class Cont, class Result>
 		Test::TesterResult<Result> impl(Cont& c, Result (Cont::*pm)())
 		{

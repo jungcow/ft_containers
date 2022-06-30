@@ -4,6 +4,7 @@ NAME		=	container_tester
 INC			=	-I./global \
 				-I./containers/base\
 				-I./containers/vector\
+				-I./containers/vector/method\
 				-I./containers/map	
 
 CXX			=	clang++
@@ -41,5 +42,8 @@ fclean		:	clean
 re			:
 	make fclean
 	make all
+
+test		:
+	make && ./container_tester
 
 -include $(DEPS)

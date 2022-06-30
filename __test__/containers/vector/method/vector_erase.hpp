@@ -1,9 +1,6 @@
 #ifndef __VECTOR_METHOD_H__
 #define __VECTOR_METHOD_H__
 
-#include <string_view>
-#include <type_traits>
-
 #include "../../global/tester_result.hpp"
 #include "../../global/tester_util.hpp"
 #include "../../global/type.hpp"

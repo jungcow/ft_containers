@@ -40,6 +40,38 @@ namespace Test
 			return (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
 		}
 	};
+	template <>
+	class TesterResult<void> : public TesterInfo
+	{
+	private:
+		// 	Result result;
+		std::chrono::duration<double> sec;
+
+	public:
+		TesterResult() : sec(-1) {}
+		TesterResult(const std::chrono::duration<double>& timespan) : sec(timespan) {}
+
+		// 	bool then(Result a)
+		// 	{
+		// 		if (result == a)
+		// 			return true;
+		// 		return false;
+		// 	}
+
+		// 	template <typename F>
+		// 	bool then_if(Result a, F pred)
+		// 	{
+		// 		return pred(a);
+		// 	}
+
+			template <class timeunit = std::chrono::duration<double> >
+			std::string info()
+			{
+				if (sec.count() < 0)
+					return (std::string("This test doesn't check time duration"));
+				return (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
+			}
+	};
 }
 
 #endif
