@@ -33,9 +33,9 @@ public:
 	BeginGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	ContainerAssured::TesterResult<typename __base::iterator> when()
+	ContainerAssured::TesterResult<Cont, typename __base::iterator, ParameterPack<void, void, void, void> >
+	when()
 	{
-		std::cout << "non-const when\n";
 		return (ContainerAssured::When<typename __base::iterator>()
 					.template impl<Cont>(this->c, &Cont::begin));
 	}
@@ -51,9 +51,9 @@ public:
 	BeginConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	ContainerAssured::TesterResult<typename __base::const_iterator> when()
+	ContainerAssured::TesterResult<Cont, typename __base::const_iterator, ParameterPack<void, void, void, void> >
+	when()
 	{
-		std::cout << "const when\n";
 		return (ContainerAssured::When<typename __base::const_iterator>()
 					.template impl<Cont>(this->c, &Cont::begin));
 	}

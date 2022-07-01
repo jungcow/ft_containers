@@ -29,7 +29,9 @@ private:
 public:
 	SizeGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	ContainerAssured::TesterResult<typename __base::size_type> when()
+	ContainerAssured::TesterResult<Cont, typename __base::size_type, 
+	ParameterPack<void, void, void, void> >
+	when()
 	{
 		return (ContainerAssured::When<typename __base::size_type>()
 					.template impl<Cont>(this->c, &Cont::size));

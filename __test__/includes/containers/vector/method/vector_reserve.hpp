@@ -29,7 +29,9 @@ private:
 public:
 	ReserveGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	ContainerAssured::TesterResult<void> when(typename __base::size_type n)
+	ContainerAssured::TesterResult<Cont, void, 
+		ParameterPack<typename __base::size_type, void, void, void> > 
+	when(typename __base::size_type n)
 	{
 		return (ContainerAssured::When<void>()
 					.template impl<Cont,

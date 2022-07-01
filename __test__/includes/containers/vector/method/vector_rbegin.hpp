@@ -33,9 +33,11 @@ public:
 	RBeginGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	ContainerAssured::TesterResult<typename __base::reverse_iterator> when()
+	ContainerAssured::TesterResult<Cont,
+								   typename __base::reverse_iterator,
+								   ParameterPack<void, void, void, void> >
+	when()
 	{
-		std::cout << "non-const when\n";
 		return (ContainerAssured::When<typename __base::reverse_iterator>()
 					.template impl<Cont>(this->c, &Cont::rbegin));
 	}
@@ -51,9 +53,10 @@ public:
 	RBeginConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	ContainerAssured::TesterResult<typename __base::const_reverse_iterator> when()
+	ContainerAssured::TesterResult<Cont, typename __base::const_reverse_iterator,
+								   ParameterPack<void, void, void, void> >
+	when()
 	{
-		std::cout << "const when\n";
 		return (ContainerAssured::When<typename __base::const_reverse_iterator>()
 					.template impl<Cont>(this->c, &Cont::rbegin));
 	}

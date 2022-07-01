@@ -29,7 +29,8 @@ private:
 public:
 	ClearGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	ContainerAssured::TesterResult<void> when()
+	ContainerAssured::TesterResult<Cont, void, ParameterPack<void, void, void, void> >
+	when()
 	{
 		return (ContainerAssured::When<void>()
 					.template impl<Cont>(this->c, &Cont::clear));

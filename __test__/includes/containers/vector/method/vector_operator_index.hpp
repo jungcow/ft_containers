@@ -33,12 +33,13 @@ public:
 	OperatorIndexGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	ContainerAssured::TesterResult<typename __base::reference> when(typename __base::size_type n)
+	ContainerAssured::TesterResult<Cont,
+								   typename __base::reference,
+								   ParameterPack<typename __base::size_type, void, void, void> >
+	when(typename __base::size_type n)
 	{
-		std::cout << "non-const when\n";
 		return (ContainerAssured::When<typename __base::reference>()
-					.template impl<Cont,
-								   typename __base::size_type>(this->c, &Cont::operator[], n));
+					.template impl<Cont, typename __base::size_type>(this->c, &Cont::operator[], n));
 	}
 };
 
@@ -52,12 +53,13 @@ public:
 	OperatorIndexConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	ContainerAssured::TesterResult<typename __base::const_reference> when(typename __base::size_type n)
+	ContainerAssured::TesterResult<Cont,
+								   typename __base::const_reference,
+								   ParameterPack<typename __base::size_type, void, void, void> >
+	when(typename __base::size_type n)
 	{
-		std::cout << "const when\n";
 		return (ContainerAssured::When<typename __base::const_reference>()
-					.template impl<Cont,
-								   typename __base::size_type>(this->c, &Cont::operator[], n));
+					.template impl<Cont, typename __base::size_type>(this->c, &Cont::operator[], n));
 	}
 };
 

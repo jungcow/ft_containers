@@ -31,7 +31,10 @@ public:
 
 	// TODO: exception 관리
 	template <class InputIterator>
-	ContainerAssured::TesterResult<void> when(InputIterator first, InputIterator last)
+	ContainerAssured::TesterResult<Cont,
+								   void,
+								   ParameterPack<InputIterator, InputIterator, void, void> >
+	when(InputIterator first, InputIterator last)
 	{
 		return (ContainerAssured::When<void>()
 					.impl<Cont,
@@ -39,7 +42,11 @@ public:
 						  InputIterator>(this->c, &Cont::assign, first, last));
 	}
 
-	ContainerAssured::TesterResult<void> when(typename __base::size_type n, typename __base::value_type& val)
+	ContainerAssured::TesterResult<Cont,
+								   void,
+								   ParameterPack<typename __base::size_type,
+												 typename __base::const_reference, void, void> >
+	when(typename __base::size_type n, typename __base::value_type& val)
 	{
 		return (ContainerAssured::When<void>()
 					.impl<Cont,

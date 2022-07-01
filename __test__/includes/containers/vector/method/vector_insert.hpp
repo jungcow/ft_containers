@@ -29,8 +29,11 @@ private:
 public:
 	InsertGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	ContainerAssured::TesterResult<typename __base::iterator> when(typename __base::iterator position,
-																   typename __base::const_reference val)
+	ContainerAssured::TesterResult<Cont,
+								   typename __base::iterator,
+								   ParameterPack<typename __base::const_iterator,
+												 typename __base::const_reference, void, void> >
+	when(typename __base::iterator position, typename __base::const_reference val)
 	{
 		return (ContainerAssured::When<typename __base::iterator>()
 					.template impl<Cont,
@@ -38,9 +41,14 @@ public:
 								   typename __base::const_reference>(this->c, &Cont::insert, position, val));
 	}
 
-	ContainerAssured::TesterResult<typename __base::iterator> when(typename __base::iterator position,
-																   typename __base::size_type n,
-																   typename __base::const_reference val)
+	ContainerAssured::TesterResult<Cont,
+								   typename __base::iterator,
+								   ParameterPack<typename __base::const_iterator,
+												 typename __base::size_type,
+												 typename __base::const_reference, void> >
+	when(typename __base::iterator position,
+		 typename __base::size_type n,
+		 typename __base::const_reference val)
 	{
 		return (ContainerAssured::When<typename __base::iterator>()
 					.template impl<Cont,
@@ -51,11 +59,15 @@ public:
 
 	// TODO: exception 관리
 	template <class InputIterator>
-	ContainerAssured::TesterResult<typename __base::iterator> when(typename __base::iterator position,
-																   typename std::enable_if<
-																	   !std::is_integral<InputIterator>::value,
-																	   InputIterator>::type first,
-																   InputIterator last)
+	ContainerAssured::TesterResult<Cont,
+								   typename __base::iterator,
+								   ParameterPack<typename __base::const_iterator,
+												 InputIterator, InputIterator, void> >
+	when(typename __base::iterator position,
+		 typename std::enable_if<
+			 !std::is_integral<InputIterator>::value,
+			 InputIterator>::type first,
+		 InputIterator last)
 	{
 		std::cout << type(position) << std::endl;
 		std::cout << type(first) << std::endl;

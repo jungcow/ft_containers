@@ -7,7 +7,7 @@ INC			=	-I./includes\
 CXX			=	clang++
 
 CXXFLAGS	=	-pedantic\
-				-std=c++11 -D LEAKS=1
+				-std=c++11  -ferror-limit=200
 
 LFLAGS		=	#-lgtest -lgtest_main
 

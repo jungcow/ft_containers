@@ -33,9 +33,11 @@ public:
 	FrontGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	ContainerAssured::TesterResult<typename __base::reference> when()
+	ContainerAssured::TesterResult<Cont,
+								   typename __base::reference,
+								   ParameterPack<void, void, void, void> >
+	when()
 	{
-		std::cout << "non-const when\n";
 		return (ContainerAssured::When<typename __base::reference>()
 					.template impl<Cont>(this->c, &Cont::front));
 	}
@@ -51,9 +53,11 @@ public:
 	FrontConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	ContainerAssured::TesterResult<typename __base::const_reference> when()
+	ContainerAssured::TesterResult<Cont,
+								   typename __base::const_reference,
+								   ParameterPack<void, void, void, void> >
+	when()
 	{
-		std::cout << "const when\n";
 		return (ContainerAssured::When<typename __base::const_reference>()
 					.template impl<Cont>(this->c, &Cont::front));
 	}

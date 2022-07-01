@@ -29,7 +29,8 @@ private:
 public:
 	EmptyGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	ContainerAssured::TesterResult<bool> when()
+	ContainerAssured::TesterResult<Cont, bool, ParameterPack<void, void, void, void> >
+	when()
 	{
 		return (ContainerAssured::When<bool>()
 					.template impl<Cont>(this->c, &Cont::empty));

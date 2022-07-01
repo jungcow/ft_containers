@@ -35,7 +35,7 @@ namespace ContainerAssured
 	public:
 		VectorTester() {}
 
-		VectorMethod::Erase erase() { return (VectorMethod::Erase()); }
+		// VectorMethod::Erase erase() { return (VectorMethod::Erase()); }
 		VectorMethod::Assign assign() { return (VectorMethod::Assign()); }
 		VectorMethod::At at() { return (VectorMethod::At()); }
 		VectorMethod::AtConst at_const() { return (VectorMethod::AtConst()); }

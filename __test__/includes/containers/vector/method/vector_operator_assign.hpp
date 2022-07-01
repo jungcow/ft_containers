@@ -29,11 +29,13 @@ private:
 public:
 	OperatorAssignGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	ContainerAssured::TesterResult<Cont&> when(const Cont& x)
+	ContainerAssured::TesterResult<Cont,
+								   Cont&,
+								   ParameterPack<const Cont&, void, void, void> >
+	when(const Cont& x)
 	{
 		return (ContainerAssured::When<Cont&>()
-					.template impl<Cont,
-								   const Cont&>(this->c, &Cont::operator=, x));
+					.template impl<Cont, const Cont&>(this->c, &Cont::operator=, x));
 	}
 };
 

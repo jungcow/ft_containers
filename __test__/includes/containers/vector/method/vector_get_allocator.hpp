@@ -29,7 +29,10 @@ private:
 public:
 	GetAllocatorGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	ContainerAssured::TesterResult<typename Cont::allocator_type> when()
+	ContainerAssured::TesterResult<Cont,
+								   typename Cont::allocator_type,
+								   ParameterPack<void, void, void, void> >
+	when()
 	{
 		return (ContainerAssured::When<typename Cont::allocator_type>()
 					.template impl<Cont>(this->c, &Cont::get_allocator));

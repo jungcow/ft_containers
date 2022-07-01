@@ -30,7 +30,10 @@ public:
 	EraseGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	ContainerAssured::TesterResult<typename __base::iterator> when(typename __base::iterator position)
+	ContainerAssured::TesterResult<Cont,
+								   typename __base::iterator,
+								   ParameterPack<typename __base::const_iterator, void, void, void> >
+	when(typename __base::iterator position)
 	{
 		return (ContainerAssured::When<typename __base::iterator>()
 					.template impl<Cont,
@@ -38,7 +41,11 @@ public:
 	}
 
 	// TODO: UB 관리
-	ContainerAssured::TesterResult<typename __base::iterator> when(typename __base::iterator first, typename __base::iterator last)
+	ContainerAssured::TesterResult<Cont,
+								   typename __base::iterator,
+								   ParameterPack<typename __base::const_iterator,
+												 typename __base::const_iterator, void, void> >
+	when(typename __base::iterator first, typename __base::iterator last)
 	{
 		return (ContainerAssured::When<typename __base::iterator>()
 					.template impl<Cont,

@@ -29,7 +29,9 @@ private:
 public:
 	SwapGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	ContainerAssured::TesterResult<void> when(Cont& x)
+	ContainerAssured::TesterResult<Cont, void, 
+	ParameterPack<Cont&, void, void, void> > 
+	when(Cont& x)
 	{
 		return (ContainerAssured::When<void>()
 					.template impl<Cont, Cont&>(this->c, &Cont::swap, x));

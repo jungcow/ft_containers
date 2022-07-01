@@ -26,20 +26,20 @@ int main(void)
 	from = vec.begin() + 2;
 	to = vec.end() - 3;
 
-	std::cout << vec.size() << std::endl;
-	std::cout << vtester->erase()
-					 .given(vec)
-					 .when(vi)
-					 .info<NANOSECONDS>()
-			  << std::endl;
+	// std::cout << vec.size() << std::endl;
+	// std::cout << vtester->erase()
+	// 				 .given(vec)
+	// 				 .when(vi)
+	// 				 .info<NANOSECONDS>()
+	// 		  << std::endl;
 
-	std::cout << vec.size() << std::endl;
-	std::cout << vtester->erase()
-					 .given(vec)
-					 .when(from, to)
-					 .info<NANOSECONDS>()
-			  << std::endl;
-	std::cout << vec.size() << std::endl;
+	// std::cout << vec.size() << std::endl;
+	// std::cout << vtester->erase()
+	// 				 .given(vec)
+	// 				 .when(from, to)
+	// 				 .info<NANOSECONDS>()
+	// 		  << std::endl;
+	// std::cout << vec.size() << std::endl;
 
 	std::cout << "\n[ Assign Tester ]" << std::endl;
 	size_t ai = 20;
