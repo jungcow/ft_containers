@@ -6,7 +6,7 @@
 #include "global/tester_result.hpp"
 #include "global/tester_util.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace VectorMethod
 	{
@@ -24,40 +24,40 @@ namespace Test
 }
 
 template <class Cont>
-class Test::VectorUtil::EndGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::EndGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	EndGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	EndGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	Test::TesterResult<typename __base::iterator> when()
+	ContainerAssured::TesterResult<typename __base::iterator> when()
 	{
 		std::cout << "non-const when\n";
-		return (Test::TesterUtil<typename __base::iterator>()
+		return (ContainerAssured::When<typename __base::iterator>()
 					.template impl<Cont>(this->c, &Cont::end));
 	}
 };
 
 template <class Cont>
-class Test::VectorUtil::EndConstGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::EndConstGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	EndConstGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	EndConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	Test::TesterResult<typename __base::const_iterator> when()
+	ContainerAssured::TesterResult<typename __base::const_iterator> when()
 	{
 		std::cout << "const when\n";
-		return (Test::TesterUtil<typename __base::const_iterator>()
+		return (ContainerAssured::When<typename __base::const_iterator>()
 					.template impl<Cont>(this->c, &Cont::end));
 	}
 };
 
-class Test::VectorMethod::End : public MethodBase
+class ContainerAssured::VectorMethod::End : public MethodBase
 {
 public:
 	template <class Cont>
@@ -66,7 +66,7 @@ public:
 		return VectorUtil::EndGiven<Cont>(container);
 	}
 };
-class Test::VectorMethod::EndConst : public MethodBase
+class ContainerAssured::VectorMethod::EndConst : public MethodBase
 {
 public:
 	template <class Cont>

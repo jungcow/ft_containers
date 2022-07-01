@@ -6,7 +6,7 @@
 #include "global/tester_result.hpp"
 #include "global/tester_util.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace VectorMethod
 	{
@@ -21,26 +21,26 @@ namespace Test
 }
 
 template <class Cont>
-class Test::VectorUtil::EmptyGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::EmptyGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	EmptyGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	EmptyGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	Test::TesterResult<bool> when()
+	ContainerAssured::TesterResult<bool> when()
 	{
-		return (Test::TesterUtil<bool>()
+		return (ContainerAssured::When<bool>()
 					.template impl<Cont>(this->c, &Cont::empty));
 	}
 };
 
-class Test::VectorMethod::Empty : public Test::MethodBase
+class ContainerAssured::VectorMethod::Empty : public ContainerAssured::MethodBase
 {
 public:
 	template <class Cont>
-	Test::VectorUtil::EmptyGiven<Cont> given(Cont& container)
+	ContainerAssured::VectorUtil::EmptyGiven<Cont> given(Cont& container)
 	{
 		return (VectorUtil::EmptyGiven<Cont>(container));
 	}

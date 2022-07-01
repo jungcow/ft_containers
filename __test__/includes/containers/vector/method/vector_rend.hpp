@@ -6,7 +6,7 @@
 #include "global/tester_result.hpp"
 #include "global/tester_util.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace VectorMethod
 	{
@@ -24,40 +24,40 @@ namespace Test
 }
 
 template <class Cont>
-class Test::VectorUtil::REndGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::REndGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	REndGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	REndGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	Test::TesterResult<typename __base::reverse_iterator> when()
+	ContainerAssured::TesterResult<typename __base::reverse_iterator> when()
 	{
 		std::cout << "non-const when\n";
-		return (Test::TesterUtil<typename __base::reverse_iterator>()
+		return (ContainerAssured::When<typename __base::reverse_iterator>()
 					.template impl<Cont>(this->c, &Cont::rend));
 	}
 };
 
 template <class Cont>
-class Test::VectorUtil::REndConstGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::REndConstGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	REndConstGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	REndConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	Test::TesterResult<typename __base::const_reverse_iterator> when()
+	ContainerAssured::TesterResult<typename __base::const_reverse_iterator> when()
 	{
 		std::cout << "const when\n";
-		return (Test::TesterUtil<typename __base::const_reverse_iterator>()
+		return (ContainerAssured::When<typename __base::const_reverse_iterator>()
 					.template impl<Cont>(this->c, &Cont::rend));
 	}
 };
 
-class Test::VectorMethod::REnd : public MethodBase
+class ContainerAssured::VectorMethod::REnd : public MethodBase
 {
 public:
 	template <class Cont>
@@ -66,7 +66,7 @@ public:
 		return VectorUtil::REndGiven<Cont>(container);
 	}
 };
-class Test::VectorMethod::REndConst : public MethodBase
+class ContainerAssured::VectorMethod::REndConst : public MethodBase
 {
 public:
 	template <class Cont>

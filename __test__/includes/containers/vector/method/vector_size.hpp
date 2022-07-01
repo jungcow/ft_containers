@@ -6,7 +6,7 @@
 #include "global/tester_result.hpp"
 #include "global/tester_util.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace VectorMethod
 	{
@@ -21,26 +21,26 @@ namespace Test
 }
 
 template <class Cont>
-class Test::VectorUtil::SizeGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::SizeGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	SizeGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	SizeGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	Test::TesterResult<typename __base::size_type> when()
+	ContainerAssured::TesterResult<typename __base::size_type> when()
 	{
-		return (Test::TesterUtil<typename __base::size_type>()
+		return (ContainerAssured::When<typename __base::size_type>()
 					.template impl<Cont>(this->c, &Cont::size));
 	}
 };
 
-class Test::VectorMethod::Size : public Test::MethodBase
+class ContainerAssured::VectorMethod::Size : public ContainerAssured::MethodBase
 {
 public:
 	template <class Cont>
-	Test::VectorUtil::SizeGiven<Cont> given(Cont& container)
+	ContainerAssured::VectorUtil::SizeGiven<Cont> given(Cont& container)
 	{
 		return (VectorUtil::SizeGiven<Cont>(container));
 	}

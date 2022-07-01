@@ -6,7 +6,7 @@
 #include "global/tester_result.hpp"
 #include "global/tester_util.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace VectorMethod
 	{
@@ -21,26 +21,26 @@ namespace Test
 }
 
 template <class Cont>
-class Test::VectorUtil::SwapGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::SwapGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	SwapGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	SwapGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	Test::TesterResult<void> when(Cont& x)
+	ContainerAssured::TesterResult<void> when(Cont& x)
 	{
-		return (Test::TesterUtil<void>()
+		return (ContainerAssured::When<void>()
 					.template impl<Cont, Cont&>(this->c, &Cont::swap, x));
 	}
 };
 
-class Test::VectorMethod::Swap : public Test::MethodBase
+class ContainerAssured::VectorMethod::Swap : public ContainerAssured::MethodBase
 {
 public:
 	template <class Cont>
-	Test::VectorUtil::SwapGiven<Cont> given(Cont& container)
+	ContainerAssured::VectorUtil::SwapGiven<Cont> given(Cont& container)
 	{
 		return (VectorUtil::SwapGiven<Cont>(container));
 	}

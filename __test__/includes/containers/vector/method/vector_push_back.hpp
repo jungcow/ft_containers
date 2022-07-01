@@ -6,7 +6,7 @@
 #include "global/tester_result.hpp"
 #include "global/tester_util.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace VectorMethod
 	{
@@ -21,27 +21,27 @@ namespace Test
 }
 
 template <class Cont>
-class Test::VectorUtil::PushBackGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::PushBackGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	PushBackGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	PushBackGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	Test::TesterResult<void> when(typename __base::const_reference val)
+	ContainerAssured::TesterResult<void> when(typename __base::const_reference val)
 	{
-		return (Test::TesterUtil<void>()
+		return (ContainerAssured::When<void>()
 					.template impl<Cont,
 								   typename __base::const_reference>(this->c, &Cont::push_back, val));
 	}
 };
 
-class Test::VectorMethod::PushBack : public Test::MethodBase
+class ContainerAssured::VectorMethod::PushBack : public ContainerAssured::MethodBase
 {
 public:
 	template <class Cont>
-	Test::VectorUtil::PushBackGiven<Cont> given(Cont& container)
+	ContainerAssured::VectorUtil::PushBackGiven<Cont> given(Cont& container)
 	{
 		return (VectorUtil::PushBackGiven<Cont>(container));
 	}

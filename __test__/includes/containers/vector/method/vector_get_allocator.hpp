@@ -6,7 +6,7 @@
 #include "global/tester_result.hpp"
 #include "global/tester_util.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace VectorMethod
 	{
@@ -21,26 +21,26 @@ namespace Test
 }
 
 template <class Cont>
-class Test::VectorUtil::GetAllocatorGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::GetAllocatorGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	GetAllocatorGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	GetAllocatorGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	Test::TesterResult<typename Cont::allocator_type> when()
+	ContainerAssured::TesterResult<typename Cont::allocator_type> when()
 	{
-		return (Test::TesterUtil<typename Cont::allocator_type>()
+		return (ContainerAssured::When<typename Cont::allocator_type>()
 					.template impl<Cont>(this->c, &Cont::get_allocator));
 	}
 };
 
-class Test::VectorMethod::GetAllocator : public Test::MethodBase
+class ContainerAssured::VectorMethod::GetAllocator : public ContainerAssured::MethodBase
 {
 public:
 	template <class Cont>
-	Test::VectorUtil::GetAllocatorGiven<Cont> given(Cont& container)
+	ContainerAssured::VectorUtil::GetAllocatorGiven<Cont> given(Cont& container)
 	{
 		return (VectorUtil::GetAllocatorGiven<Cont>(container));
 	}

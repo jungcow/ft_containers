@@ -6,7 +6,7 @@
 #include "global/tester_result.hpp"
 #include "global/tester_util.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace VectorMethod
 	{
@@ -21,26 +21,26 @@ namespace Test
 }
 
 template <class Cont>
-class Test::VectorUtil::PopBackGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::PopBackGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	PopBackGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	PopBackGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	Test::TesterResult<void> when()
+	ContainerAssured::TesterResult<void> when()
 	{
-		return (Test::TesterUtil<void>()
+		return (ContainerAssured::When<void>()
 					.template impl<Cont>(this->c, &Cont::pop_back));
 	}
 };
 
-class Test::VectorMethod::PopBack : public Test::MethodBase
+class ContainerAssured::VectorMethod::PopBack : public ContainerAssured::MethodBase
 {
 public:
 	template <class Cont>
-	Test::VectorUtil::PopBackGiven<Cont> given(Cont& container)
+	ContainerAssured::VectorUtil::PopBackGiven<Cont> given(Cont& container)
 	{
 		return (VectorUtil::PopBackGiven<Cont>(container));
 	}

@@ -6,7 +6,7 @@
 #include "global/tester_result.hpp"
 #include "global/tester_util.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace VectorMethod
 	{
@@ -24,44 +24,44 @@ namespace Test
 }
 
 template <class Cont>
-class Test::VectorUtil::OperatorIndexGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::OperatorIndexGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	OperatorIndexGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	OperatorIndexGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	Test::TesterResult<typename __base::reference> when(typename __base::size_type n)
+	ContainerAssured::TesterResult<typename __base::reference> when(typename __base::size_type n)
 	{
 		std::cout << "non-const when\n";
-		return (Test::TesterUtil<typename __base::reference>()
+		return (ContainerAssured::When<typename __base::reference>()
 					.template impl<Cont,
 								   typename __base::size_type>(this->c, &Cont::operator[], n));
 	}
 };
 
 template <class Cont>
-class Test::VectorUtil::OperatorIndexConstGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::OperatorIndexConstGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	OperatorIndexConstGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	OperatorIndexConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	Test::TesterResult<typename __base::const_reference> when(typename __base::size_type n)
+	ContainerAssured::TesterResult<typename __base::const_reference> when(typename __base::size_type n)
 	{
 		std::cout << "const when\n";
-		return (Test::TesterUtil<typename __base::const_reference>()
+		return (ContainerAssured::When<typename __base::const_reference>()
 					.template impl<Cont,
 								   typename __base::size_type>(this->c, &Cont::operator[], n));
 	}
 };
 
-class Test::VectorMethod::OperatorIndex : public MethodBase
+class ContainerAssured::VectorMethod::OperatorIndex : public MethodBase
 {
 public:
 	template <class Cont>
@@ -70,7 +70,7 @@ public:
 		return VectorUtil::OperatorIndexGiven<Cont>(container);
 	}
 };
-class Test::VectorMethod::OperatorIndexConst : public MethodBase
+class ContainerAssured::VectorMethod::OperatorIndexConst : public MethodBase
 {
 public:
 	template <class Cont>

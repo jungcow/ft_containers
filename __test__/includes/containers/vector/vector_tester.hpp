@@ -28,7 +28,7 @@
 #include "vector/method/vector_swap.hpp"
 #if 0
 #endif
-namespace Test
+namespace ContainerAssured
 {
 	class VectorTester
 	{

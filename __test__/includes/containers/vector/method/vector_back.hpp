@@ -6,7 +6,7 @@
 #include "global/tester_result.hpp"
 #include "global/tester_util.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace VectorMethod
 	{
@@ -24,42 +24,42 @@ namespace Test
 }
 
 template <class Cont>
-class Test::VectorUtil::BackGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::BackGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	BackGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	BackGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	Test::TesterResult<typename __base::reference> when()
+	ContainerAssured::TesterResult<typename __base::reference> when()
 	{
 		std::cout << "non-const when\n";
-		return (Test::TesterUtil<typename __base::reference>()
+		return (ContainerAssured::When<typename __base::reference>()
 					.template impl<Cont>(this->c, &Cont::back));
 	}
 };
 
 template <class Cont>
-class Test::VectorUtil::BackConstGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::BackConstGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	BackConstGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	BackConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	Test::TesterResult<typename __base::const_reference> when()
+	ContainerAssured::TesterResult<typename __base::const_reference> when()
 	{
 		std::cout << "const when\n";
-		return (Test::TesterUtil<typename __base::const_reference>()
+		return (ContainerAssured::When<typename __base::const_reference>()
 					.template impl<Cont>(this->c, &Cont::back));
 	}
 };
 
-class Test::VectorMethod::Back : public MethodBase
+class ContainerAssured::VectorMethod::Back : public MethodBase
 {
 public:
 	template <class Cont>
@@ -68,7 +68,7 @@ public:
 		return VectorUtil::BackGiven<Cont>(container);
 	}
 };
-class Test::VectorMethod::BackConst : public MethodBase
+class ContainerAssured::VectorMethod::BackConst : public MethodBase
 {
 public:
 	template <class Cont>

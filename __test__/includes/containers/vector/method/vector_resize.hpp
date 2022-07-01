@@ -6,7 +6,7 @@
 #include "global/tester_result.hpp"
 #include "global/tester_util.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace VectorMethod
 	{
@@ -21,29 +21,29 @@ namespace Test
 }
 
 template <class Cont>
-class Test::VectorUtil::ResizeGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::ResizeGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	ResizeGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	ResizeGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	Test::TesterResult<void> when(typename __base::size_type n,
-								  typename __base::value_type val = typename __base::value_type())
+	ContainerAssured::TesterResult<void> when(typename __base::size_type n,
+											  typename __base::value_type val = typename __base::value_type())
 	{
-		return (Test::TesterUtil<void>()
+		return (ContainerAssured::When<void>()
 					.template impl<Cont,
 								   typename __base::size_type,
 								   typename __base::const_reference>(this->c, &Cont::resize, n, val));
 	}
 };
 
-class Test::VectorMethod::Resize : public Test::MethodBase
+class ContainerAssured::VectorMethod::Resize : public ContainerAssured::MethodBase
 {
 public:
 	template <class Cont>
-	Test::VectorUtil::ResizeGiven<Cont> given(Cont& container)
+	ContainerAssured::VectorUtil::ResizeGiven<Cont> given(Cont& container)
 	{
 		return (VectorUtil::ResizeGiven<Cont>(container));
 	}

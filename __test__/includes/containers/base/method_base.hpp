@@ -5,13 +5,13 @@
 
 #include "./vector_given_base.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	class MethodBase
 	{
 	public:
 		template <class Cont>
-		Test::Base::VectorGivenBase<Cont> given(Cont& container)
+		ContainerAssured::Base::VectorGivenBase<Cont> given(Cont& container)
 		{
 			return Base::VectorGivenBase<Cont>(container);
 		}

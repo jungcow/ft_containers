@@ -6,7 +6,7 @@
 #include "global/tester_result.hpp"
 #include "global/tester_util.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace VectorMethod
 	{
@@ -24,42 +24,42 @@ namespace Test
 }
 
 template <class Cont>
-class Test::VectorUtil::BeginGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::BeginGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	BeginGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	BeginGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	Test::TesterResult<typename __base::iterator> when()
+	ContainerAssured::TesterResult<typename __base::iterator> when()
 	{
 		std::cout << "non-const when\n";
-		return (Test::TesterUtil<typename __base::iterator>()
+		return (ContainerAssured::When<typename __base::iterator>()
 					.template impl<Cont>(this->c, &Cont::begin));
 	}
 };
 
 template <class Cont>
-class Test::VectorUtil::BeginConstGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::BeginConstGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	BeginConstGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	BeginConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	Test::TesterResult<typename __base::const_iterator> when()
+	ContainerAssured::TesterResult<typename __base::const_iterator> when()
 	{
 		std::cout << "const when\n";
-		return (Test::TesterUtil<typename __base::const_iterator>()
+		return (ContainerAssured::When<typename __base::const_iterator>()
 					.template impl<Cont>(this->c, &Cont::begin));
 	}
 };
 
-class Test::VectorMethod::Begin : public MethodBase
+class ContainerAssured::VectorMethod::Begin : public MethodBase
 {
 public:
 	template <class Cont>
@@ -68,7 +68,7 @@ public:
 		return VectorUtil::BeginGiven<Cont>(container);
 	}
 };
-class Test::VectorMethod::BeginConst : public MethodBase
+class ContainerAssured::VectorMethod::BeginConst : public MethodBase
 {
 public:
 	template <class Cont>

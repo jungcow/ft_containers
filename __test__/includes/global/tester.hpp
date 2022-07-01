@@ -8,7 +8,7 @@
 #include "stack/stack_tester.hpp"
 #endif
 
-namespace Test
+namespace ContainerAssured
 {
 	template <class TesterClass>
 	class Tester

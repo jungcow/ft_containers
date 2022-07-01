@@ -6,7 +6,7 @@
 
 #include "tester_info.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	template <typename Result>
 	class TesterResult : public TesterInfo
@@ -14,10 +14,13 @@ namespace Test
 	private:
 		Result result;
 		std::chrono::duration<double> sec;
+		std::string log;
 
 	public:
 		TesterResult(const Result& rs) : result(rs), sec(-1) {}
-		TesterResult(const Result& rs, const std::chrono::duration<double>& timespan) : result(rs), sec(timespan) {}
+		TesterResult(const Result& rs, const std::chrono::duration<double>& timespan) : result(rs), sec(timespan)
+		{
+		}
 
 		bool then(Result a)
 		{

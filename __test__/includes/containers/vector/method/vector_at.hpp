@@ -6,7 +6,7 @@
 #include "global/tester_result.hpp"
 #include "global/tester_util.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace VectorMethod
 	{
@@ -24,43 +24,43 @@ namespace Test
 }
 
 template <class Cont>
-class Test::VectorUtil::AtGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::AtGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	AtGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	AtGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: exception 관리
-	Test::TesterResult<typename __base::reference> when(typename __base::size_type n)
+	ContainerAssured::TesterResult<typename __base::reference> when(typename __base::size_type n)
 	{
 		std::cout << "non-const when\n";
-		return (Test::TesterUtil<typename __base::reference>()
+		return (ContainerAssured::When<typename __base::reference>()
 					.template impl<Cont,
 								   typename __base::size_type>(this->c, &Cont::at, n));
 	}
 };
 template <class Cont>
-class Test::VectorUtil::AtConstGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::AtConstGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	AtConstGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	AtConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: exception 관리
-	Test::TesterResult<typename __base::const_reference> when(typename __base::size_type n)
+	ContainerAssured::TesterResult<typename __base::const_reference> when(typename __base::size_type n)
 	{
 		std::cout << "const when\n";
-		return (Test::TesterUtil<typename __base::const_reference>()
+		return (ContainerAssured::When<typename __base::const_reference>()
 					.template impl<Cont,
 								   typename __base::size_type>(this->c, &Cont::at, n));
 	}
 };
 
-class Test::VectorMethod::At : public MethodBase
+class ContainerAssured::VectorMethod::At : public MethodBase
 {
 public:
 	template <class Cont>
@@ -69,7 +69,7 @@ public:
 		return VectorUtil::AtGiven<Cont>(container);
 	}
 };
-class Test::VectorMethod::AtConst : public MethodBase
+class ContainerAssured::VectorMethod::AtConst : public MethodBase
 {
 public:
 	template <class Cont>

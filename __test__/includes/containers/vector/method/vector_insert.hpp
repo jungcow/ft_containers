@@ -6,7 +6,7 @@
 #include "global/tester_result.hpp"
 #include "global/tester_util.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace VectorMethod
 	{
@@ -21,28 +21,28 @@ namespace Test
 }
 
 template <class Cont>
-class Test::VectorUtil::InsertGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::InsertGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	InsertGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	InsertGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	Test::TesterResult<typename __base::iterator> when(typename __base::iterator position,
-													   typename __base::const_reference val)
+	ContainerAssured::TesterResult<typename __base::iterator> when(typename __base::iterator position,
+																   typename __base::const_reference val)
 	{
-		return (Test::TesterUtil<typename __base::iterator>()
+		return (ContainerAssured::When<typename __base::iterator>()
 					.template impl<Cont,
 								   typename __base::const_iterator,
 								   typename __base::const_reference>(this->c, &Cont::insert, position, val));
 	}
 
-	Test::TesterResult<typename __base::iterator> when(typename __base::iterator position,
-													   typename __base::size_type n,
-													   typename __base::const_reference val)
+	ContainerAssured::TesterResult<typename __base::iterator> when(typename __base::iterator position,
+																   typename __base::size_type n,
+																   typename __base::const_reference val)
 	{
-		return (Test::TesterUtil<typename __base::iterator>()
+		return (ContainerAssured::When<typename __base::iterator>()
 					.template impl<Cont,
 								   typename __base::const_iterator,
 								   typename __base::size_type,
@@ -51,16 +51,16 @@ public:
 
 	// TODO: exception 관리
 	template <class InputIterator>
-	Test::TesterResult<typename __base::iterator> when(typename __base::iterator position,
-													   typename std::enable_if<
-														   !std::is_integral<InputIterator>::value,
-														   InputIterator>::type first,
-													   InputIterator last)
+	ContainerAssured::TesterResult<typename __base::iterator> when(typename __base::iterator position,
+																   typename std::enable_if<
+																	   !std::is_integral<InputIterator>::value,
+																	   InputIterator>::type first,
+																   InputIterator last)
 	{
 		std::cout << type(position) << std::endl;
 		std::cout << type(first) << std::endl;
 		std::cout << type(last) << std::endl;
-		return (Test::TesterUtil<typename __base::iterator>()
+		return (ContainerAssured::When<typename __base::iterator>()
 					.template impl<Cont,
 								   typename __base::const_iterator,
 								   InputIterator,
@@ -68,7 +68,7 @@ public:
 	}
 };
 
-class Test::VectorMethod::Insert : public MethodBase
+class ContainerAssured::VectorMethod::Insert : public MethodBase
 {
 public:
 	template <class Cont>

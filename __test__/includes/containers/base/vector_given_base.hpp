@@ -5,7 +5,7 @@
 
 #include "global/type.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace Base
 	{

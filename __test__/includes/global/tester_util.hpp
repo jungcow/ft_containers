@@ -7,10 +7,10 @@
 #include "tester_result.hpp"
 
 //============================ non-void ===============================
-namespace Test
+namespace ContainerAssured
 {
 	template <class Result>
-	class TesterUtil
+	class When
 	{
 	private:
 		std::chrono::steady_clock::time_point startTime;
@@ -18,26 +18,26 @@ namespace Test
 
 	public:
 		template <class Cont, class... Args>
-		Test::TesterResult<Result> impl(Cont& c, Result (Cont::*pm)(Args...), Args... args)
+		ContainerAssured::TesterResult<Result> impl(Cont& c, Result (Cont::*pm)(Args...), Args... args)
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			Result result = (c.*pm)(args...);
 			this->endTime = std::chrono::steady_clock::now();
-			return (Test::TesterResult<Result>(result, this->endTime - this->startTime));
+			return (ContainerAssured::TesterResult<Result>(result, this->endTime - this->startTime));
 		}
 		template <class Cont, class... Args>
-		Test::TesterResult<Result> impl(Cont& c, Result (Cont::*pm)(Args...) const, Args... args)
+		ContainerAssured::TesterResult<Result> impl(Cont& c, Result (Cont::*pm)(Args...) const, Args... args)
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			Result result = (c.*pm)(args...);
 			this->endTime = std::chrono::steady_clock::now();
-			return (Test::TesterResult<Result>(result, this->endTime - this->startTime));
+			return (ContainerAssured::TesterResult<Result>(result, this->endTime - this->startTime));
 		}
 	};
 
 	//============================ void specialization ===============================
 	template <>
-	class TesterUtil<void>
+	class When<void>
 	{
 	private:
 		std::chrono::steady_clock::time_point startTime;
@@ -45,20 +45,20 @@ namespace Test
 
 	public:
 		template <class Cont, class... Args>
-		Test::TesterResult<void> impl(Cont& c, void (Cont::*pm)(Args...), Args... args)
+		ContainerAssured::TesterResult<void> impl(Cont& c, void (Cont::*pm)(Args...), Args... args)
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			(c.*pm)(args...);
 			this->endTime = std::chrono::steady_clock::now();
-			return (Test::TesterResult<void>(this->endTime - this->startTime));
+			return (ContainerAssured::TesterResult<void>(this->endTime - this->startTime));
 		}
 		template <class Cont, class... Args>
-		Test::TesterResult<void> impl(Cont& c, void (Cont::*pm)(Args...) const, Args... args)
+		ContainerAssured::TesterResult<void> impl(Cont& c, void (Cont::*pm)(Args...) const, Args... args)
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			(c.*pm)(args...);
 			this->endTime = std::chrono::steady_clock::now();
-			return (Test::TesterResult<void>(this->endTime - this->startTime));
+			return (ContainerAssured::TesterResult<void>(this->endTime - this->startTime));
 		}
 	};
 }

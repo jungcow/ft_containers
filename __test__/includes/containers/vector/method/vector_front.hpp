@@ -6,7 +6,7 @@
 #include "global/tester_result.hpp"
 #include "global/tester_util.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace VectorMethod
 	{
@@ -24,42 +24,42 @@ namespace Test
 }
 
 template <class Cont>
-class Test::VectorUtil::FrontGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::FrontGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	FrontGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	FrontGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	Test::TesterResult<typename __base::reference> when()
+	ContainerAssured::TesterResult<typename __base::reference> when()
 	{
 		std::cout << "non-const when\n";
-		return (Test::TesterUtil<typename __base::reference>()
+		return (ContainerAssured::When<typename __base::reference>()
 					.template impl<Cont>(this->c, &Cont::front));
 	}
 };
 
 template <class Cont>
-class Test::VectorUtil::FrontConstGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::FrontConstGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	FrontConstGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	FrontConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	Test::TesterResult<typename __base::const_reference> when()
+	ContainerAssured::TesterResult<typename __base::const_reference> when()
 	{
 		std::cout << "const when\n";
-		return (Test::TesterUtil<typename __base::const_reference>()
+		return (ContainerAssured::When<typename __base::const_reference>()
 					.template impl<Cont>(this->c, &Cont::front));
 	}
 };
 
-class Test::VectorMethod::Front : public MethodBase
+class ContainerAssured::VectorMethod::Front : public MethodBase
 {
 public:
 	template <class Cont>
@@ -68,7 +68,7 @@ public:
 		return VectorUtil::FrontGiven<Cont>(container);
 	}
 };
-class Test::VectorMethod::FrontConst : public MethodBase
+class ContainerAssured::VectorMethod::FrontConst : public MethodBase
 {
 public:
 	template <class Cont>

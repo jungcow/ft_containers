@@ -3,7 +3,7 @@
 
 #include "global/tester.hpp"
 
-using namespace Test;
+using namespace ContainerAssured;
 
 void hello(void)
 {

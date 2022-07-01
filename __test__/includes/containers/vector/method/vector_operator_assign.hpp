@@ -6,7 +6,7 @@
 #include "global/tester_result.hpp"
 #include "global/tester_util.hpp"
 
-namespace Test
+namespace ContainerAssured
 {
 	namespace VectorMethod
 	{
@@ -21,27 +21,27 @@ namespace Test
 }
 
 template <class Cont>
-class Test::VectorUtil::OperatorAssignGiven : public Test::Base::VectorGivenBase<Cont>
+class ContainerAssured::VectorUtil::OperatorAssignGiven : public ContainerAssured::Base::VectorGivenBase<Cont>
 {
 private:
-	typedef Test::Base::VectorGivenBase<Cont> __base;
+	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
 
 public:
-	OperatorAssignGiven(Cont& input) : Test::Base::VectorGivenBase<Cont>(input) {}
+	OperatorAssignGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	Test::TesterResult<Cont&> when(const Cont& x)
+	ContainerAssured::TesterResult<Cont&> when(const Cont& x)
 	{
-		return (Test::TesterUtil<Cont&>()
+		return (ContainerAssured::When<Cont&>()
 					.template impl<Cont,
 								   const Cont&>(this->c, &Cont::operator=, x));
 	}
 };
 
-class Test::VectorMethod::OperatorAssign : public Test::MethodBase
+class ContainerAssured::VectorMethod::OperatorAssign : public ContainerAssured::MethodBase
 {
 public:
 	template <class Cont>
-	Test::VectorUtil::OperatorAssignGiven<Cont> given(Cont& container)
+	ContainerAssured::VectorUtil::OperatorAssignGiven<Cont> given(Cont& container)
 	{
 		return (VectorUtil::OperatorAssignGiven<Cont>(container));
 	}
