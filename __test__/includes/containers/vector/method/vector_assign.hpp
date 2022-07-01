@@ -4,7 +4,7 @@
 #include "base/method_base.hpp"
 #include "base/vector_given_base.hpp"
 #include "global/tester_result.hpp"
-#include "global/tester_util.hpp"
+#include "global/when.hpp"
 
 namespace ContainerAssured
 {
@@ -29,25 +29,25 @@ private:
 public:
 	AssignGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	// TODO: exception 관리
-	template <class InputIterator>
-	ContainerAssured::TesterResult<Cont, void, typename twoParameterPack<InputIterator, InputIterator>::type>
-	when(InputIterator first, InputIterator last)
-	{
-		return (ContainerAssured::When<void>()
-					.impl<Cont,
-						  InputIterator,
-						  InputIterator>(this->c, &Cont::assign, first, last));
-	}
-
 	ContainerAssured::TesterResult<Cont, void,
 								   typename twoParameterPack<typename __base::size_type, typename __base::const_reference>::type>
-	when(typename __base::size_type n, typename __base::value_type& val)
+	when(typename __base::size_type n, const typename __base::value_type& val)
 	{
 		return (ContainerAssured::When<void>()
 					.impl<Cont,
 						  typename __base::size_type,
 						  typename __base::const_reference>(this->c, &Cont::assign, n, val));
+	}
+
+	// TODO: exception 관리
+	template <class InputIterator>
+	ContainerAssured::TesterResult<Cont, void, typename twoParameterPack<InputIterator, InputIterator>::type>
+	when(typename std::enable_if<!std::is_integral<InputIterator>::value, InputIterator>::type first, InputIterator last)
+	{
+		return (ContainerAssured::When<void>()
+					.impl<Cont,
+						  InputIterator,
+						  InputIterator>(this->c, &Cont::assign, first, last));
 	}
 };
 

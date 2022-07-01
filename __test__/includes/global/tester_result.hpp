@@ -25,8 +25,9 @@ namespace ContainerAssured
 		TesterResult(const Cont& c, const Result& rs, const Args& inputArgs, const std::chrono::duration<double>& timespan)
 			: container(c), result(rs), args(inputArgs), sec(timespan) {}
 
-		// then(Result a)
+		// Then<Cont, Result, Args> then()
 		// {
+		// 	return (Then<Cont, Result, Args>());
 		// }
 
 		template <class timeunit = std::chrono::duration<double> >

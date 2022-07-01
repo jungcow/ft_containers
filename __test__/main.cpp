@@ -47,7 +47,7 @@ int main(void)
 
 	std::cout << vtester->assign()
 					 .given(vec)
-					 .when(ai, ad)
+					 .when(20, 3.3)
 					 .info<NANOSECONDS>()
 			  << std::endl;
 	std::cout << "size: " << vec.size() << std::endl;
@@ -267,4 +267,11 @@ int main(void)
 					 .info<NANOSECONDS>()
 			  << std::endl;
 	vtester->at_const().given(vec3).when(3).info();
+
+	ContainerAssured::Tester<VectorTester> vtester1;
+	std::vector<int> vec5(4, 10);
+
+	std::cout << "size: " << vec5.size() << std::endl;
+	std::cout << vtester1->assign().given(vec5).when(8, 20).info() << std::endl;
+	std::cout << "size: " << vec5.size() << std::endl;
 }

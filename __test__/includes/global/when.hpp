@@ -1,8 +1,7 @@
-#ifndef __TESTER_UTIL_H__
-#define __TESTER_UTIL_H__
+#ifndef __WHEN_H__
+#define __WHEN_H__
 
 #include <chrono>
-#include <iostream>
 
 #include "global/parameter_pack.hpp"
 #include "global/tester_result.hpp"
