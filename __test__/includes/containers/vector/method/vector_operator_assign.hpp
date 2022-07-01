@@ -31,7 +31,7 @@ public:
 
 	ContainerAssured::TesterResult<Cont,
 								   Cont&,
-								   ParameterPack<const Cont&, void, void, void> >
+								   typename oneParameterPack<const Cont&>::type>
 	when(const Cont& x)
 	{
 		return (ContainerAssured::When<Cont&>()

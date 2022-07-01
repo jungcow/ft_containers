@@ -29,8 +29,8 @@ private:
 public:
 	SwapGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	ContainerAssured::TesterResult<Cont, void, 
-	ParameterPack<Cont&, void, void, void> > 
+	ContainerAssured::TesterResult<Cont, void,
+								   typename oneParameterPack<Cont&>::type>
 	when(Cont& x)
 	{
 		return (ContainerAssured::When<void>()

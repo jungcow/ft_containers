@@ -33,7 +33,7 @@ public:
 	BeginGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	ContainerAssured::TesterResult<Cont, typename __base::iterator, ParameterPack<void, void, void, void> >
+	ContainerAssured::TesterResult<Cont, typename __base::iterator, voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<typename __base::iterator>()
@@ -51,7 +51,7 @@ public:
 	BeginConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	ContainerAssured::TesterResult<Cont, typename __base::const_iterator, ParameterPack<void, void, void, void> >
+	ContainerAssured::TesterResult<Cont, typename __base::const_iterator, voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<typename __base::const_iterator>()

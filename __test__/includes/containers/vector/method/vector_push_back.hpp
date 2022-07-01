@@ -29,9 +29,7 @@ private:
 public:
 	PushBackGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	ContainerAssured::TesterResult<Cont,
-								   void,
-								   ParameterPack<typename __base::const_reference, void, void, void> >
+	ContainerAssured::TesterResult<Cont, void, typename oneParameterPack<typename __base::const_reference>::type>
 	when(typename __base::const_reference val)
 	{
 		return (ContainerAssured::When<void>()

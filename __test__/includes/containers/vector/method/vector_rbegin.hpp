@@ -35,7 +35,7 @@ public:
 	// TODO: UB 관리
 	ContainerAssured::TesterResult<Cont,
 								   typename __base::reverse_iterator,
-								   ParameterPack<void, void, void, void> >
+								   voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<typename __base::reverse_iterator>()
@@ -54,7 +54,7 @@ public:
 
 	// TODO: UB 관리
 	ContainerAssured::TesterResult<Cont, typename __base::const_reverse_iterator,
-								   ParameterPack<void, void, void, void> >
+								   voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<typename __base::const_reverse_iterator>()

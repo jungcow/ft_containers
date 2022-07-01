@@ -25,14 +25,17 @@ namespace ContainerAssured
 		TesterResult(const Cont& c, const Result& rs, const Args& inputArgs, const std::chrono::duration<double>& timespan)
 			: container(c), result(rs), args(inputArgs), sec(timespan) {}
 
-		bool then(Result a) {}
+		// then(Result a)
+		// {
+		// }
 
 		template <class timeunit = std::chrono::duration<double> >
 		std::string info()
 		{
-			if (sec.count() < 0)
-				return (std::string("This test doesn't check time duration"));
-			return (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
+			return ("hello");
+			// if (sec.count() < 0)
+			// 	return (std::string("This test doesn't check time duration"));
+			// return (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
 		}
 	};
 

@@ -29,10 +29,9 @@ private:
 public:
 	InsertGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	ContainerAssured::TesterResult<Cont,
-								   typename __base::iterator,
-								   ParameterPack<typename __base::const_iterator,
-												 typename __base::const_reference, void, void> >
+	ContainerAssured::TesterResult<Cont, typename __base::iterator,
+								   typename twoParameterPack<typename __base::const_iterator,
+															 typename __base::const_reference>::type>
 	when(typename __base::iterator position, typename __base::const_reference val)
 	{
 		return (ContainerAssured::When<typename __base::iterator>()
@@ -43,9 +42,9 @@ public:
 
 	ContainerAssured::TesterResult<Cont,
 								   typename __base::iterator,
-								   ParameterPack<typename __base::const_iterator,
-												 typename __base::size_type,
-												 typename __base::const_reference, void> >
+								   typename threeParameterPack<typename __base::const_iterator,
+															   typename __base::size_type,
+															   typename __base::const_reference>::type>
 	when(typename __base::iterator position,
 		 typename __base::size_type n,
 		 typename __base::const_reference val)
@@ -59,19 +58,15 @@ public:
 
 	// TODO: exception 관리
 	template <class InputIterator>
-	ContainerAssured::TesterResult<Cont,
-								   typename __base::iterator,
-								   ParameterPack<typename __base::const_iterator,
-												 InputIterator, InputIterator, void> >
+	ContainerAssured::TesterResult<Cont, typename __base::iterator,
+								   typename threeParameterPack<typename __base::const_iterator,
+															   InputIterator, InputIterator>::type>
 	when(typename __base::iterator position,
 		 typename std::enable_if<
 			 !std::is_integral<InputIterator>::value,
 			 InputIterator>::type first,
 		 InputIterator last)
 	{
-		std::cout << type(position) << std::endl;
-		std::cout << type(first) << std::endl;
-		std::cout << type(last) << std::endl;
 		return (ContainerAssured::When<typename __base::iterator>()
 					.template impl<Cont,
 								   typename __base::const_iterator,

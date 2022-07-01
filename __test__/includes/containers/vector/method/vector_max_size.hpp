@@ -31,7 +31,7 @@ public:
 
 	ContainerAssured::TesterResult<Cont,
 								   typename __base::size_type,
-								   ParameterPack<void, void, void, void> >
+								   voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<typename __base::size_type>()

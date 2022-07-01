@@ -32,7 +32,7 @@ public:
 	// TODO: UB 관리
 	ContainerAssured::TesterResult<Cont,
 								   typename __base::iterator,
-								   ParameterPack<typename __base::const_iterator, void, void, void> >
+								   typename oneParameterPack<typename __base::const_iterator>::type>
 	when(typename __base::iterator position)
 	{
 		return (ContainerAssured::When<typename __base::iterator>()
@@ -41,10 +41,9 @@ public:
 	}
 
 	// TODO: UB 관리
-	ContainerAssured::TesterResult<Cont,
-								   typename __base::iterator,
-								   ParameterPack<typename __base::const_iterator,
-												 typename __base::const_iterator, void, void> >
+	ContainerAssured::TesterResult<Cont, typename __base::iterator,
+								   typename twoParameterPack<typename __base::const_iterator,
+															 typename __base::const_iterator>::type>
 	when(typename __base::iterator first, typename __base::iterator last)
 	{
 		return (ContainerAssured::When<typename __base::iterator>()

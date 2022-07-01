@@ -32,7 +32,7 @@ private:
 public:
 	EndGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	ContainerAssured::TesterResult<Cont, typename __base::iterator, ParameterPack<void, void, void, void> >
+	ContainerAssured::TesterResult<Cont, typename __base::iterator, voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<typename __base::iterator>()
@@ -49,7 +49,7 @@ private:
 public:
 	EndConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	ContainerAssured::TesterResult<Cont, typename __base::const_iterator, ParameterPack<void, void, void, void> >
+	ContainerAssured::TesterResult<Cont, typename __base::const_iterator, voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<typename __base::const_iterator>()

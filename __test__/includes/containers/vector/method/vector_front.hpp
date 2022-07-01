@@ -35,7 +35,7 @@ public:
 	// TODO: UB 관리
 	ContainerAssured::TesterResult<Cont,
 								   typename __base::reference,
-								   ParameterPack<void, void, void, void> >
+								   voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<typename __base::reference>()
@@ -55,7 +55,7 @@ public:
 	// TODO: UB 관리
 	ContainerAssured::TesterResult<Cont,
 								   typename __base::const_reference,
-								   ParameterPack<void, void, void, void> >
+								   voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<typename __base::const_reference>()

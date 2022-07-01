@@ -33,7 +33,7 @@ public:
 	REndGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	ContainerAssured::TesterResult<Cont, typename __base::reverse_iterator,
-								   ParameterPack<void, void, void, void> >
+								   voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<typename __base::reverse_iterator>()
@@ -50,8 +50,7 @@ private:
 public:
 	REndConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	ContainerAssured::TesterResult<Cont, typename __base::const_reverse_iterator,
-								   ParameterPack<void, void, void, void> >
+	ContainerAssured::TesterResult<Cont, typename __base::const_reverse_iterator, voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<typename __base::const_reverse_iterator>()

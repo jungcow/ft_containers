@@ -29,7 +29,7 @@ private:
 public:
 	EmptyGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	ContainerAssured::TesterResult<Cont, bool, ParameterPack<void, void, void, void> >
+	ContainerAssured::TesterResult<Cont, bool, voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<bool>()

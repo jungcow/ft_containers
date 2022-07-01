@@ -31,7 +31,7 @@ public:
 
 	ContainerAssured::TesterResult<Cont,
 								   void,
-								   ParameterPack<void, void, void, void> >
+								   voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<void>()

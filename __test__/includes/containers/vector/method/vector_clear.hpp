@@ -29,7 +29,7 @@ private:
 public:
 	ClearGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
-	ContainerAssured::TesterResult<Cont, void, ParameterPack<void, void, void, void> >
+	ContainerAssured::TesterResult<Cont, void, voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<void>()

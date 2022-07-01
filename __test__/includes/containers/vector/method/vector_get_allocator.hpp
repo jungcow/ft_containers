@@ -31,7 +31,7 @@ public:
 
 	ContainerAssured::TesterResult<Cont,
 								   typename Cont::allocator_type,
-								   ParameterPack<void, void, void, void> >
+								   voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<typename Cont::allocator_type>()

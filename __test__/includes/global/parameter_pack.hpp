@@ -3,6 +3,7 @@
 
 namespace ContainerAssured
 {
+
 	template <class Arg1, class Arg2, class Arg3, class Arg4>
 	class ParameterPackBase
 	{
@@ -113,6 +114,27 @@ namespace ContainerAssured
 	class ParameterPack<void, void, void, void> : private ParameterPackBase<int, int, int, int>
 	{
 	};
+
+	typedef ParameterPack<void, void, void, void> voidParameterPack;
+
+	template <class Arg1>
+	struct oneParameterPack
+	{
+		typedef ParameterPack<Arg1, void, void, void> type;
+	};
+
+	template <class Arg1, class Arg2>
+	struct twoParameterPack
+	{
+		typedef ParameterPack<Arg1, Arg2, void, void> type;
+	};
+
+	template <class Arg1, class Arg2, class Arg3>
+	struct threeParameterPack
+	{
+		typedef ParameterPack<Arg1, Arg2, Arg3, void> type;
+	};
+
 }
 
 #endif

@@ -33,9 +33,7 @@ public:
 	BackGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	ContainerAssured::TesterResult<Cont,
-								   typename __base::reference,
-								   ParameterPack<void, void, void, void> >
+	ContainerAssured::TesterResult<Cont, typename __base::reference, voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<typename __base::reference>()
@@ -53,9 +51,7 @@ public:
 	BackConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	// TODO: UB 관리
-	ContainerAssured::TesterResult<Cont,
-								   typename __base::const_reference,
-								   ParameterPack<void, void, void, void> >
+	ContainerAssured::TesterResult<Cont, typename __base::const_reference, voidParameterPack>
 	when()
 	{
 		return (ContainerAssured::When<typename __base::const_reference>()

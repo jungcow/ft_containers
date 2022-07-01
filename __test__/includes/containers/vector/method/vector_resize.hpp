@@ -30,8 +30,8 @@ public:
 	ResizeGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	ContainerAssured::TesterResult<Cont, void,
-								   ParameterPack<typename __base::size_type,
-												 typename __base::const_reference, void, void> >
+								   typename twoParameterPack<typename __base::size_type,
+															 typename __base::const_reference>::type>
 	when(typename __base::size_type n,
 		 typename __base::value_type val = typename __base::value_type())
 	{
