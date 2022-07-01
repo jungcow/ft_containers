@@ -5,8 +5,8 @@
 #include <functional>
 #include <vector>
 
-#include "./method_tester_base.hpp"
 #include "./tester_result.hpp"
+#include "method_tester_base.hpp"
 
 template <class Result, class T>
 class ConstMethodTester : public MethodTesterBase<Result, T>

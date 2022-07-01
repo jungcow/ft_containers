@@ -1,9 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#include "containers/vector/vector_tester.hpp"
 #include "global/tester.hpp"
-#include "type.hpp"
 
 using namespace Test;
 
@@ -14,10 +12,9 @@ void hello(void)
 
 int main(void)
 {
-#if LEAKS
+#ifdef LEAKS
 	atexit(hello);
 #endif
-
 	std::cout << "\n[ Erase Tester ]" << std::endl;
 	Tester<VectorTester> vtester;
 	std::vector<double> vec(10, 8);
@@ -269,4 +266,5 @@ int main(void)
 					 .when(vec4)
 					 .info<NANOSECONDS>()
 			  << std::endl;
+	vtester->at_const().given(vec3).when(3).info();
 }

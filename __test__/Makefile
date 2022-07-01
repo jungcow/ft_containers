@@ -1,16 +1,13 @@
 .PHONY		:	all re fclean clean
 
 NAME		=	container_tester
-INC			=	-I./global \
-				-I./containers/base\
-				-I./containers/vector\
-				-I./containers/vector/method\
-				-I./containers/map
+INC			=	-I./includes\
+				-I./includes/containers
 
 CXX			=	clang++
 
 CXXFLAGS	=	-pedantic\
-				-std=c++11 #-D TYPE=1
+				-std=c++11 -D LEAKS=1
 
 LFLAGS		=	#-lgtest -lgtest_main
 

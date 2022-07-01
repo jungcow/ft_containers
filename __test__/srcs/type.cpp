@@ -1,4 +1,4 @@
-#include "../global/type.hpp"
+#include "global/type.hpp"
 #ifdef __GNUG__
 #include <cxxabi.h>
 

@@ -1,8 +1,8 @@
 #ifndef __ITERATOR_TEST_H__
 #define __ITERATOR_TEST_H__
 
-#include "../const_method_tester.hpp"
-#include "../method_tester.hpp"
+#include "const_method_tester.hpp"
+#include "method_tester.hpp"
 
 class IteratorTest
 {

@@ -3,4 +3,5 @@
 *.o
 *.d
 .vscode/
+.deprecated/
 container_tester
