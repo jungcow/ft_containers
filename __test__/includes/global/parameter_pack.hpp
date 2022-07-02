@@ -43,10 +43,13 @@ namespace ContainerAssured
 	};
 
 	template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-	class ParameterPack : private ParameterPackBase<Arg1, Arg2, Arg3, Arg4>
+	struct ParameterPack : private ParameterPackBase<Arg1, Arg2, Arg3, Arg4>
 	{
-	public:
 		static const int num = 4;
+		typedef Arg1 Arg1Type;
+		typedef Arg2 Arg2Type;
+		typedef Arg3 Arg3Type;
+		typedef Arg4 Arg4Type;
 
 		ParameterPack(const Arg1& arg1, const Arg2& arg2, const Arg3& arg3, const Arg4& arg4)
 			: ParameterPackBase<Arg1, Arg2, Arg3, Arg4>(arg1, arg2, arg3, arg4) {}
@@ -73,10 +76,12 @@ namespace ContainerAssured
 	};
 
 	template <typename Arg1, typename Arg2, typename Arg3>
-	class ParameterPack<Arg1, Arg2, Arg3, void> : private ParameterPackBase<Arg1, Arg2, Arg3, int>
+	struct ParameterPack<Arg1, Arg2, Arg3, void> : private ParameterPackBase<Arg1, Arg2, Arg3, int>
 	{
-	public:
 		static const int num = 3;
+		typedef Arg1 Arg1Type;
+		typedef Arg2 Arg2Type;
+		typedef Arg3 Arg3Type;
 
 		ParameterPack(const Arg1& arg1, const Arg2& arg2, const Arg3& arg3)
 			: ParameterPackBase<Arg1, Arg2, Arg3, int>(arg1, arg2, arg3) {}
@@ -98,10 +103,11 @@ namespace ContainerAssured
 	};
 
 	template <typename Arg1, typename Arg2>
-	class ParameterPack<Arg1, Arg2, void, void> : private ParameterPackBase<Arg1, Arg2, int, int>
+	struct ParameterPack<Arg1, Arg2, void, void> : private ParameterPackBase<Arg1, Arg2, int, int>
 	{
-	public:
 		static const int num = 2;
+		typedef Arg1 Arg1Type;
+		typedef Arg2 Arg2Type;
 
 		ParameterPack(const Arg1& arg1, const Arg2& arg2)
 			: ParameterPackBase<Arg1, Arg2, int, int>(arg1, arg2, 0, 0) {}
@@ -120,10 +126,10 @@ namespace ContainerAssured
 	};
 
 	template <typename Arg1>
-	class ParameterPack<Arg1, void, void, void> : private ParameterPackBase<Arg1, int, int, int>
+	struct ParameterPack<Arg1, void, void, void> : private ParameterPackBase<Arg1, int, int, int>
 	{
-	public:
 		static const int num = 1;
+		typedef Arg1 Arg1Type;
 
 		ParameterPack(const Arg1& arg1)
 			: ParameterPackBase<Arg1, int, int, int>(arg1, 0, 0, 0) {}
@@ -135,33 +141,12 @@ namespace ContainerAssured
 			return this->getFirstParam();
 		}
 	};
-
 	template <>
-	class ParameterPack<void, void, void, void> : private ParameterPackBase<int, int, int, int>
+	struct ParameterPack<void, void, void, void> : private ParameterPackBase<int, int, int, int>
 	{
-	public:
 		static const int num = 0;
 	};
 
-	typedef ParameterPack<void, void, void, void> voidParameterPack;
-
-	template <class Arg1>
-	struct OneParameterPack
-	{
-		typedef ParameterPack<Arg1, void, void, void> type;
-	};
-
-	template <class Arg1, class Arg2>
-	struct TwoParameterPack
-	{
-		typedef ParameterPack<Arg1, Arg2, void, void> type;
-	};
-
-	template <class Arg1, class Arg2, class Arg3>
-	struct ThreeParameterPack
-	{
-		typedef ParameterPack<Arg1, Arg2, Arg3, void> type;
-	};
 }
 
 #endif

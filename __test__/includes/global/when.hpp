@@ -3,8 +3,8 @@
 
 #include <chrono>
 
-#include "global/parameter_pack.hpp"
 #include "global/tester_result.hpp"
+#include "global/tester_type_traits.hpp"
 
 namespace ContainerAssured
 {

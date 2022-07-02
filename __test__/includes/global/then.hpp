@@ -1,6 +1,7 @@
 #ifndef __THEN_H__
 #define __THEN_H__
 
+#include "global/tester_type_traits.hpp"
 #include "tester_info.hpp"
 #include "type.hpp"
 
@@ -18,49 +19,53 @@ namespace ContainerAssured
 	 * - returnValue
 	 * - log
 	 */
-	// template <class Cont, class result, class Args>
-	// class ThenBase
-	// {
-	// private:
-	// 	const Result& result;
-	// 	const Cont& container;
-	// 	const Args args;  // ParameterPack class
-	// 	std::chrono::duration<double> sec;
-	// 	std::string log;
-	// };
-
-	//=============================================================================
 	template <class Cont, class Result, class Args>
-	class Then : public TesterInfo
+	class ThenBase : public TesterInfo
 	{
 	private:
-		const Result& result;
-		const Cont& container;
+		Cont container;
 		const Args args;  // ParameterPack class
 		std::chrono::duration<double> sec;
 		std::string log;
 
-	public:
-		Then(const Cont& c, const Result& rs, const Args& inputArgs, std::chrono::duration<double> timespan)
-			: container(c), result(rs), args(inputArgs), sec(timespan) {}
-		// template <>
-		Then* firstParam()
+	protected:
+		ThenBase(const Cont& c, const Args& inputArgs, std::chrono::duration<double> timespan)
+			: container(c), args(inputArgs), sec(timespan) {}
+
+		ThenBase(const Args& inputArgs, std::chrono::duration<double> timespan)
+			: args(inputArgs), sec(timespan) {}
+
+	protected:
+		template <class T = Args>
+		typename T::Arg1Type firstParam(typename std::enable_if<!is_lt_one<T>::value>::type* = nullptr)
 		{
-			if (Args::num < 1)
-				std::cout << "no param\n";
-			else
-				std::cout << "first param: " << args.firstParam() << '\n';
-			return this;
-		}
-		Then* thisValue()
-		{
-			std::cout << "then's container addresss: " << &container << std::endl;
-		}
-		Then* returnValue()
-		{
-			std::cout << "then's return value: " << result << std::endl;
+			return args.firstParam();
 		}
 
+		template <class T = Args>
+		typename T::Arg2Type secondParam(typename std::enable_if<!is_lt_two<T>::value>::type* = nullptr)
+		{
+			return args.secondParam();
+		}
+
+		template <class T = Args>
+		typename T::Arg3Type thridParam(typename std::enable_if<!is_lt_three<T>::value>::type* = nullptr)
+		{
+			return args.thridParam();
+		}
+
+		template <class T = Args>
+		typename T::Arg4Type fourthParam(typename std::enable_if<!is_lt_four<T>::value>::type* = nullptr)
+		{
+			return args.fourthParam();
+		}
+
+		const Cont& thisValue()
+		{
+			return container;
+		}
+
+	public:
 		template <class timeunit = std::chrono::duration<double> >
 		std::string info()
 		{
@@ -68,85 +73,145 @@ namespace ContainerAssured
 				return (std::string("This test doesn't check time duration"));
 			return (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
 		}
+	};
+
+	//=============================================================================
+	template <class Cont, class Result, class Args>
+	struct Then : public ThenBase<Cont, Result, Args>
+	{
+		Then(const Cont& c, const Result& rs, const Args& inputArgs, std::chrono::duration<double> timespan)
+			: ThenBase<Cont, Result, Args>(c, inputArgs, timespan), result(rs) {}
+
+		template <class T = Args>
+		Then* assertFirstParam(typename std::enable_if<!is_lt_one<T>::value>::type* = nullptr)
+		{
+			this->firstParam();
+			return this;
+		}
+
+		template <class T = Args>
+		Then* assertSecondParam(typename std::enable_if<!is_lt_two<T>::value>::type* = nullptr)
+		{
+			this->secondParam();
+			return this;
+		}
+
+		template <class T = Args>
+		Then* assertThridParam(typename std::enable_if<!is_lt_three<T>::value>::type* = nullptr)
+		{
+			this->thridParam();
+			return this;
+		}
+
+		template <class T = Args>
+		Then* assertFourthParam(typename std::enable_if<!is_lt_four<T>::value>::type* = nullptr)
+		{
+			this->fourthParam();
+			return this;
+		}
+		Then* assertThisValue()
+		{
+			this->thisValue();
+			return this;
+		}
+
+		Then* assertReturnValue()
+		{
+			// result;
+			return this;
+		}
+
+	private:
+		const Result& result;
 	};
 
 	/**
 	 * Cont의 void에 대한 특수화
 	 */
 	template <class Result, class Args>
-	class Then<void, Result, Args> : TesterInfo
+	struct Then<void, Result, Args> : public ThenBase<int, Result, Args>
 	{
-	private:
-		const Result& result;
-		const Args args;  // ParameterPack class
-		std::chrono::duration<double> sec;
-		std::string log;
-
-	public:
 		Then(const Result& rs, const Args& inputArgs, std::chrono::duration<double> timespan)
-			: result(rs), args(inputArgs), sec(timespan) {}
-		// template <>
-		Then* firstParam()
+			: ThenBase<int, Result, Args>(inputArgs, timespan), result(rs) {}
+
+		template <class T = Args>
+		Then* assertFirstParam(typename std::enable_if<!is_lt_one<T>::value>::type* = nullptr)
 		{
-			if (Args::num < 1)
-				std::cout << "no param\n";
-			else
-			{
-				std::cout << "first param: " << args.firstParam() << '\n';
-			}
+			this->firstParam();
 			return this;
 		}
-		Then* returnValue()
+
+		template <class T = Args>
+		Then* assertSecondParam(typename std::enable_if<!is_lt_two<T>::value>::type* = nullptr)
 		{
-			std::cout << "then's return value: " << result << std::endl;
+			this->secondParam();
+			return this;
 		}
 
-		template <class timeunit = std::chrono::duration<double> >
-		std::string info()
+		template <class T = Args>
+		Then* assertThridParam(typename std::enable_if<!is_lt_three<T>::value>::type* = nullptr)
 		{
-			if (sec.count() < 0)
-				return (std::string("This test doesn't check time duration"));
-			return (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
+			this->thridParam();
+			return this;
 		}
+
+		template <class T = Args>
+		Then* assertFourthParam(typename std::enable_if<!is_lt_four<T>::value>::type* = nullptr)
+		{
+			this->fourthParam();
+			return this;
+		}
+
+		Then* assertReturnValue()
+		{
+			// result;
+			return this;
+		}
+
+	private:
+		const Result& result;
 	};
 
 	/**
 	 * Result의 void에 대한 특수화
 	 */
 	template <class Cont, class Args>
-	class Then<Cont, void, Args> : TesterInfo
+	struct Then<Cont, void, Args> : public ThenBase<Cont, int, Args>
 	{
-	private:
-		const Cont& container;
-		const Args args;  // ParameterPack class
-		std::chrono::duration<double> sec;
-		std::string log;
-
-	public:
 		Then(const Cont& c, const Args& inputArgs, std::chrono::duration<double> timespan)
-			: container(c), args(inputArgs), sec(timespan) {}
-		// template <>
-		Then* firstParam()
+			: ThenBase<Cont, int, Args>(c, inputArgs, timespan) {}
+
+		template <class T = Args>
+		Then* assertFirstParam(typename std::enable_if<!is_lt_one<T>::value>::type* = nullptr)
 		{
-			if (Args::num < 1)
-				std::cout << "no param\n";
-			else
-			{
-				std::cout << "first param: " << args.firstParam() << '\n';
-			}
+			this->firstParam();
 			return this;
 		}
-		Then* thisValue()
+
+		template <class T = Args>
+		Then* assertSecondParam(typename std::enable_if<!is_lt_two<T>::value>::type* = nullptr)
 		{
-			std::cout << "then's container addresss: " << &container << std::endl;
+			this->secondParam();
+			return this;
 		}
 
-		template <class timeunit = std::chrono::duration<double> >
-		std::string info()
+		template <class T = Args>
+		Then* assertThridParam(typename std::enable_if<!is_lt_three<T>::value>::type* = nullptr)
 		{
-			if (sec.count() < 0)
-				return (std::string("This test doesn't check time duration"));
-			return (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
+			this->thridParam();
+			return this;
+		}
+
+		template <class T = Args>
+		Then* assertFourthParam(typename std::enable_if<!is_lt_four<T>::value>::type* = nullptr)
+		{
+			this->fourthParam();
+			return this;
+		}
+		Then* assertThisValue()
+		{
+			this->thisValue();
+			return this;
 		}
 	};
 
@@ -154,34 +219,37 @@ namespace ContainerAssured
 	 * Cont와 Result의 void에 대한 특수화
 	 */
 	template <class Args>
-	class Then<void, void, Args> : TesterInfo
+	struct Then<void, void, Args> : ThenBase<int, int, Args>
 	{
-	private:
-		const Args args;  // ParameterPack class
-		std::chrono::duration<double> sec;
-		std::string log;
-
-	public:
 		Then(const Args& inputArgs, std::chrono::duration<double> timespan)
-			: args(inputArgs), sec(timespan) {}
-		// template <>
-		Then* firstParam()
+			: ThenBase<int, int, Args>(inputArgs, timespan) {}
+
+		template <class T = Args>
+		Then* assertFirstParam(typename std::enable_if<!is_lt_one<T>::value>::type* = nullptr)
 		{
-			if (Args::num < 1)
-				std::cout << "no param\n";
-			else
-			{
-				std::cout << "first param: " << args.firstParam() << '\n';
-			}
+			this->firstParam();
 			return this;
 		}
 
-		template <class timeunit = std::chrono::duration<double> >
-		std::string info()
+		template <class T = Args>
+		Then* assertSecondParam(typename std::enable_if<!is_lt_two<T>::value>::type* = nullptr)
 		{
-			if (sec.count() < 0)
-				return (std::string("This test doesn't check time duration"));
-			return (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
+			this->secondParam();
+			return this;
+		}
+
+		template <class T = Args>
+		Then* assertThridParam(typename std::enable_if<!is_lt_three<T>::value>::type* = nullptr)
+		{
+			this->thridParam();
+			return this;
+		}
+
+		template <class T = Args>
+		Then* assertFourthParam(typename std::enable_if<!is_lt_four<T>::value>::type* = nullptr)
+		{
+			this->fourthParam();
+			return this;
 		}
 	};
 }
