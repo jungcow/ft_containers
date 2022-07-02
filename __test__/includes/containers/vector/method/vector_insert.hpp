@@ -30,7 +30,7 @@ public:
 	InsertGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	ContainerAssured::TesterResult<Cont, typename __base::iterator,
-								   typename twoParameterPack<typename __base::const_iterator,
+								   typename TwoParameterPack<typename __base::const_iterator,
 															 typename __base::const_reference>::type>
 	when(typename __base::iterator position, typename __base::const_reference val)
 	{
@@ -42,7 +42,7 @@ public:
 
 	ContainerAssured::TesterResult<Cont,
 								   typename __base::iterator,
-								   typename threeParameterPack<typename __base::const_iterator,
+								   typename ThreeParameterPack<typename __base::const_iterator,
 															   typename __base::size_type,
 															   typename __base::const_reference>::type>
 	when(typename __base::iterator position,
@@ -59,7 +59,7 @@ public:
 	// TODO: exception 관리
 	template <class InputIterator>
 	ContainerAssured::TesterResult<Cont, typename __base::iterator,
-								   typename threeParameterPack<typename __base::const_iterator,
+								   typename ThreeParameterPack<typename __base::const_iterator,
 															   InputIterator, InputIterator>::type>
 	when(typename __base::iterator position,
 		 typename std::enable_if<

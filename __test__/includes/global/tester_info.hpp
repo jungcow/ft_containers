@@ -5,48 +5,51 @@
 #include <string>
 #include <type_traits>
 
-typedef std::chrono::milliseconds MILLISECONDS;
-typedef std::chrono::microseconds MICROSECONDS;
-typedef std::chrono::nanoseconds NANOSECONDS;
-
-class TesterInfo
+namespace ContainerAssured
 {
-private:
-	std::string takes;
+	typedef std::chrono::milliseconds MILLISECONDS;
+	typedef std::chrono::microseconds MICROSECONDS;
+	typedef std::chrono::nanoseconds NANOSECONDS;
 
-public:
-	TesterInfo() : takes("takes ") {}
-
-protected:
-	std::string info(std::chrono::duration<double> sec)
+	class TesterInfo
 	{
-		std::string info("takes ");
+	private:
+		std::string takes;
 
-		takes += std::to_string(sec.count());
-		takes += " s";
-		return takes;
-	}
+	public:
+		TesterInfo() : takes("takes ") {}
 
-	std::string info(std::chrono::milliseconds ms)
-	{
-		takes += std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(ms).count());
-		takes += " ms";
-		return takes;
-	}
+	protected:
+		std::string info(std::chrono::duration<double> sec)
+		{
+			std::string info("takes ");
 
-	std::string info(std::chrono::microseconds us)
-	{
-		takes += std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(us).count());
-		takes += " us";
-		return takes;
-	}
+			takes += std::to_string(sec.count());
+			takes += " s";
+			return takes;
+		}
 
-	std::string info(std::chrono::nanoseconds ns)
-	{
-		takes += std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(ns).count());
-		takes += " ns";
-		return takes;
-	}
-};
+		std::string info(std::chrono::milliseconds ms)
+		{
+			takes += std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(ms).count());
+			takes += " ms";
+			return takes;
+		}
+
+		std::string info(std::chrono::microseconds us)
+		{
+			takes += std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(us).count());
+			takes += " us";
+			return takes;
+		}
+
+		std::string info(std::chrono::nanoseconds ns)
+		{
+			takes += std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(ns).count());
+			takes += " ns";
+			return takes;
+		}
+	};
+}
 
 #endif

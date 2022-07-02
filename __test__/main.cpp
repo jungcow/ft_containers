@@ -266,12 +266,24 @@ int main(void)
 					 .when(vec4)
 					 .info<NANOSECONDS>()
 			  << std::endl;
-	vtester->at_const().given(vec3).when(3).info();
 
-	ContainerAssured::Tester<VectorTester> vtester1;
-	std::vector<int> vec5(4, 10);
+	std::cout << "main's container address: " << &vec << std::endl;
+	std::cout << vtester->assign()
+					 .given(vec)
+					 .when(20, 7)
+					 .then()
+					 ->firstParam()
+					 ->thisValue()
+					 ->info<NANOSECONDS>()
+			  << std::endl;
 
-	std::cout << "size: " << vec5.size() << std::endl;
-	std::cout << vtester1->assign().given(vec5).when(8, 20).info() << std::endl;
-	std::cout << "size: " << vec5.size() << std::endl;
+	std::cout << vtester->at_const()
+					 .given(vec)
+					 .when(9)
+					 .then()
+					 ->firstParam()
+					 ->thisValue()
+					 ->returnValue()
+					 ->info<NANOSECONDS>()
+			  << std::endl;
 }

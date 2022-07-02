@@ -43,65 +43,65 @@ namespace ContainerAssured
 		 */
 		template <class Cont, class Arg>
 		TesterResult<Cont,
-					 Result, typename oneParameterPack<Arg>::type>
+					 Result, typename OneParameterPack<Arg>::type>
 		impl(Cont& c, Result (Cont::*pm)(Arg), Arg arg)
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			Result result = (c.*pm)(arg);
 			this->endTime = std::chrono::steady_clock::now();
-			return (TesterResult<Cont, Result, typename oneParameterPack<Arg>::type>(c, result, typename oneParameterPack<Arg>::type(arg), this->endTime - this->startTime));
+			return (TesterResult<Cont, Result, typename OneParameterPack<Arg>::type>(c, result, typename OneParameterPack<Arg>::type(arg), this->endTime - this->startTime));
 		}
 		template <class Cont, class Arg>
 		TesterResult<Cont,
-					 Result, typename oneParameterPack<Arg>::type>
+					 Result, typename OneParameterPack<Arg>::type>
 		impl(Cont& c, Result (Cont::*pm)(Arg) const, Arg arg)
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			Result result = (c.*pm)(arg);
 			this->endTime = std::chrono::steady_clock::now();
 			return (TesterResult<Cont, Result,
-								 typename oneParameterPack<Arg>::type>(c,
+								 typename OneParameterPack<Arg>::type>(c,
 																	   result,
-																	   typename oneParameterPack<Arg>::type(arg),
+																	   typename OneParameterPack<Arg>::type(arg),
 																	   this->endTime - this->startTime));
 		}
 		/**
 		 * two parameter method
 		 */
 		template <class Cont, class Arg1, class Arg2>
-		TesterResult<Cont, Result, typename twoParameterPack<Arg1, Arg2>::type> impl(Cont& c, Result (Cont::*pm)(Arg1, Arg2), Arg1 arg1, Arg2 arg2)
+		TesterResult<Cont, Result, typename TwoParameterPack<Arg1, Arg2>::type> impl(Cont& c, Result (Cont::*pm)(Arg1, Arg2), Arg1 arg1, Arg2 arg2)
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			Result result = (c.*pm)(arg1, arg2);
 			this->endTime = std::chrono::steady_clock::now();
-			return (TesterResult<Cont, Result, typename twoParameterPack<Arg1, Arg2>::type>(c, result, typename twoParameterPack<Arg1, Arg2>::type(arg1, arg2), this->endTime - this->startTime));
+			return (TesterResult<Cont, Result, typename TwoParameterPack<Arg1, Arg2>::type>(c, result, typename TwoParameterPack<Arg1, Arg2>::type(arg1, arg2), this->endTime - this->startTime));
 		}
 		template <class Cont, class Arg1, class Arg2>
-		TesterResult<Cont, Result, typename twoParameterPack<Arg1, Arg2>::type> impl(Cont& c, Result (Cont::*pm)(Arg1, Arg2) const, Arg1 arg1, Arg2 arg2)
+		TesterResult<Cont, Result, typename TwoParameterPack<Arg1, Arg2>::type> impl(Cont& c, Result (Cont::*pm)(Arg1, Arg2) const, Arg1 arg1, Arg2 arg2)
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			Result result = (c.*pm)(arg1, arg2);
 			this->endTime = std::chrono::steady_clock::now();
-			return (TesterResult<Cont, Result, typename twoParameterPack<Arg1, Arg2>::type>(c, result, typename twoParameterPack<Arg1, Arg2>::type(arg1, arg2), this->endTime - this->startTime));
+			return (TesterResult<Cont, Result, typename TwoParameterPack<Arg1, Arg2>::type>(c, result, typename TwoParameterPack<Arg1, Arg2>::type(arg1, arg2), this->endTime - this->startTime));
 		}
 		/**
 		 * three parameter method
 		 */
 		template <class Cont, class Arg1, class Arg2, class Arg3>
-		TesterResult<Cont, Result, typename threeParameterPack<Arg1, Arg2, Arg3>::type> impl(Cont& c, Result (Cont::*pm)(Arg1, Arg2, Arg3), Arg1 arg1, Arg2 arg2, Arg3 arg3)
+		TesterResult<Cont, Result, typename ThreeParameterPack<Arg1, Arg2, Arg3>::type> impl(Cont& c, Result (Cont::*pm)(Arg1, Arg2, Arg3), Arg1 arg1, Arg2 arg2, Arg3 arg3)
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			Result result = (c.*pm)(arg1, arg2, arg3);
 			this->endTime = std::chrono::steady_clock::now();
-			return (TesterResult<Cont, Result, typename threeParameterPack<Arg1, Arg2, Arg3>::type>(c, result, typename threeParameterPack<Arg1, Arg2, Arg3>::type(arg1, arg2, arg3), this->endTime - this->startTime));
+			return (TesterResult<Cont, Result, typename ThreeParameterPack<Arg1, Arg2, Arg3>::type>(c, result, typename ThreeParameterPack<Arg1, Arg2, Arg3>::type(arg1, arg2, arg3), this->endTime - this->startTime));
 		}
 		template <class Cont, class Arg1, class Arg2, class Arg3>
-		TesterResult<Cont, Result, typename threeParameterPack<Arg1, Arg2, Arg3>::type> impl(Cont& c, Result (Cont::*pm)(Arg1, Arg2, Arg3) const, Arg1 arg1, Arg2 arg2, Arg3 arg3)
+		TesterResult<Cont, Result, typename ThreeParameterPack<Arg1, Arg2, Arg3>::type> impl(Cont& c, Result (Cont::*pm)(Arg1, Arg2, Arg3) const, Arg1 arg1, Arg2 arg2, Arg3 arg3)
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			Result result = (c.*pm)(arg1, arg2, arg3);
 			this->endTime = std::chrono::steady_clock::now();
-			return (TesterResult<Cont, Result, typename threeParameterPack<Arg1, Arg2, Arg3>::type>(c, result, typename threeParameterPack<Arg1, Arg2, Arg3>::type(arg1, arg2, arg3), this->endTime - this->startTime));
+			return (TesterResult<Cont, Result, typename ThreeParameterPack<Arg1, Arg2, Arg3>::type>(c, result, typename ThreeParameterPack<Arg1, Arg2, Arg3>::type(arg1, arg2, arg3), this->endTime - this->startTime));
 		}
 		/**
 		 * four parameter method
@@ -160,72 +160,72 @@ namespace ContainerAssured
 		 * one parameter method
 		 */
 		template <class Cont, class Arg>
-		TesterResult<Cont, void, typename oneParameterPack<Arg>::type> impl(Cont& c, void (Cont::*pm)(Arg), Arg arg)
+		TesterResult<Cont, void, typename OneParameterPack<Arg>::type> impl(Cont& c, void (Cont::*pm)(Arg), Arg arg)
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			(c.*pm)(arg);
 			this->endTime = std::chrono::steady_clock::now();
 			return (TesterResult<Cont, void,
-								 typename oneParameterPack<Arg>::type>(c,
-																	   typename oneParameterPack<Arg>::type(arg),
+								 typename OneParameterPack<Arg>::type>(c,
+																	   typename OneParameterPack<Arg>::type(arg),
 																	   this->endTime - this->startTime));
 		}
 		template <class Cont, class Arg>
-		TesterResult<Cont, void, typename oneParameterPack<Arg>::type> impl(Cont& c, void (Cont::*pm)(Arg) const, Arg arg)
+		TesterResult<Cont, void, typename OneParameterPack<Arg>::type> impl(Cont& c, void (Cont::*pm)(Arg) const, Arg arg)
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			(c.*pm)(arg);
 			this->endTime = std::chrono::steady_clock::now();
 			return (TesterResult<Cont, void,
-								 typename oneParameterPack<Arg>::type>(c,
-																	   typename oneParameterPack<Arg>::type(arg),
+								 typename OneParameterPack<Arg>::type>(c,
+																	   typename OneParameterPack<Arg>::type(arg),
 																	   this->endTime - this->startTime));
 		}
 		/**
 		 * two parameter method
 		 */
 		template <class Cont, class Arg1, class Arg2>
-		TesterResult<Cont, void, typename twoParameterPack<Arg1, Arg2>::type> impl(Cont& c, void (Cont::*pm)(Arg1, Arg2), Arg1 arg1, Arg2 arg2)
+		TesterResult<Cont, void, typename TwoParameterPack<Arg1, Arg2>::type> impl(Cont& c, void (Cont::*pm)(Arg1, Arg2), Arg1 arg1, Arg2 arg2)
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			(c.*pm)(arg1, arg2);
 			this->endTime = std::chrono::steady_clock::now();
 			return TesterResult<Cont,
 								void,
-								typename twoParameterPack<Arg1, Arg2>::type>(c, typename twoParameterPack<Arg1, Arg2>::type(arg1, arg2), this->endTime - this->startTime);
+								typename TwoParameterPack<Arg1, Arg2>::type>(c, typename TwoParameterPack<Arg1, Arg2>::type(arg1, arg2), this->endTime - this->startTime);
 		}
 		template <class Cont, class Arg1, class Arg2>
-		TesterResult<Cont, void, typename twoParameterPack<Arg1, Arg2>::type> impl(Cont& c, void (Cont::*pm)(Arg1, Arg2) const, Arg1 arg1, Arg2 arg2)
+		TesterResult<Cont, void, typename TwoParameterPack<Arg1, Arg2>::type> impl(Cont& c, void (Cont::*pm)(Arg1, Arg2) const, Arg1 arg1, Arg2 arg2)
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			(c.*pm)(arg1, arg2);
 			this->endTime = std::chrono::steady_clock::now();
 			return TesterResult<Cont,
 								void,
-								typename twoParameterPack<Arg1, Arg2>::type>(c, typename twoParameterPack<Arg1, Arg2>::type(arg1, arg2), this->endTime - this->startTime);
+								typename TwoParameterPack<Arg1, Arg2>::type>(c, typename TwoParameterPack<Arg1, Arg2>::type(arg1, arg2), this->endTime - this->startTime);
 		}
 		/**
 		 * three parameter method
 		 */
 		template <class Cont, class Arg1, class Arg2, class Arg3>
-		TesterResult<Cont, void, typename threeParameterPack<Arg1, Arg2, Arg3>::type> impl(Cont& c, void (Cont::*pm)(Arg1, Arg2, Arg3), Arg1 arg1, Arg2 arg2, Arg3 arg3)
+		TesterResult<Cont, void, typename ThreeParameterPack<Arg1, Arg2, Arg3>::type> impl(Cont& c, void (Cont::*pm)(Arg1, Arg2, Arg3), Arg1 arg1, Arg2 arg2, Arg3 arg3)
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			(c.*pm)(arg1, arg2, arg3);
 			this->endTime = std::chrono::steady_clock::now();
 			return (TesterResult<Cont,
 								 void,
-								 typename threeParameterPack<Arg1, Arg2, Arg3>::type>(c, typename threeParameterPack<Arg1, Arg2, Arg3>::type(arg1, arg2, arg3), this->endTime - this->startTime));
+								 typename ThreeParameterPack<Arg1, Arg2, Arg3>::type>(c, typename ThreeParameterPack<Arg1, Arg2, Arg3>::type(arg1, arg2, arg3), this->endTime - this->startTime));
 		}
 		template <class Cont, class Arg1, class Arg2, class Arg3>
-		TesterResult<Cont, void, typename threeParameterPack<Arg1, Arg2, Arg3>::type> impl(Cont& c, void (Cont::*pm)(Arg1, Arg2, Arg3) const, Arg1 arg1, Arg2 arg2, Arg3 arg3)
+		TesterResult<Cont, void, typename ThreeParameterPack<Arg1, Arg2, Arg3>::type> impl(Cont& c, void (Cont::*pm)(Arg1, Arg2, Arg3) const, Arg1 arg1, Arg2 arg2, Arg3 arg3)
 		{
 			this->startTime = std::chrono::steady_clock::now();
 			(c.*pm)(arg1, arg2, arg3);
 			this->endTime = std::chrono::steady_clock::now();
 			return (TesterResult<Cont,
 								 void,
-								 typename threeParameterPack<Arg1, Arg2, Arg3>::type>(c, typename threeParameterPack<Arg1, Arg2, Arg3>::type(arg1, arg2, arg3), this->endTime - this->startTime));
+								 typename ThreeParameterPack<Arg1, Arg2, Arg3>::type>(c, typename ThreeParameterPack<Arg1, Arg2, Arg3>::type(arg1, arg2, arg3), this->endTime - this->startTime));
 		}
 		/**
 		 * four parameter method

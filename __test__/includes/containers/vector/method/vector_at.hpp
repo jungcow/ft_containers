@@ -35,7 +35,7 @@ public:
 	// TODO: exception 관리
 	ContainerAssured::TesterResult<Cont,
 								   typename __base::reference,
-								   typename oneParameterPack<typename __base::size_type>::type>
+								   typename OneParameterPack<typename __base::size_type>::type>
 	when(typename __base::size_type n)
 	{
 		return (ContainerAssured::When<typename __base::reference>()
@@ -55,7 +55,7 @@ public:
 	// TODO: exception 관리
 	ContainerAssured::TesterResult<Cont,
 								   typename __base::const_reference,
-								   typename oneParameterPack<typename __base::size_type>::type>
+								   typename OneParameterPack<typename __base::size_type>::type>
 	when(typename __base::size_type n)
 	{
 		return (ContainerAssured::When<typename __base::const_reference>()

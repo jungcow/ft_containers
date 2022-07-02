@@ -30,7 +30,7 @@ public:
 	AssignGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
 
 	ContainerAssured::TesterResult<Cont, void,
-								   typename twoParameterPack<typename __base::size_type, typename __base::const_reference>::type>
+								   typename TwoParameterPack<typename __base::size_type, typename __base::const_reference>::type>
 	when(typename __base::size_type n, const typename __base::value_type& val)
 	{
 		return (ContainerAssured::When<void>()
@@ -41,7 +41,7 @@ public:
 
 	// TODO: exception 관리
 	template <class InputIterator>
-	ContainerAssured::TesterResult<Cont, void, typename twoParameterPack<InputIterator, InputIterator>::type>
+	ContainerAssured::TesterResult<Cont, void, typename TwoParameterPack<InputIterator, InputIterator>::type>
 	when(typename std::enable_if<!std::is_integral<InputIterator>::value, InputIterator>::type first, InputIterator last)
 	{
 		return (ContainerAssured::When<void>()

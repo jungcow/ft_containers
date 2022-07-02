@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include "tester_info.hpp"
+#include "then.hpp"
 
 namespace ContainerAssured
 {
@@ -12,11 +13,10 @@ namespace ContainerAssured
 	class TesterResult : public TesterInfo
 	{
 	private:
-		Result result;
+		const Result& result;
 		const Cont& container;
-		const Args& args;
+		const Args args;
 		std::chrono::duration<double> sec;
-		std::string log;
 
 	public:
 		TesterResult(const Cont& c, const Result& rs, const Args& inputArgs)
@@ -25,18 +25,17 @@ namespace ContainerAssured
 		TesterResult(const Cont& c, const Result& rs, const Args& inputArgs, const std::chrono::duration<double>& timespan)
 			: container(c), result(rs), args(inputArgs), sec(timespan) {}
 
-		// Then<Cont, Result, Args> then()
-		// {
-		// 	return (Then<Cont, Result, Args>());
-		// }
+		Then<Cont, Result, Args>* then()
+		{
+			return (new Then<Cont, Result, Args>(container, result, args, sec));
+		}
 
 		template <class timeunit = std::chrono::duration<double> >
 		std::string info()
 		{
-			return ("hello");
-			// if (sec.count() < 0)
-			// 	return (std::string("This test doesn't check time duration"));
-			// return (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
+			if (sec.count() < 0)
+				return (std::string("This test doesn't check time duration"));
+			return (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
 		}
 	};
 
@@ -47,8 +46,8 @@ namespace ContainerAssured
 	class TesterResult<void, Result, Args> : public TesterInfo
 	{
 	private:
-		Result result;
-		const Args& args;
+		const Result& result;
+		const Args args;
 		std::chrono::duration<double> sec;
 		std::string log;
 
@@ -59,7 +58,10 @@ namespace ContainerAssured
 		TesterResult(const Result& rs, const Args& inputArgs, const std::chrono::duration<double>& timespan)
 			: result(rs), args(inputArgs), sec(timespan) {}
 
-		bool then(Result a) {}
+		Then<void, Result, Args>* then()
+		{
+			return (new Then<void, Result, Args>(result, args, sec));
+		}
 
 		template <class timeunit = std::chrono::duration<double> >
 		std::string info()
@@ -78,7 +80,7 @@ namespace ContainerAssured
 	{
 	private:
 		const Cont& container;
-		const Args& args;
+		const Args args;
 		std::chrono::duration<double> sec;
 		std::string log;
 
@@ -86,6 +88,11 @@ namespace ContainerAssured
 		TesterResult(const Cont& c, const Args& inputArgs) : container(c), args(inputArgs), sec(-1) {}
 		TesterResult(const Cont& c, const Args& inputArgs, const std::chrono::duration<double>& timespan)
 			: container(c), args(inputArgs), sec(timespan) {}
+
+		Then<Cont, void, Args>* then()
+		{
+			return (new Then<Cont, void, Args>(container, args, sec));
+		}
 
 		template <class timeunit = std::chrono::duration<double> >
 		std::string info()
@@ -103,13 +110,18 @@ namespace ContainerAssured
 	class TesterResult<void, void, Args> : public TesterInfo
 	{
 	private:
-		const Args& args;
+		const Args args;
 		std::chrono::duration<double> sec;
 		std::string log;
 
 	public:
 		TesterResult(const Args& inputArgs) : args(inputArgs), sec(-1) {}
 		TesterResult(const Args& inputArgs, const std::chrono::duration<double>& timespan) : args(inputArgs), sec(timespan) {}
+
+		Then<void, void, Args>* then()
+		{
+			return (new Then<void, void, Args>(args, sec));
+		}
 
 		template <class timeunit = std::chrono::duration<double> >
 		std::string info()
