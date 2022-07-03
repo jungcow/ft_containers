@@ -1,7 +1,7 @@
 #ifndef __VECTOR_TESTER_H__
 #define __VECTOR_TESTER_H__
 
-#include <iostream>
+// #include <iostream>
 
 #include "vector/method/vector_assign.hpp"
 #include "vector/method/vector_at.hpp"

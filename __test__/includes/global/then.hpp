@@ -7,31 +7,15 @@
 
 namespace ContainerAssured
 {
-	/**
-	 * Then Base Class
-	 *
-	 * Interface:
-	 * - firstParam
-	 * - secondParam
-	 * - thirdParam
-	 * - fourthParam
-	 * - thisValue
-	 * - returnValue
-	 * - log
-	 */
-	template <class Cont, class Result, class Args>
+	template <class Args>
 	class ThenBase : public TesterInfo
 	{
 	private:
-		Cont container;
 		const Args args;  // ParameterPack class
 		std::chrono::duration<double> sec;
 		std::string log;
 
 	protected:
-		ThenBase(const Cont& c, const Args& inputArgs, std::chrono::duration<double> timespan)
-			: container(c), args(inputArgs), sec(timespan) {}
-
 		ThenBase(const Args& inputArgs, std::chrono::duration<double> timespan)
 			: args(inputArgs), sec(timespan) {}
 
@@ -60,11 +44,6 @@ namespace ContainerAssured
 			return args.fourthParam();
 		}
 
-		const Cont& thisValue()
-		{
-			return container;
-		}
-
 	public:
 		template <class timeunit = std::chrono::duration<double> >
 		std::string info()
@@ -77,10 +56,10 @@ namespace ContainerAssured
 
 	//=============================================================================
 	template <class Cont, class Result, class Args>
-	struct Then : public ThenBase<Cont, Result, Args>
+	struct Then : public ThenBase<Args>
 	{
 		Then(const Cont& c, const Result& rs, const Args& inputArgs, std::chrono::duration<double> timespan)
-			: ThenBase<Cont, Result, Args>(c, inputArgs, timespan), result(rs) {}
+			: ThenBase<Args>(inputArgs, timespan), container(c), result(rs) {}
 
 		template <class T = Args>
 		Then* assertFirstParam(typename std::enable_if<!is_lt_one<T>::value>::type* = nullptr)
@@ -111,7 +90,7 @@ namespace ContainerAssured
 		}
 		Then* assertThisValue()
 		{
-			this->thisValue();
+			// this->thisValue();
 			return this;
 		}
 
@@ -122,17 +101,18 @@ namespace ContainerAssured
 		}
 
 	private:
-		const Result& result;
+		const Result result;
+		const Cont& container;
 	};
 
 	/**
 	 * Cont의 void에 대한 특수화
 	 */
 	template <class Result, class Args>
-	struct Then<void, Result, Args> : public ThenBase<int, Result, Args>
+	struct Then<void, Result, Args> : public ThenBase<Args>
 	{
 		Then(const Result& rs, const Args& inputArgs, std::chrono::duration<double> timespan)
-			: ThenBase<int, Result, Args>(inputArgs, timespan), result(rs) {}
+			: ThenBase<Args>(inputArgs, timespan), result(rs) {}
 
 		template <class T = Args>
 		Then* assertFirstParam(typename std::enable_if<!is_lt_one<T>::value>::type* = nullptr)
@@ -169,17 +149,17 @@ namespace ContainerAssured
 		}
 
 	private:
-		const Result& result;
+		const Result result;
 	};
 
 	/**
 	 * Result의 void에 대한 특수화
 	 */
 	template <class Cont, class Args>
-	struct Then<Cont, void, Args> : public ThenBase<Cont, int, Args>
+	struct Then<Cont, void, Args> : public ThenBase<Args>
 	{
 		Then(const Cont& c, const Args& inputArgs, std::chrono::duration<double> timespan)
-			: ThenBase<Cont, int, Args>(c, inputArgs, timespan) {}
+			: ThenBase<Args>(inputArgs, timespan), container(c) {}
 
 		template <class T = Args>
 		Then* assertFirstParam(typename std::enable_if<!is_lt_one<T>::value>::type* = nullptr)
@@ -210,19 +190,22 @@ namespace ContainerAssured
 		}
 		Then* assertThisValue()
 		{
-			this->thisValue();
+			// this->thisValue();
 			return this;
 		}
+
+	private:
+		const Cont& container;
 	};
 
 	/**
 	 * Cont와 Result의 void에 대한 특수화
 	 */
 	template <class Args>
-	struct Then<void, void, Args> : ThenBase<int, int, Args>
+	struct Then<void, void, Args> : ThenBase<Args>
 	{
 		Then(const Args& inputArgs, std::chrono::duration<double> timespan)
-			: ThenBase<int, int, Args>(inputArgs, timespan) {}
+			: ThenBase<Args>(inputArgs, timespan) {}
 
 		template <class T = Args>
 		Then* assertFirstParam(typename std::enable_if<!is_lt_one<T>::value>::type* = nullptr)
