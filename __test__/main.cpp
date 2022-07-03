@@ -15,7 +15,6 @@ int main(void)
 #ifdef LEAKS
 	atexit(hello);
 #endif
-	std::cout << "\n[ Erase Tester ]" << std::endl;
 	Tester<VectorTester> vtester;
 	std::vector<double> vec(10, 8);
 	std::vector<double>::iterator vi;
@@ -26,6 +25,7 @@ int main(void)
 	from = vec.begin() + 2;
 	to = vec.end() - 3;
 
+	std::cout << "\n[ Erase Tester ]" << std::endl;
 	std::cout << vec.size() << std::endl;
 	std::cout << vtester->erase()
 					 .given(vec)
@@ -267,41 +267,19 @@ int main(void)
 					 .info<NANOSECONDS>()
 			  << std::endl;
 
-	std::cout << "main's container address: " << &vec << std::endl;
-	std::cout << vtester->assign()
-					 .given(vec)
-					 .when(20, 7)
-					 .then()
-					 ->assertFirstParam()
-					 ->assertSecondParam()
-					 ->assertThisValue()
-					 ->info<NANOSECONDS>()
+	std::vector<int> vec5(10, 20);
+	std::vector<int> vec6(20, 30);
+
+	std::cout << vtester->assign().given(vec5).when(20, 10).then()
+		->assertContainer()
+			.sizeIs(20).sizeIs(10).nextAssert()
+		->assertFirstParam()
+		->info<NANOSECONDS>()
 			  << std::endl;
 
-	std::cout << vtester->at_const()
-					 .given(vec)
-					 .when(9)
-					 .then()
-					 ->assertFirstParam()
-					 ->assertThisValue()
-					 ->assertReturnValue()
-					 ->info<NANOSECONDS>()
-			  << std::endl;
-	std::cout << vtester->pop_back()
-					 .given(vec)
-					 .when()
-					 .then()
-					 ->assertThisValue()
-					 ->info<NANOSECONDS>()
-			  << std::endl;
-	std::cout << vtester->push_back()
-					 .given(vec)
-					 .when(2)
-					 .then()
-					 ->assertFirstParam()
-					 ->assertThisValue()
-					 ->info<NANOSECONDS>()
-			  << std::endl;
-
-	
+	vtester->swap()
+		.given(vec6)
+		.when(vec5)
+		.then()
+		->assertContainer();
 }

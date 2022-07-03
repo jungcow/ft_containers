@@ -125,6 +125,9 @@ namespace ContainerAssured
 	};
 
 	//============================ Result's void specialization ===============================
+	/**
+	 * Void Specialization
+	 */
 	template <>
 	class When<void>
 	{

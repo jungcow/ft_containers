@@ -1,6 +1,7 @@
 #ifndef __THEN_H__
 #define __THEN_H__
 
+#include "assert.hpp"
 #include "global/tester_type_traits.hpp"
 #include "tester_info.hpp"
 #include "type.hpp"
@@ -14,6 +15,11 @@ namespace ContainerAssured
 		const Args args;  // ParameterPack class
 		std::chrono::duration<double> sec;
 		std::string log;
+
+	protected:
+		ContainerAssertInfo containerAssertInfo;
+		ReturnValueAssertInfo returnValueAssertInfo;
+		ParameterAssertInfo parameterAssertInfo;
 
 	protected:
 		ThenBase(const Args& inputArgs, std::chrono::duration<double> timespan)
@@ -88,10 +94,9 @@ namespace ContainerAssured
 			this->fourthParam();
 			return this;
 		}
-		Then* assertThisValue()
+		AssertContainer<Then*, Cont&> assertContainer()
 		{
-			// this->thisValue();
-			return this;
+			return AssertContainer<Then*, Cont&>(this, this->containerAssertInfo, container);
 		}
 
 		Then* assertReturnValue()
@@ -188,10 +193,10 @@ namespace ContainerAssured
 			this->fourthParam();
 			return this;
 		}
-		Then* assertThisValue()
+
+		AssertContainer<Then*, Cont> assertContainer()
 		{
-			// this->thisValue();
-			return this;
+			return AssertContainer<Then*, Cont>(this, this->containerAssertInfo, container);
 		}
 
 	private:

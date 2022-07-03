@@ -9,6 +9,11 @@
 
 namespace ContainerAssured
 {
+	/**
+	 * First Template Parameter: Container Type
+	 * Second Template Parameter: Return type
+	 * Thrid Template Parameter: ParameterPack class Template
+	 */
 	template <class Cont, class Result, class Args>
 	class TesterResult : public TesterInfo
 	{
