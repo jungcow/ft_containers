@@ -28,6 +28,7 @@ class ContainerAssured::VectorUtil::RBeginGiven : public ContainerAssured::Base:
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "rbegin";
 
 public:
 	RBeginGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -38,7 +39,7 @@ public:
 								   voidParameterPack>
 	when()
 	{
-		return (ContainerAssured::When<typename __base::reverse_iterator>()
+		return (ContainerAssured::When<typename __base::reverse_iterator>(methodname)
 					.template impl<Cont>(this->c, &Cont::rbegin));
 	}
 };
@@ -48,6 +49,7 @@ class ContainerAssured::VectorUtil::RBeginConstGiven : public ContainerAssured::
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "rbegin const";
 
 public:
 	RBeginConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -57,7 +59,7 @@ public:
 								   voidParameterPack>
 	when()
 	{
-		return (ContainerAssured::When<typename __base::const_reverse_iterator>()
+		return (ContainerAssured::When<typename __base::const_reverse_iterator>(methodname)
 					.template impl<Cont>(this->c, &Cont::rbegin));
 	}
 };

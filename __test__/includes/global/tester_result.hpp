@@ -18,21 +18,22 @@ namespace ContainerAssured
 	class TesterResult : public TesterInfo
 	{
 	private:
-		const Result& result;
+		const Result result;
 		const Cont& container;
 		const Args args;
+		const char* methodname;
 		std::chrono::duration<double> sec;
 
 	public:
-		TesterResult(const Cont& c, const Result& rs, const Args& inputArgs)
-			: container(c), result(rs), args(inputArgs), sec(-1) {}
+		TesterResult(const Cont& c, const Result& rs, const Args& inputArgs, const char* mn)
+			: container(c), result(rs), args(inputArgs), sec(-1), methodname(mn) {}
 
-		TesterResult(const Cont& c, const Result& rs, const Args& inputArgs, const std::chrono::duration<double>& timespan)
-			: container(c), result(rs), args(inputArgs), sec(timespan) {}
+		TesterResult(const Cont& c, const Result& rs, const Args& inputArgs, const std::chrono::duration<double>& timespan, const char* mn)
+			: container(c), result(rs), args(inputArgs), sec(timespan), methodname(mn) {}
 
 		Then<Cont, Result, Args>* then()
 		{
-			return (new Then<Cont, Result, Args>(container, result, args, sec));
+			return (new Then<Cont, Result, Args>(container, result, args, sec, methodname));
 		}
 
 		template <class timeunit = std::chrono::duration<double> >
@@ -53,19 +54,19 @@ namespace ContainerAssured
 	private:
 		const Result& result;
 		const Args args;
+		const char* methodname;
 		std::chrono::duration<double> sec;
-		std::string log;
 
 	public:
-		TesterResult(const Result& rs, const Args& inputArgs)
-			: result(rs), args(inputArgs), sec(-1) {}
+		TesterResult(const Result& rs, const Args& inputArgs, const char* mn)
+			: result(rs), args(inputArgs), sec(-1), methodname(mn) {}
 
-		TesterResult(const Result& rs, const Args& inputArgs, const std::chrono::duration<double>& timespan)
-			: result(rs), args(inputArgs), sec(timespan) {}
+		TesterResult(const Result& rs, const Args& inputArgs, const std::chrono::duration<double>& timespan, const char* mn)
+			: result(rs), args(inputArgs), sec(timespan), methodname(mn) {}
 
 		Then<void, Result, Args>* then()
 		{
-			return (new Then<void, Result, Args>(result, args, sec));
+			return (new Then<void, Result, Args>(result, args, sec, methodname));
 		}
 
 		template <class timeunit = std::chrono::duration<double> >
@@ -86,17 +87,17 @@ namespace ContainerAssured
 	private:
 		const Cont& container;
 		const Args args;
+		const char* methodname;
 		std::chrono::duration<double> sec;
-		std::string log;
 
 	public:
-		TesterResult(const Cont& c, const Args& inputArgs) : container(c), args(inputArgs), sec(-1) {}
-		TesterResult(const Cont& c, const Args& inputArgs, const std::chrono::duration<double>& timespan)
-			: container(c), args(inputArgs), sec(timespan) {}
+		TesterResult(const Cont& c, const Args& inputArgs, const char* mn) : container(c), args(inputArgs), sec(-1), methodname(mn) {}
+		TesterResult(const Cont& c, const Args& inputArgs, const std::chrono::duration<double>& timespan, const char* mn)
+			: container(c), args(inputArgs), sec(timespan), methodname(mn) {}
 
 		Then<Cont, void, Args>* then()
 		{
-			return (new Then<Cont, void, Args>(container, args, sec));
+			return (new Then<Cont, void, Args>(container, args, sec, methodname));
 		}
 
 		template <class timeunit = std::chrono::duration<double> >
@@ -116,16 +117,16 @@ namespace ContainerAssured
 	{
 	private:
 		const Args args;
+		const char* methodname;
 		std::chrono::duration<double> sec;
-		std::string log;
 
 	public:
-		TesterResult(const Args& inputArgs) : args(inputArgs), sec(-1) {}
-		TesterResult(const Args& inputArgs, const std::chrono::duration<double>& timespan) : args(inputArgs), sec(timespan) {}
+		TesterResult(const Args& inputArgs, const char* mn) : args(inputArgs), sec(-1), methodname(mn) {}
+		TesterResult(const Args& inputArgs, const std::chrono::duration<double>& timespan, const char* mn) : args(inputArgs), sec(timespan), methodname(mn) {}
 
 		Then<void, void, Args>* then()
 		{
-			return (new Then<void, void, Args>(args, sec));
+			return (new Then<void, void, Args>(args, sec, methodname));
 		}
 
 		template <class timeunit = std::chrono::duration<double> >

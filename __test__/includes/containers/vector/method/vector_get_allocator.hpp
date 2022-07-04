@@ -25,6 +25,7 @@ class ContainerAssured::VectorUtil::GetAllocatorGiven : public ContainerAssured:
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "get_allocator";
 
 public:
 	GetAllocatorGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -34,7 +35,7 @@ public:
 								   voidParameterPack>
 	when()
 	{
-		return (ContainerAssured::When<typename Cont::allocator_type>()
+		return (ContainerAssured::When<typename Cont::allocator_type>(methodname)
 					.template impl<Cont>(this->c, &Cont::get_allocator));
 	}
 };

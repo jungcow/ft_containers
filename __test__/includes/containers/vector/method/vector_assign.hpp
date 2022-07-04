@@ -25,6 +25,7 @@ class ContainerAssured::VectorUtil::AssignGiven : public ContainerAssured::Base:
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "assign";
 
 public:
 	AssignGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -33,7 +34,7 @@ public:
 								   typename TwoParameterPack<typename __base::size_type, typename __base::const_reference>::type>
 	when(typename __base::size_type n, const typename __base::value_type& val)
 	{
-		return (ContainerAssured::When<void>()
+		return (ContainerAssured::When<void>(methodname)
 					.impl<Cont,
 						  typename __base::size_type,
 						  typename __base::const_reference>(this->c, &Cont::assign, n, val));
@@ -44,7 +45,7 @@ public:
 	ContainerAssured::TesterResult<Cont, void, typename TwoParameterPack<InputIterator, InputIterator>::type>
 	when(typename std::enable_if<!std::is_integral<InputIterator>::value, InputIterator>::type first, InputIterator last)
 	{
-		return (ContainerAssured::When<void>()
+		return (ContainerAssured::When<void>(methodname)
 					.impl<Cont,
 						  InputIterator,
 						  InputIterator>(this->c, &Cont::assign, first, last));

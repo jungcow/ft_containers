@@ -25,6 +25,7 @@ class ContainerAssured::VectorUtil::CapacityGiven : public ContainerAssured::Bas
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "capacity";
 
 public:
 	CapacityGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -32,7 +33,7 @@ public:
 	ContainerAssured::TesterResult<Cont, typename __base::size_type, voidParameterPack>
 	when()
 	{
-		return (ContainerAssured::When<typename __base::size_type>()
+		return (ContainerAssured::When<typename __base::size_type>(methodname)
 					.template impl<Cont>(this->c, &Cont::capacity));
 	}
 };

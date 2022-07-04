@@ -14,16 +14,16 @@ namespace ContainerAssured
 	private:
 		const Args args;  // ParameterPack class
 		std::chrono::duration<double> sec;
-		std::string log;
 
 	protected:
 		ContainerAssertInfo containerAssertInfo;
 		ReturnValueAssertInfo returnValueAssertInfo;
 		ParameterAssertInfo parameterAssertInfo;
+		const char* methodname;
 
 	protected:
-		ThenBase(const Args& inputArgs, std::chrono::duration<double> timespan)
-			: args(inputArgs), sec(timespan) {}
+		ThenBase(const Args& inputArgs, std::chrono::duration<double> timespan, const char* mn)
+			: args(inputArgs), sec(timespan), methodname(mn) {}
 
 	protected:
 		template <class T = Args>
@@ -64,8 +64,8 @@ namespace ContainerAssured
 	template <class Cont, class Result, class Args>
 	struct Then : public ThenBase<Args>
 	{
-		Then(const Cont& c, const Result& rs, const Args& inputArgs, std::chrono::duration<double> timespan)
-			: ThenBase<Args>(inputArgs, timespan), container(c), result(rs) {}
+		Then(const Cont& c, const Result& rs, const Args& inputArgs, std::chrono::duration<double> timespan, const char* mn)
+			: ThenBase<Args>(inputArgs, timespan, mn), container(c), result(rs) {}
 
 		template <class T = Args>
 		Then* assertFirstParam(typename std::enable_if<!is_lt_one<T>::value>::type* = nullptr)
@@ -116,8 +116,8 @@ namespace ContainerAssured
 	template <class Result, class Args>
 	struct Then<void, Result, Args> : public ThenBase<Args>
 	{
-		Then(const Result& rs, const Args& inputArgs, std::chrono::duration<double> timespan)
-			: ThenBase<Args>(inputArgs, timespan), result(rs) {}
+		Then(const Result& rs, const Args& inputArgs, std::chrono::duration<double> timespan, const char* mn)
+			: ThenBase<Args>(inputArgs, timespan, mn), result(rs) {}
 
 		template <class T = Args>
 		Then* assertFirstParam(typename std::enable_if<!is_lt_one<T>::value>::type* = nullptr)
@@ -163,8 +163,8 @@ namespace ContainerAssured
 	template <class Cont, class Args>
 	struct Then<Cont, void, Args> : public ThenBase<Args>
 	{
-		Then(const Cont& c, const Args& inputArgs, std::chrono::duration<double> timespan)
-			: ThenBase<Args>(inputArgs, timespan), container(c) {}
+		Then(const Cont& c, const Args& inputArgs, std::chrono::duration<double> timespan, const char* mn)
+			: ThenBase<Args>(inputArgs, timespan, mn), container(c) {}
 
 		template <class T = Args>
 		Then* assertFirstParam(typename std::enable_if<!is_lt_one<T>::value>::type* = nullptr)
@@ -209,8 +209,8 @@ namespace ContainerAssured
 	template <class Args>
 	struct Then<void, void, Args> : ThenBase<Args>
 	{
-		Then(const Args& inputArgs, std::chrono::duration<double> timespan)
-			: ThenBase<Args>(inputArgs, timespan) {}
+		Then(const Args& inputArgs, std::chrono::duration<double> timespan, const char* mn)
+			: ThenBase<Args>(inputArgs, timespan, mn) {}
 
 		template <class T = Args>
 		Then* assertFirstParam(typename std::enable_if<!is_lt_one<T>::value>::type* = nullptr)

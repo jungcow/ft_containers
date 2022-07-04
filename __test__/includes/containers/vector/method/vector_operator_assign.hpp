@@ -25,6 +25,7 @@ class ContainerAssured::VectorUtil::OperatorAssignGiven : public ContainerAssure
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "operator=";
 
 public:
 	OperatorAssignGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -34,7 +35,7 @@ public:
 								   typename OneParameterPack<const Cont&>::type>
 	when(const Cont& x)
 	{
-		return (ContainerAssured::When<Cont&>()
+		return (ContainerAssured::When<Cont&>(methodname)
 					.template impl<Cont, const Cont&>(this->c, &Cont::operator=, x));
 	}
 };

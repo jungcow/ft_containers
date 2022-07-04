@@ -25,6 +25,7 @@ class ContainerAssured::VectorUtil::ReserveGiven : public ContainerAssured::Base
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "reserve";
 
 public:
 	ReserveGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -32,7 +33,7 @@ public:
 	ContainerAssured::TesterResult<Cont, void, typename OneParameterPack<typename __base::size_type>::type>
 	when(typename __base::size_type n)
 	{
-		return (ContainerAssured::When<void>()
+		return (ContainerAssured::When<void>(methodname)
 					.template impl<Cont,
 								   typename __base::size_type>(this->c, &Cont::reserve, n));
 	}

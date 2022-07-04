@@ -28,6 +28,7 @@ class ContainerAssured::VectorUtil::EndGiven : public ContainerAssured::Base::Ve
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "end";
 
 public:
 	EndGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -35,7 +36,7 @@ public:
 	ContainerAssured::TesterResult<Cont, typename __base::iterator, voidParameterPack>
 	when()
 	{
-		return (ContainerAssured::When<typename __base::iterator>()
+		return (ContainerAssured::When<typename __base::iterator>(methodname)
 					.template impl<Cont>(this->c, &Cont::end));
 	}
 };
@@ -45,6 +46,7 @@ class ContainerAssured::VectorUtil::EndConstGiven : public ContainerAssured::Bas
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "end const";
 
 public:
 	EndConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -52,7 +54,7 @@ public:
 	ContainerAssured::TesterResult<Cont, typename __base::const_iterator, voidParameterPack>
 	when()
 	{
-		return (ContainerAssured::When<typename __base::const_iterator>()
+		return (ContainerAssured::When<typename __base::const_iterator>(methodname)
 					.template impl<Cont>(this->c, &Cont::end));
 	}
 };

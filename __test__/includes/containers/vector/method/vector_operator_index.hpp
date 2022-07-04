@@ -28,6 +28,7 @@ class ContainerAssured::VectorUtil::OperatorIndexGiven : public ContainerAssured
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "operator[]";
 
 public:
 	OperatorIndexGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -38,7 +39,7 @@ public:
 								   typename OneParameterPack<typename __base::size_type>::type>
 	when(typename __base::size_type n)
 	{
-		return (ContainerAssured::When<typename __base::reference>()
+		return (ContainerAssured::When<typename __base::reference>(methodname)
 					.template impl<Cont, typename __base::size_type>(this->c, &Cont::operator[], n));
 	}
 };
@@ -48,6 +49,7 @@ class ContainerAssured::VectorUtil::OperatorIndexConstGiven : public ContainerAs
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "operator[] const";
 
 public:
 	OperatorIndexConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -58,7 +60,7 @@ public:
 								   typename OneParameterPack<typename __base::size_type>::type>
 	when(typename __base::size_type n)
 	{
-		return (ContainerAssured::When<typename __base::const_reference>()
+		return (ContainerAssured::When<typename __base::const_reference>(methodname)
 					.template impl<Cont, typename __base::size_type>(this->c, &Cont::operator[], n));
 	}
 };

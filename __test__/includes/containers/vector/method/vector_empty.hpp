@@ -25,6 +25,7 @@ class ContainerAssured::VectorUtil::EmptyGiven : public ContainerAssured::Base::
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "empty";
 
 public:
 	EmptyGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -32,7 +33,7 @@ public:
 	ContainerAssured::TesterResult<Cont, bool, voidParameterPack>
 	when()
 	{
-		return (ContainerAssured::When<bool>()
+		return (ContainerAssured::When<bool>(methodname)
 					.template impl<Cont>(this->c, &Cont::empty));
 	}
 };

@@ -25,6 +25,7 @@ class ContainerAssured::VectorUtil::SizeGiven : public ContainerAssured::Base::V
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "size";
 
 public:
 	SizeGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -32,7 +33,7 @@ public:
 	ContainerAssured::TesterResult<Cont, typename __base::size_type, voidParameterPack>
 	when()
 	{
-		return (ContainerAssured::When<typename __base::size_type>()
+		return (ContainerAssured::When<typename __base::size_type>(methodname)
 					.template impl<Cont>(this->c, &Cont::size));
 	}
 };

@@ -25,6 +25,7 @@ class ContainerAssured::VectorUtil::MaxSizeGiven : public ContainerAssured::Base
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "max_size";
 
 public:
 	MaxSizeGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -34,7 +35,7 @@ public:
 								   voidParameterPack>
 	when()
 	{
-		return (ContainerAssured::When<typename __base::size_type>()
+		return (ContainerAssured::When<typename __base::size_type>(methodname)
 					.template impl<Cont>(this->c, &Cont::max_size));
 	}
 };

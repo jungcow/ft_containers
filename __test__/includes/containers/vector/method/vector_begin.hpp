@@ -28,6 +28,7 @@ class ContainerAssured::VectorUtil::BeginGiven : public ContainerAssured::Base::
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "begin";
 
 public:
 	BeginGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -36,7 +37,7 @@ public:
 	ContainerAssured::TesterResult<Cont, typename __base::iterator, voidParameterPack>
 	when()
 	{
-		return (ContainerAssured::When<typename __base::iterator>()
+		return (ContainerAssured::When<typename __base::iterator>(methodname)
 					.template impl<Cont>(this->c, &Cont::begin));
 	}
 };
@@ -46,6 +47,7 @@ class ContainerAssured::VectorUtil::BeginConstGiven : public ContainerAssured::B
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "begin const";
 
 public:
 	BeginConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -54,7 +56,7 @@ public:
 	ContainerAssured::TesterResult<Cont, typename __base::const_iterator, voidParameterPack>
 	when()
 	{
-		return (ContainerAssured::When<typename __base::const_iterator>()
+		return (ContainerAssured::When<typename __base::const_iterator>(methodname)
 					.template impl<Cont>(this->c, &Cont::begin));
 	}
 };

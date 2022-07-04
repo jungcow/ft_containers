@@ -25,6 +25,7 @@ class ContainerAssured::VectorUtil::PopBackGiven : public ContainerAssured::Base
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "pop_back";
 
 public:
 	PopBackGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -34,7 +35,7 @@ public:
 								   voidParameterPack>
 	when()
 	{
-		return (ContainerAssured::When<void>()
+		return (ContainerAssured::When<void>(methodname)
 					.template impl<Cont>(this->c, &Cont::pop_back));
 	}
 };

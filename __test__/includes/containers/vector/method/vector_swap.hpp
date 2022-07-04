@@ -25,6 +25,7 @@ class ContainerAssured::VectorUtil::SwapGiven : public ContainerAssured::Base::V
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "swap";
 
 public:
 	SwapGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -33,7 +34,7 @@ public:
 								   typename OneParameterPack<Cont&>::type>
 	when(Cont& x)
 	{
-		return (ContainerAssured::When<void>()
+		return (ContainerAssured::When<void>(methodname)
 					.template impl<Cont, Cont&>(this->c, &Cont::swap, x));
 	}
 };

@@ -1,8 +1,6 @@
 #ifndef __GIVEN_BASE_H__
 #define __GIVEN_BASE_H__
 
-#include <chrono>
-
 #include "global/type.hpp"
 
 namespace ContainerAssured

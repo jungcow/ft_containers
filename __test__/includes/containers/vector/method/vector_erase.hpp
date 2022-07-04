@@ -25,6 +25,7 @@ class ContainerAssured::VectorUtil::EraseGiven : public ContainerAssured::Base::
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "erase";
 
 public:
 	EraseGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -35,7 +36,7 @@ public:
 								   typename OneParameterPack<typename __base::const_iterator>::type>
 	when(typename __base::iterator position)
 	{
-		return (ContainerAssured::When<typename __base::iterator>()
+		return (ContainerAssured::When<typename __base::iterator>(methodname)
 					.template impl<Cont,
 								   typename __base::const_iterator>(this->c, &Cont::erase, position));
 	}
@@ -46,7 +47,7 @@ public:
 															 typename __base::const_iterator>::type>
 	when(typename __base::iterator first, typename __base::iterator last)
 	{
-		return (ContainerAssured::When<typename __base::iterator>()
+		return (ContainerAssured::When<typename __base::iterator>(methodname)
 					.template impl<Cont,
 								   typename __base::const_iterator,
 								   typename __base::const_iterator>(this->c, &Cont::erase, first, last));

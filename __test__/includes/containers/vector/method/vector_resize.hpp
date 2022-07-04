@@ -25,6 +25,7 @@ class ContainerAssured::VectorUtil::ResizeGiven : public ContainerAssured::Base:
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "resize";
 
 public:
 	ResizeGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -35,7 +36,7 @@ public:
 	when(typename __base::size_type n,
 		 typename __base::value_type val = typename __base::value_type())
 	{
-		return (ContainerAssured::When<void>()
+		return (ContainerAssured::When<void>(methodname)
 					.template impl<Cont,
 								   typename __base::size_type,
 								   typename __base::const_reference>(this->c, &Cont::resize, n, val));

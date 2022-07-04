@@ -25,6 +25,7 @@ class ContainerAssured::VectorUtil::InsertGiven : public ContainerAssured::Base:
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "insert";
 
 public:
 	InsertGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -34,7 +35,7 @@ public:
 															 typename __base::const_reference>::type>
 	when(typename __base::iterator position, typename __base::const_reference val)
 	{
-		return (ContainerAssured::When<typename __base::iterator>()
+		return (ContainerAssured::When<typename __base::iterator>(methodname)
 					.template impl<Cont,
 								   typename __base::const_iterator,
 								   typename __base::const_reference>(this->c, &Cont::insert, position, val));
@@ -49,7 +50,7 @@ public:
 		 typename __base::size_type n,
 		 typename __base::const_reference val)
 	{
-		return (ContainerAssured::When<typename __base::iterator>()
+		return (ContainerAssured::When<typename __base::iterator>(methodname)
 					.template impl<Cont,
 								   typename __base::const_iterator,
 								   typename __base::size_type,
@@ -67,7 +68,7 @@ public:
 			 InputIterator>::type first,
 		 InputIterator last)
 	{
-		return (ContainerAssured::When<typename __base::iterator>()
+		return (ContainerAssured::When<typename __base::iterator>(methodname)
 					.template impl<Cont,
 								   typename __base::const_iterator,
 								   InputIterator,

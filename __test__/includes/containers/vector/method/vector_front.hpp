@@ -28,6 +28,7 @@ class ContainerAssured::VectorUtil::FrontGiven : public ContainerAssured::Base::
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "front";
 
 public:
 	FrontGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -38,7 +39,7 @@ public:
 								   voidParameterPack>
 	when()
 	{
-		return (ContainerAssured::When<typename __base::reference>()
+		return (ContainerAssured::When<typename __base::reference>(methodname)
 					.template impl<Cont>(this->c, &Cont::front));
 	}
 };
@@ -48,6 +49,7 @@ class ContainerAssured::VectorUtil::FrontConstGiven : public ContainerAssured::B
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "front const";
 
 public:
 	FrontConstGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -58,7 +60,7 @@ public:
 								   voidParameterPack>
 	when()
 	{
-		return (ContainerAssured::When<typename __base::const_reference>()
+		return (ContainerAssured::When<typename __base::const_reference>(methodname)
 					.template impl<Cont>(this->c, &Cont::front));
 	}
 };

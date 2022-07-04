@@ -25,6 +25,7 @@ class ContainerAssured::VectorUtil::ClearGiven : public ContainerAssured::Base::
 {
 private:
 	typedef ContainerAssured::Base::VectorGivenBase<Cont> __base;
+	const char* methodname = "clear";
 
 public:
 	ClearGiven(Cont& input) : ContainerAssured::Base::VectorGivenBase<Cont>(input) {}
@@ -32,7 +33,7 @@ public:
 	ContainerAssured::TesterResult<Cont, void, voidParameterPack>
 	when()
 	{
-		return (ContainerAssured::When<void>()
+		return (ContainerAssured::When<void>(methodname)
 					.template impl<Cont>(this->c, &Cont::clear));
 	}
 };
