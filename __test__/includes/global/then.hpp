@@ -54,9 +54,37 @@ namespace ContainerAssured
 		template <class timeunit = std::chrono::duration<double> >
 		std::string info()
 		{
-			if (sec.count() < 0)
-				return (std::string("This test doesn't check time duration"));
-			return (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
+			/**
+			 * mmethod name
+			 * assertion type
+			 * assert name
+			 * description
+			 * result(bool)
+			 */
+			std::cout << "[ " << methodname << " ]" << std::endl;
+			std::cout << containerAssertInfo.AssertName << std::endl;
+			for (int i = 0; i < containerAssertInfo.assertions.size(); i++)
+			{
+				std::cout << containerAssertInfo.assertions[i].testname << " | ";
+				std::cout << containerAssertInfo.assertions[i].description << " | ";
+				if (containerAssertInfo.assertions[i].result == true)
+					std::cout << "✅" << std::endl;
+				else
+					std::cout << "❌" << std::endl;
+			}
+			for (int i = 0; i < returnValueAssertInfo.assertions.size(); i++)
+			{
+				std::cout << returnValueAssertInfo.assertions[i].testname << " | ";
+				std::cout << returnValueAssertInfo.assertions[i].description << " | ";
+				if (returnValueAssertInfo.assertions[i].result == true)
+					std::cout << "✅" << std::endl;
+				else
+					std::cout << "❌" << std::endl;
+			}
+			return ("");
+			// if (sec.count() < 0)
+			// 	return (std::string("This test doesn't check time duration"));
+			// return (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
 		}
 	};
 
@@ -94,19 +122,18 @@ namespace ContainerAssured
 			this->fourthParam();
 			return this;
 		}
-		AssertContainer<Then*, Cont&> assertContainer()
+		AssertContainer<Then*, const Cont&> assertContainer()
 		{
-			return AssertContainer<Then*, Cont&>(this, this->containerAssertInfo, container);
+			return AssertContainer<Then*, const Cont&>(this, this->containerAssertInfo, container);
 		}
 
-		Then* assertReturnValue()
+		AssertReturnValue<Then*, const Result&, const Cont&> assertReturnValue()
 		{
-			// result;
-			return this;
+			return AssertReturnValue<Then*, const Result&, const Cont&>(this, this->returnValueAssertInfo, result, container);
 		}
 
 	private:
-		const Result result;
+		const Result& result;
 		const Cont& container;
 	};
 
@@ -147,14 +174,13 @@ namespace ContainerAssured
 			return this;
 		}
 
-		Then* assertReturnValue()
-		{
-			// result;
-			return this;
-		}
+		// AssertReturnValue<Then*, Result&> assertReturnValue()
+		// {
+		// 	return AssertReturnValue<Then*, Result&>(this, this->returnValueAssertInfo, result);
+		// }
 
 	private:
-		const Result result;
+		const Result& result;
 	};
 
 	/**

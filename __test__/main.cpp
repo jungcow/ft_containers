@@ -270,16 +270,31 @@ int main(void)
 	std::vector<int> vec5(10, 20);
 	std::vector<int> vec6(20, 30);
 
-	std::cout << vtester->assign().given(vec5).when(20, 10).then()
-		->assertContainer()
-			.sizeIs(20).sizeIs(10).nextAssert()
-		->assertFirstParam()
-		->info<NANOSECONDS>()
+	std::cout << vtester->begin()
+					 .given(vec6)
+					 .when()
+					 .then()
+					 ->assertContainer()
+					 .sizeIs(20)
+					 .nextAssert()
+					 ->assertReturnValue()
+					 .pointedValue(30)
+					 .pointedValue(vec.begin())
+					 .nextAssert()
+					 ->info()
 			  << std::endl;
 
-	vtester->swap()
-		.given(vec6)
-		.when(vec5)
-		.then()
-		->assertContainer();
+	std::cout << vtester->assign().given(vec5).when(20, 10).then()->assertContainer().sizeIs(20).sizeIs(10).capacityIs(500).nextAssert()->info<NANOSECONDS>()
+			  << std::endl;
+
+	// .nextA
+	// 	->assertReturnValue()
+	// 	.pointedValue<int>(30)
+	// 	.nextAssert()
+	// 		vtester->at()
+	// 	.given(vec6)
+	// 	.when(4)
+	// 	.then()
+	// 	->assertReturnValue()
+	// 	.pointedValue();
 }
