@@ -4,89 +4,11 @@
 #include "assert.hpp"
 #include "global/tester_type_traits.hpp"
 #include "tester_info.hpp"
+#include "then_base.hpp"
 #include "type.hpp"
 
 namespace ContainerAssured
 {
-	template <class Args>
-	class ThenBase : public TesterInfo
-	{
-	private:
-		const Args args;  // ParameterPack class
-		std::chrono::duration<double> sec;
-
-	protected:
-		ContainerAssertInfo containerAssertInfo;
-		ReturnValueAssertInfo returnValueAssertInfo;
-		ParameterAssertInfo parameterAssertInfo;
-		const char* methodname;
-
-	protected:
-		ThenBase(const Args& inputArgs, std::chrono::duration<double> timespan, const char* mn)
-			: args(inputArgs), sec(timespan), methodname(mn) {}
-
-	protected:
-		template <class T = Args>
-		typename T::Arg1Type firstParam(typename std::enable_if<!is_lt_one<T>::value>::type* = nullptr)
-		{
-			return args.firstParam();
-		}
-
-		template <class T = Args>
-		typename T::Arg2Type secondParam(typename std::enable_if<!is_lt_two<T>::value>::type* = nullptr)
-		{
-			return args.secondParam();
-		}
-
-		template <class T = Args>
-		typename T::Arg3Type thridParam(typename std::enable_if<!is_lt_three<T>::value>::type* = nullptr)
-		{
-			return args.thridParam();
-		}
-
-		template <class T = Args>
-		typename T::Arg4Type fourthParam(typename std::enable_if<!is_lt_four<T>::value>::type* = nullptr)
-		{
-			return args.fourthParam();
-		}
-
-	public:
-		template <class timeunit = std::chrono::duration<double> >
-		std::string info()
-		{
-			/**
-			 * mmethod name
-			 * assertion type
-			 * assert name
-			 * description
-			 * result(bool)
-			 */
-			std::cout << "[ " << methodname << " ]" << std::endl;
-			std::cout << containerAssertInfo.AssertName << std::endl;
-			for (int i = 0; i < containerAssertInfo.assertions.size(); i++)
-			{
-				std::cout << containerAssertInfo.assertions[i].testname << " | ";
-				std::cout << containerAssertInfo.assertions[i].description << " | ";
-				if (containerAssertInfo.assertions[i].result == true)
-					std::cout << "✅" << std::endl;
-				else
-					std::cout << "❌" << std::endl;
-			}
-			for (int i = 0; i < returnValueAssertInfo.assertions.size(); i++)
-			{
-				std::cout << returnValueAssertInfo.assertions[i].testname << " | ";
-				std::cout << returnValueAssertInfo.assertions[i].description << " | ";
-				if (returnValueAssertInfo.assertions[i].result == true)
-					std::cout << "✅" << std::endl;
-				else
-					std::cout << "❌" << std::endl;
-			}
-			return ("");
-			// if (sec.count() < 0)
-			// 	return (std::string("This test doesn't check time duration"));
-			// return (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
-		}
-	};
 
 	//=============================================================================
 	template <class Cont, class Result, class Args>
@@ -124,12 +46,12 @@ namespace ContainerAssured
 		}
 		AssertContainer<Then*, const Cont&> assertContainer()
 		{
-			return AssertContainer<Then*, const Cont&>(this, this->containerAssertInfo, container);
+			return AssertContainer<Then*, const Cont&>(this, this->assertInfo, container);
 		}
 
 		AssertReturnValue<Then*, const Result&, const Cont&> assertReturnValue()
 		{
-			return AssertReturnValue<Then*, const Result&, const Cont&>(this, this->returnValueAssertInfo, result, container);
+			return AssertReturnValue<Then*, const Result&, const Cont&>(this, this->assertInfo, result, container);
 		}
 
 	private:
@@ -137,6 +59,7 @@ namespace ContainerAssured
 		const Cont& container;
 	};
 
+#if 0
 	/**
 	 * Cont의 void에 대한 특수화
 	 */
@@ -182,7 +105,7 @@ namespace ContainerAssured
 	private:
 		const Result& result;
 	};
-
+#endif
 	/**
 	 * Result의 void에 대한 특수화
 	 */
@@ -222,13 +145,14 @@ namespace ContainerAssured
 
 		AssertContainer<Then*, Cont> assertContainer()
 		{
-			return AssertContainer<Then*, Cont>(this, this->containerAssertInfo, container);
+			return AssertContainer<Then*, Cont>(this, this->assertInfo, container);
 		}
 
 	private:
 		const Cont& container;
 	};
 
+#if 0
 	/**
 	 * Cont와 Result의 void에 대한 특수화
 	 */
@@ -266,6 +190,7 @@ namespace ContainerAssured
 			return this;
 		}
 	};
+#endif
 }
 
 #endif

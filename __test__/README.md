@@ -2,65 +2,14 @@
 
 ### Unit Test Library 구현하기
 #### 테스터 뼈대 구성
-- [ ] non-member 함수 테스터 뼈대 구성
-- then 메서드
-  - [ ] then_if메서드 구현 - 커스텀 비교 함수를 통한 검증 구현 (find_if 참고)
-  - [ ] 출력 불가능한 문자에 대한 케이스 처리하기
-- info 메서드
-  - 반환하는 정보를 좀 더 다듬기(형식이 보이게끔)
-- 타입정보 테스터
-  - [ ] 가능한지 보고 어떻게 구성하는게 나을찌 구상해보기
-- vector
-  - [ ] default constructor
-  - [ ] fill constructor
-  - [ ] range constructor
-  - [ ] copy constructor
-  - [ ] destructor
-  - member function
-    - [x] range assign
-    - [x] fill assign
-    - [x] at
-    - [x] const at
-    - [x] back
-    - [x] const back
-    - [x] begin
-    - [x] const begin
-    - [x] capacity
-    - [x] clear
-    - [x] empty
-    - [x] end
-    - [x] const end
-    - [x] erase(1)
-    - [x] erase(2)
-    - [x] front
-    - [x] const front
-    - [x] get_allocator
-    - [x] single element insert
-    - [x] fill insert
-    - [x] range insert
-    - [x] max_size
-    - [x] operator=
-    - [x] operator[]
-    - [x] const operator[]
-    - [x] pop_back
-    - [x] push_back
-    - [x] rbegin
-    - [x] const rbegin
-    - [x] rend
-    - [x] const rend
-    - [x] reserve
-    - [x] resize
-    - [x] size
-    - [x] swap
-  - non-member function
-    - [ ] operator==
-    - [ ] operator!=
-    - [ ] operaotr<
-    - [ ] operator<=
-    - [ ] operator>
-    - [ ] operator>=
-    - [ ] swap
 
+- Assertion
+  - [ ] 출력 불가능한 문자에 대한 케이스 처리하기
+  - [ ] 출력 형식에 맞추기
+- Test Case
+  - [ ] non-member function
+  - [ ] 타입정보 테스터 - 가능한지 보고 어떻게 구성하는게 나을찌 구상해보기
+  - [ ] Constructor & Destructor
 
 #### Makefile 구성하기
   - [ ] Makefile Safe 플래그 구현 -> 비정상적인 종료를 방지 (되면 하고, 안되면 하지 말고)

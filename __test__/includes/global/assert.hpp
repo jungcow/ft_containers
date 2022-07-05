@@ -10,12 +10,13 @@ namespace ContainerAssured
 	{
 	protected:
 		This then;
-		AssertInfoBase& assertInfo;
+		AssertInfo& assertInfo;
+		std::string assertType;
 		std::string testname;
 		std::string description;
 
 	public:
-		AssertBase(This t, AssertInfoBase& info) : then(t), assertInfo(info) {}
+		AssertBase(This t, AssertInfo& info, const std::string& at) : then(t), assertInfo(info), assertType(at) {}
 		This nextAssert(void) { return then; }
 	};
 
@@ -31,25 +32,21 @@ namespace ContainerAssured
 		const Cont& container;
 
 	public:
-		AssertContainer(This t, ContainerAssertInfo& CAI, const Cont& c) : AssertBase<This>(t, CAI), container(c) {}
+		AssertContainer(This t, AssertInfo& CAI, const Cont& c) : AssertBase<This>(t, CAI, "Container"), container(c) {}
 
 		template <class C = Cont>
 		AssertContainer& sizeIs(size_t size)
 		{
 			this->testname = "Size";
-			this->description = std::to_string(container.size()) + "==" + std::to_string(size) + "?";
-			this->assertInfo.assertions.push_back(Assertion(this->testname, this->description, container.size() == size));
-			std::cout << "is size " << size << "?" << '\n';
-			if (container.size() == size)
-				std::cout << "Yes!\n";
-			else
-				std::cout << "NOOO!\n";
+			this->description = std::to_string(container.size()) + " == " + std::to_string(size) + "?";
+			this->assertInfo.assertions.push_back(Assertion(this->assertType, this->testname, this->description, container.size() == size));
 			return (*this);
 		}
 		template <class UniPred>
 		AssertContainer& sizeIs(typename std::enable_if<!std::is_integral<UniPred>::value, UniPred>::type F)
 		{
-			this->assertInfo.assertions.push_back(Assertion("Size Test", "", F(container.size())));
+			this->testname = "Size";
+			this->assertInfo.assertions.push_back(Assertion(this->assertType, this->testname, "", F(container.size())));
 			return (*this);
 		}
 
@@ -57,24 +54,26 @@ namespace ContainerAssured
 		AssertContainer& capacityIs(typename C::size_type capacity)
 		{
 			this->testname = "Capacity";
-			this->description = std::to_string(container.capacity()) + "==" + std::to_string(capacity) + "?";
-
-			this->assertInfo.assertions.push_back(Assertion(this->testname, this->description, container.capacity() == capacity));
+			this->description = std::to_string(container.capacity()) + " == " + std::to_string(capacity) + "?";
+			this->assertInfo.assertions.push_back(Assertion(this->assertType, this->testname, this->description, container.capacity() == capacity));
 			return (*this);
 		}
 		template <class UniPred>
 		AssertContainer& capacityIs(typename std::enable_if<!std::is_integral<UniPred>::value, UniPred>::type F)
 		{
 			this->testname = "Capacity";
-			this->assertInfo.assertions.push_back(Assertion(this->testname, "", F(container.capacity())));
+			this->assertInfo.assertions.push_back(Assertion(this->assertType, this->testname, "", F(container.capacity())));
 			return (*this);
 		}
 
-		template <class OtherCont>
-		AssertContainer& equalWith(OtherCont input)
+		template <class OtherCont = Cont>
+		AssertContainer& equalWith(typename std::enable_if<
+								   std::is_same<Cont, OtherCont>::value,
+								   OtherCont>::type input)
 		{
 			this->testname = "Equivalence";
-			this->assertInfo.assertions.push_back(Assertion(this->testname, "", container == input));
+			this->description = type(container) + " == " + type(input) + "?";
+			this->assertInfo.assertions.push_back(Assertion(this->assertType, this->testname, this->description, container == input));
 			return (*this);
 		}
 	};
@@ -89,14 +88,14 @@ namespace ContainerAssured
 		Container container;
 
 	public:
-		AssertReturnValue(This t, ReturnValueAssertInfo& RVAI, const Ret& rv, const Cont& c)
-			: AssertBase<This>(t, RVAI), returnValue(rv), container(c) {}
+		AssertReturnValue(This t, AssertInfo& RVAI, const Ret& rv, const Cont& c)
+			: AssertBase<This>(t, RVAI, "ReturnValue"), returnValue(rv), container(c) {}
 
 		AssertReturnValue& pointedValue(typename Container::value_type a)
 		{
 			this->testname = "Pointed Value";
-			this->description = std::to_string(*returnValue) + "==" + std::to_string(a) + "?";
-			this->assertInfo.assertions.push_back(Assertion(this->testname, this->description, *returnValue == a));
+			this->description = std::to_string(*returnValue) + " == " + std::to_string(a) + "?";
+			this->assertInfo.assertions.push_back(Assertion(this->assertType, this->testname, this->description, *returnValue == a));
 			return (*this);
 		}
 
@@ -107,23 +106,21 @@ namespace ContainerAssured
 												 std::is_same<typename std::iterator_traits<T>::iterator_category, std::forward_iterator_tag>::value ||
 												 std::is_same<typename std::iterator_traits<T>::iterator_category, std::input_iterator_tag>::value>::type* = nullptr)
 		{
-			std::cout << "what is? " << *a << std::endl;
 			this->testname = "Iterator pointedValue assertion";
-			this->description = std::to_string(*returnValue) + "==" + std::to_string(*a) + "?";
-			this->assertInfo.assertions.push_back(Assertion(this->testname, this->description, *returnValue == *a));
+			this->description = std::to_string(*returnValue) + " == " + std::to_string(*a) + "?";
+			this->assertInfo.assertions.push_back(Assertion(this->assertType, this->testname, this->description, *returnValue == *a));
 			return (*this);
 		}
 
-		template <class T, class U = Ret>
-		AssertReturnValue& valueIs()
+		AssertReturnValue& valueIs(Ret a)
 		{
-			std::cout << "value assertion" << std::endl;
+			this->testname = "Value";
+			this->description = std::to_string(returnValue) + " == " + std::to_string(a) + "?";
+			this->assertInfo.assertions.push_back(Assertion(this->assertType, this->testname, this->description, returnValue == a));
 			return (*this);
 		}
 		/**
-		 * pointedValueIs(Value): this
-		 * valueIs(size_t): this
-		 * addressIs(Container): this
+		 * addressIs(Container): this -> 미정
 		 */
 	};
 }

@@ -275,6 +275,7 @@ int main(void)
 					 .when()
 					 .then()
 					 ->assertContainer()
+					 .equalWith(vec6)
 					 .sizeIs(20)
 					 .nextAssert()
 					 ->assertReturnValue()
@@ -287,14 +288,13 @@ int main(void)
 	std::cout << vtester->assign().given(vec5).when(20, 10).then()->assertContainer().sizeIs(20).sizeIs(10).capacityIs(500).nextAssert()->info<NANOSECONDS>()
 			  << std::endl;
 
-	// .nextA
-	// 	->assertReturnValue()
-	// 	.pointedValue<int>(30)
-	// 	.nextAssert()
-	// 		vtester->at()
-	// 	.given(vec6)
-	// 	.when(4)
-	// 	.then()
-	// 	->assertReturnValue()
-	// 	.pointedValue();
+	std::cout << vtester->empty()
+					 .given(vec6)
+					 .when()
+					 .then()
+					 ->assertReturnValue()
+					 .valueIs(false)
+					 .nextAssert()
+					 ->info()
+			  << std::endl;
 }
