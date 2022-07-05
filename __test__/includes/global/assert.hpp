@@ -72,8 +72,8 @@ namespace ContainerAssured
 								   OtherCont>::type input)
 		{
 			this->testname = "Equivalence";
-			this->description = type(container) + " == " + type(input) + "?";
-			this->assertInfo.assertions.push_back(Assertion(this->assertType, this->testname, this->description, container == input));
+			// this->description = type(container) + " == " + type(input) + "?";
+			this->assertInfo.assertions.push_back(Assertion(this->assertType, this->testname, "", container == input));
 			return (*this);
 		}
 	};
@@ -106,7 +106,7 @@ namespace ContainerAssured
 												 std::is_same<typename std::iterator_traits<T>::iterator_category, std::forward_iterator_tag>::value ||
 												 std::is_same<typename std::iterator_traits<T>::iterator_category, std::input_iterator_tag>::value>::type* = nullptr)
 		{
-			this->testname = "Iterator pointedValue assertion";
+			this->testname = "Pointed Value";
 			this->description = std::to_string(*returnValue) + " == " + std::to_string(*a) + "?";
 			this->assertInfo.assertions.push_back(Assertion(this->assertType, this->testname, this->description, *returnValue == *a));
 			return (*this);

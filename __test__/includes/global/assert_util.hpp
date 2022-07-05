@@ -26,19 +26,6 @@ namespace ContainerAssured
 	{
 		std::vector<Assertion> assertions;
 	};
-
-	// struct ContainerAssertInfo : AssertInfoBase
-	// {
-	// 	std::vector<Assertion> assertions;
-	// };
-	// struct ReturnValueAssertInfo : AssertInfoBase
-	// {
-	// 	std::vector<Assertion> assertions;
-	// };
-	// struct ParameterAssertInfo : AssertInfoBase
-	// {
-	// 	std::vector<Assertion> assertions;
-	// };
 }
 
 #endif

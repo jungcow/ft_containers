@@ -1,6 +1,14 @@
 #ifndef __THEN_BASE_H__
 #define __THEN_BASE_H__
 
+#include <unistd.h>
+
+#include <iomanip>
+
+#include "color.hpp"
+
+using namespace std;
+
 namespace ContainerAssured
 {
 
@@ -44,24 +52,49 @@ namespace ContainerAssured
 			return args.fourthParam();
 		}
 
+	private:
+		void printInfoHeader(void)
+		{
+			cout << '\n'
+				 << BLUE;
+			cout << left << setw(15) << setfill(' ') << "FUNCTIONS";
+			cout << left << setw(15) << setfill(' ') << "ASSERTYPE";
+			cout << left << setw(15) << setfill(' ') << "ASSERTION";
+			cout << left << setw(15) << setfill(' ') << "RESULT";
+			cout << left << setw(15) << setfill(' ') << "TIME";
+			cout << "DESCRIPTION";
+			cout << RESET << endl;
+		}
+
 	public:
 		template <class timeunit = std::chrono::duration<double> >
 		std::string info()
 		{
-			std::cout << "[ " << methodname << " ]" << std::endl;
+			string time = (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
+
+			printInfoHeader();
 			for (int i = 0; i < assertInfo.assertions.size(); i++)
 			{
-				std::cout << assertInfo.assertions[i].assertType << " | ";
-				std::cout << assertInfo.assertions[i].testname << " | ";
-				std::cout << assertInfo.assertions[i].description << " | ";
+				cout << left << setw(15) << setfill(' ') << methodname;
+				cout << left << setw(15) << setfill(' ') << assertInfo.assertions[i].assertType;
+				cout << left << setw(15) << setfill(' ') << assertInfo.assertions[i].testname;
 				if (assertInfo.assertions[i].result == true)
-					std::cout << "✅" << std::endl;
+				{
+					cout << GREEN << "  ";
+					cout << left << setw(15) << setfill(' ') << "✔";
+					cout << RESET;
+				}
 				else
-					std::cout << "❌" << std::endl;
+				{
+					cout << RED << "  ";
+					cout << left << setw(15) << setfill(' ') << "✘";
+					cout << RESET;
+				}
+				cout << left << setw(15) << setfill(' ') << time;
+				cout << assertInfo.assertions[i].description << endl;
+				usleep(100000);
 			}
-			if (sec.count() < 0)
-				return (std::string("This test doesn't check time duration"));
-			return (TesterInfo::info(std::chrono::duration_cast<timeunit>(sec)));
+			return time;
 		}
 	};
 }

@@ -17,7 +17,7 @@ namespace ContainerAssured
 		std::string takes;
 
 	public:
-		TesterInfo() : takes("takes ") {}
+		TesterInfo() : takes() {}
 
 	protected:
 		std::string info(std::chrono::duration<double> sec)
@@ -25,28 +25,28 @@ namespace ContainerAssured
 			std::string info("takes ");
 
 			takes += std::to_string(sec.count());
-			takes += " s";
+			takes += "s";
 			return takes;
 		}
 
 		std::string info(std::chrono::milliseconds ms)
 		{
 			takes += std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(ms).count());
-			takes += " ms";
+			takes += "ms";
 			return takes;
 		}
 
 		std::string info(std::chrono::microseconds us)
 		{
 			takes += std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(us).count());
-			takes += " us";
+			takes += "us";
 			return takes;
 		}
 
 		std::string info(std::chrono::nanoseconds ns)
 		{
 			takes += std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(ns).count());
-			takes += " ns";
+			takes += "ns";
 			return takes;
 		}
 	};
