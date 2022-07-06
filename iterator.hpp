@@ -3,6 +3,8 @@
 
 #include <cstddef>  // ptrdiff_t
 
+#include "type_traits.hpp"  // input_iterator_tag
+
 namespace ft
 {
 	/**
@@ -17,11 +19,13 @@ namespace ft
 	struct output_iterator_tag
 	{
 	};
-	struct forward_iterator_tag;
-	struct bidirectional_iterator_tag
+	struct forward_iterator_tag : ft::input_iterator_tag
 	{
 	};
-	struct random_access_iterator_tag
+	struct bidirectional_iterator_tag : ft::forward_iterator_tag
+	{
+	};
+	struct random_access_iterator_tag : ft::bidirectional_iterator_tag
 	{
 	};
 
@@ -82,6 +86,23 @@ namespace ft
 		typedef const T* pointer;
 		typedef const T& reference;
 		typedef random_access_iterator_tag iterator_category;
+	};
+
+	template <class T>
+	struct iterator_traits_wrapper
+	{
+		typedef typename iterator_traits<T>::iterator_category iterator_category;
+	};
+
+	template <>
+	struct iterator_traits_wrapper<int>
+	{
+		typedef char iterator_category;
+	};
+	template <>
+	struct iterator_traits_wrapper<ft::input_iterator_tag>
+	{
+		typedef ft::input_iterator_tag iterator_category;
 	};
 
 	/**
