@@ -1,7 +1,10 @@
 #ifndef __FT_VECTOR_H__
 #define __FT_VECTOR_H__
 
-#include <memory>
+#include <exception> // bad_alloc, length_error, out_of_range
+#include <iostream>  //temporary include TODO: 지우기
+#include <iterator>  // std::distance
+#include <memory> // allocator
 
 #include "iterator.hpp"
 #include "type_traits.hpp"
@@ -19,6 +22,7 @@ namespace ft
 
 	public:
 		typedef typename allocator_type::value_type value_type;
+		typedef typename allocator_type::size_type size_type;
 
 		typedef value_type& reference;
 		typedef const value_type& const_reference;
@@ -28,68 +32,454 @@ namespace ft
 
 		typedef ft::vector_iterator<pointer, pointer> iterator;
 		typedef ft::vector_iterator<const_pointer, pointer> const_iterator;
-#if 0
 
-		typedef ft::reverse_iterator<iterator>			reverse_iterator;
-		typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
-#endif
-		typedef typename allocator_type::size_type size_type;
+		typedef ft::reverse_iterator<iterator> reverse_iterator;
+		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
+
+	private:
+		allocator_type allocator_;
+		pointer data_;
+		size_type size_;
+		size_type capacity_;
 
 	public:
-#if 0
-		explicit vector (const allocator_type& alloc = allocator_type());
-		explicit vector (size_type n, const value_type& val = value_type(),
-                 const allocator_type& alloc = allocator_type());
+		explicit vector(const allocator_type& alloc = allocator_type())  // throw(std::bad_alloc)
+			: allocator_(alloc), size_(0), capacity_(1)
+		{
+			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+		}
+		explicit vector(size_type n, const value_type& val = value_type(),
+						const allocator_type& alloc = allocator_type())  // throw(std::bad_alloc)
+			: allocator_(alloc), size_(n), capacity_(n)
+		{
+			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+			for (size_type i = 0; i < size_; i++)
+				allocator_.construct(&data_[i], val);
+		}
 		template <class InputIterator>
-         vector (InputIterator first, InputIterator last,
-                 const allocator_type& alloc = allocator_type());
-		vector (const vector& x);
-#endif
+		vector(typename ft::enable_if<
+				   !ft::is_integral<InputIterator>::value &&
+					   ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value,
+				   InputIterator>::type first,
+			   InputIterator last, const allocator_type& alloc = allocator_type())
+			: allocator_(alloc)
+		{
+			size_type n = std::distance(first, last);
+			size_ = capacity_ = n;
+			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+			for (size_type i = 0; i < n; i++)
+			{
+				allocator_.construct(&data_[i], *first++);
+			}
+		}
+		template <class InputIterator>
+		vector(typename ft::enable_if<
+				   !ft::is_integral<InputIterator>::value &&
+					   !ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value &&
+					   ft::is_base_of<ft::input_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value,
+				   InputIterator>::type first,
+			   InputIterator last, const allocator_type& alloc = allocator_type())  // throw(std::bad_alloc)
+			: allocator_(alloc)
+		{
+			size_ = 0;
+			capacity_ = 1;
+			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+			for (; first != last; first++)
+				push_back(*first);
+		}
+		vector(const vector& x)  // throw(std::bad_alloc)
+			: allocator_(x.allocator_), size_(x.size_), capacity_(x.capacity_)
+		{
+			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+			for (size_type i = 0; i < size_; i++)
+			{
+				allocator_.construct(&data_[i], x.data_[i]);
+			}
+		}
 
-#if 0
 	public:
 		template <class InputIterator>
-		void assign(InputIterator first, InputIterator last) {}
-		void assign(size_type n, const value_type& val) {}
+		void assign(typename ft::enable_if<
+						!ft::is_integral<InputIterator>::value &&
+							ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value,
+						InputIterator>::type first,
+					InputIterator last)
+		{
+			std::allocator<void>::const_pointer hint = &data_[0];
+			size_type n = std::distance(first, last);
 
-		reference at (size_type n) {}
-		const_reference at (size_type n) const {}
+			if (capacity_ < n)
+			{
+				resize(n);
+			}
+			clear();
+			data_ = allocator_.allocate((sizeof(value_type) * capacity_), hint);
+			for (size_type i = 0; i < n; i++)
+			{
+				allocator_.construct(&data_[i], *first++);
+			}
+			size_ = n;
+		}
+		template <class InputIterator>
+		void assign(typename ft::enable_if<
+						!ft::is_integral<InputIterator>::value &&
+							!ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value &&
+							ft::is_base_of<ft::input_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value,
+						InputIterator>::type first,
+					InputIterator last)
+		{
+			clear();
+			// TODO: 주석 확인하고 지우기
+			//  allocator_.deallocate(data_, capacity_);
 
-		reference back() {}
-		const_reference back() const {}
+			// capacity_ = 1;
+			// data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+			for (; first != last; first++)
+				push_back(*first);
+		}
+		void assign(size_type n, const value_type& val)
+		{
+			if (capacity_ < n)
+				resize(n);
+			clear();
+			data_ = allocator_.allocate(sizeof(value_type) * capacity_, &data_[0]);
+			for (size_type i = 0; i < n; i++)
+				allocator_.construct(&data_[i], val);
+		}
 
-vector& operator= (const vector& x) {}
-reference operator[] (size_type n) {}
-const_reference operator[] (size_type n) const {}
-iterator begin() {}
-const_iterator begin() const {}
-size_type capacity() const {}
-size_type capacity() const {}
-void clear() {}
-bool empty() const {}
-iterator end() {}
-const_iterator end() const {}
-iterator erase (iterator position) {}
-iterator erase (iterator first, iterator last) {}
-reference front() {}
-const_reference front() const {}
-allocator_type get_allocator() const {}
-iterator insert (iterator position, const value_type& val) {}
-void insert (iterator position, size_type n, const value_type& val) {}
-template <class InputIterator>
-    void insert (iterator position, InputIterator first, InputIterator last) {}
-size_type max_size() const {}
-void pop_back() {}
-void push_back (const value_type& val) {}
-reverse_iterator rbegin() {}
-const_reverse_iterator rbegin() const {}
-reverse_iterator rend() {}
-const_reverse_iterator rend() const {}
-void reserve (size_type n) {}
-void resize (size_type n, value_type val = value_type()) {}
-size_type size() const {}
-void swap (vector& x) {}
-#endif
+		reference at(size_type n)  // throw(std::out_of_range)
+		{
+			if (size_ <= n)
+				throw std::out_of_range("at: out of range");
+			return (data_[n]);
+		}
+		const_reference at(size_type n) const  // throw(std::out_of_range)
+		{
+			if (size_ <= n)
+				throw std::out_of_range("at: out of range");
+			return (data_[n]);
+		}
+
+		reference back()
+		{
+			return (data_[size_ - 1]);
+		}
+		const_reference back() const
+		{
+			return (data_[size_ - 1]);
+		}
+
+		iterator begin()
+		{
+			return iterator(&data_[0]);
+		}
+		const_iterator begin() const
+		{
+			return const_iterator(&data_[0]);
+		}
+
+		size_type capacity() const
+		{
+			return (capacity_);
+		}
+
+		void clear()
+		{
+			// size to 0, not modify capacity(not guaranted)
+			/**
+			 * TODO: destroy 하지 않아도 될 것들은 상수 시간내에 clear할 수 있음
+			 */
+			if (!ft::is_trivial_destructible_junior<value_type>::value)
+			{
+				for (size_type i = 0; i < size_; i++)
+					allocator_.destroy(&data_[i]);
+			}
+			size_ = 0;
+		}
+
+		bool empty() const
+		{
+			return (size_ == 0);
+		}
+
+		iterator end()
+		{
+			return iterator(&data_[size_]);
+		}
+		const_iterator end() const
+		{
+			return const_iterator(&data_[size_]);
+		}
+
+		iterator erase(iterator position)
+		{
+			// TODO: iterator의 위치가 잘못됐을 시, undefined behavior 발생
+			if (position == end() - 1)
+			{
+				allocator_.destroy(&data_[size_ - 1]);
+				size_--;
+				return end();
+			}
+			iterator start = position;
+			iterator ret = start;
+			iterator finish = end();
+			for (; start + 1 != finish; start++)
+			{
+				allocator_.destroy(&(*start));
+				allocator_.construct(&(*start), &(*(start + 1)));
+			}
+			allocator_.destroy(&(*start));
+			size_--;
+			return ret;
+		}
+		iterator erase(iterator first, iterator last)
+		{
+			size_type n = last - first;
+			iterator start = first;
+			iterator ret = first;
+			iterator finish = last;
+			for (; start + n != finish; start++)
+			{
+				allocator_.destroy(&(*start));
+				allocator_.construct(&(*start), &(*start + n));
+			}
+			for (; start != finish; start++)
+			{
+				allocator_.destroy(&(*start));
+			}
+			size_ -= n;
+			return ret;
+		}
+
+		reference front()
+		{
+			return (data_[0]);
+		}
+		const_reference front() const
+		{
+			return (data_[0]);
+		}
+
+		allocator_type get_allocator() const
+		{
+			return (allocator_type(allocator_));
+		}
+
+		iterator insert(iterator position, const value_type& val)
+		{
+			// position 앞에 insert를 진행
+			if (size_ + 1 >= capacity_)
+				resize(capacity_ * 2);
+			iterator start = end();
+			for (; start != position; start--)
+			{
+				allocator_.construct(&(*start), &(*start - 1));
+				allocator_.destroy(&(*start - 1));
+			}
+			allocator_.construct(&(*start), val);
+			size_++;
+			return start;
+		}
+		void insert(iterator position, size_type n, const value_type& val)
+		{
+			if (size_ + n >= capacity_)
+				resize(capacity_ * 2);
+			iterator start = end() + n - 1;
+			for (; start - (n - 1) != position; start--)
+			{
+				allocator_.construct(&(*start), &(*start - n));
+				allocator_.destroy(&(*start - n));
+			}
+			for (size_type i = 0; i < n; i++, position++)
+			{
+				allocator_.construct(&(*position), val);
+			}
+			size_ += n;
+		}
+		template <class InputIterator>
+		void insert(iterator position,
+					typename ft::enable_if<
+						!ft::is_integral<InputIterator>::value &&
+							ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value,
+						InputIterator>::type first,
+					InputIterator last)
+		{
+			size_type n = std::distance(first, last);
+
+			if (size_ + n >= capacity_)
+				resize(capacity_ * 2);
+			for (iterator start = end() + n - 1; start - (n - 1) != position; start--)
+			{
+				allocator_.construct(&(*start), &(*start - n));
+				allocator_.destroy(&(*start - n));
+			}
+			for (size_type i = 0; i < n && first != last; i++)
+			{
+				allocator_.construct(&(*position), *first++);
+			}
+			size_ += n;
+		}
+		template <class InputIterator>
+		void insert(iterator position,
+					typename ft::enable_if<
+						!ft::is_integral<InputIterator>::value &&
+							!ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value &&
+							ft::is_base_of<ft::input_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value,
+						InputIterator>::type first,
+					InputIterator last)
+		{
+			vector tmp = *this;
+			iterator start = begin();
+			iterator finish = end();
+
+			for (; start != position; start++)
+				tmp.push_back(*start);
+			for (; first != last; first++, start++)
+				tmp.push_back(*first);
+			for (; start != finish; start++)
+				tmp.push_back(*start);
+		}
+
+		size_type max_size() const throw()
+		{
+			return (allocator_.max_size());
+		}
+
+		vector& operator=(const vector& x)
+		{
+			// modify size, not capacity
+			size_type i;
+
+			if (capacity_ < x.size_)
+				resize(x.size_);  // TODO: capacity에 x.capacity_를 넣을지 아니면 size_를 넣을 지 확인
+
+			for (i = 0; i < x.size_; i++)
+			{
+				/**
+				 * value_type에서 operator=가 오버로딩 안되어있으면 ub
+				 * https://m.cplusplus.com/reference/vector/vector/operator=/
+				 */
+				data_[i] = x.data_[i];
+			}
+
+			// TODO: optimization using checking is type trivial destructible
+			if (!ft::is_trivial_destructible_junior<value_type>::value)
+			{
+				for (; i < size_; i++)
+				{
+					allocator_.destroy(&data_[i]);
+				}
+			}
+			size_ = x.size_;
+			return (*this);
+		}
+
+		reference operator[](size_type n)
+		{
+			return (data_[n]);
+		}
+		const_reference operator[](size_type n) const
+		{
+			return (data_[n]);
+		}
+
+		void pop_back()
+		{
+			if (empty())
+				return;
+			// TODO: optimization using checking is type trivial destructible
+			if (!ft::is_trivial_destructible_junior<value_type>::value)
+				allocator_.destroy(&data_[size_ - 1]);
+			size_--;
+			if (size_ < (capacity_ / 4))
+				resize(capacity_ / 2);
+		}
+
+		void push_back(const value_type& val)
+		{
+			if (size_ == capacity_)
+				resize(capacity_ * 2);
+			data_[size_++] = val;
+		}
+
+		reverse_iterator rbegin() throw()
+		{
+			return (reverse_iterator(end() - 1));
+		}
+		const_reverse_iterator rbegin() const throw()
+		{
+			return (const_reverse_iterator(end() - 1));
+		}
+
+		reverse_iterator rend() throw()
+		{
+			return (reverse_iterator(begin() - 1));
+		}
+		const_reverse_iterator rend() const throw()
+		{
+			return (const_reverse_iterator(begin() - 1));
+		}
+
+		void reserve(size_type n)  // TODO: length_error and bad_alloc
+		{
+			if (capacity_ < n)
+				resize(n);
+		}
+
+		void resize(size_type n, value_type val = value_type())
+		{
+			pointer tmp;
+			size_type i;
+
+			// TODO: optimization using checking is type trivial destructible
+			if (size_ < n)
+			{
+				tmp = allocator_.allocate(sizeof(value_type) * n);
+				if (!ft::is_trivial_destructible_junior<value_type>::value)
+				{
+					for (i = 0; i < size_; i++)
+					{
+						allocator_.construct(&tmp[i], data_[i]);
+						allocator_.destroy(&data_[i]);
+					}
+				}
+				else
+				{
+					for (i = 0; i < size_; i++)
+						allocator_.construct(&tmp[i], data_[i]);
+				}
+				allocator_.deallocate(data_, capacity_);
+				for (; i < n; i++)
+				{
+					allocator_.construct(&tmp[i], val);
+				}
+				data_ = tmp;
+				capacity_ = n;
+			}
+		}
+		size_type size() const throw()
+		{
+			return (size_);
+		}
+
+		void swap(vector& x)
+		{
+			pointer d = data_;
+			data_ = x.data_;
+			x.data_ = d;
+
+			size_type n = size_;
+			size_ = x.size_;
+			x.size_ = n;
+
+			size_type c = capacity_;
+			capacity_ = x.capacity_;
+			x.capacity_ = c;
+
+			allocator_type tmp = get_allocator();
+			allocator_ = x.get_allocator();
+			x.allocator_ = tmp;
+		}
 	};
 #if 0
 template <class T, class Alloc>
@@ -111,7 +501,7 @@ template <class T, class Alloc>
 	template <class Iterator, class Pointer>
 	class vector_iterator
 	{
-	private:
+	public:
 		typedef ft::iterator_traits<Iterator> traits;
 		typedef typename traits::value_type value_type;
 		typedef typename traits::pointer pointer;
@@ -142,6 +532,9 @@ template <class T, class Alloc>
 		{
 			std::cout << "copy constructor of vector iterator\n";
 		}
+
+		explicit vector_iterator(const Iterator& otherIter)
+			: base_(otherIter) {}
 
 		/**
 		 * can be assigned by same type
