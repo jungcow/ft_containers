@@ -44,25 +44,30 @@ namespace ft
 		size_type capacity_;
 
 	public:
-		explicit vector(const allocator_type& alloc = allocator_type())  // throw(std::bad_alloc)
+		explicit vector(const allocator_type& alloc = allocator_type()) throw(std::bad_alloc)
 			: allocator_(alloc), size_(0), capacity_(1)
 		{
+			if (capacity_ > max_size())
+				throw std::bad_alloc();
 			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
 		}
 		explicit vector(size_type n, const value_type& val = value_type(),
-						const allocator_type& alloc = allocator_type())  // throw(std::bad_alloc)
+						const allocator_type& alloc = allocator_type()) throw(std::bad_alloc)
 			: allocator_(alloc), size_(n), capacity_(n)
 		{
+			if (n > max_size())
+				throw std::bad_alloc();
 			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
 			for (size_type i = 0; i < size_; i++)
 				allocator_.construct(&data_[i], val);
 		}
+		// &&
+		// 			   ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value
 		template <class InputIterator>
 		vector(typename ft::enable_if<
-				   !ft::is_integral<InputIterator>::value &&
-					   ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value,
+				   !ft::is_integral<InputIterator>::value,
 				   InputIterator>::type first,
-			   InputIterator last, const allocator_type& alloc = allocator_type())
+			   InputIterator last, const allocator_type& alloc = allocator_type()) throw(std::bad_alloc)
 			: allocator_(alloc)
 		{
 			size_type n = 0;
@@ -73,6 +78,8 @@ namespace ft
 				for (InputIterator start = first; start != last; start++)
 					n++;
 			}
+			if (n > max_size())
+				throw std::bad_alloc();
 			size_ = capacity_ = n;
 			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
 			for (size_type i = 0; i < n; i++)
@@ -80,24 +87,27 @@ namespace ft
 				allocator_.construct(&data_[i], *first++);
 			}
 		}
-		template <class InputIterator>
-		vector(typename ft::enable_if<
-				   !ft::is_integral<InputIterator>::value &&
-					   !ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value &&
-					   ft::is_base_of<ft::input_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value,
-				   InputIterator>::type first,
-			   InputIterator last, const allocator_type& alloc = allocator_type())  // throw(std::bad_alloc)
-			: allocator_(alloc)
-		{
-			size_ = 0;
-			capacity_ = 1;
-			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
-			for (; first != last; first++)
-				push_back(*first);
-		}
-		vector(const vector& x)  // throw(std::bad_alloc)
+		//  &&
+		// 			   !ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value &&
+		// 			   ft::is_base_of<ft::input_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value
+		// template <class InputIterator>
+		// vector(typename ft::enable_if<
+		// 		   !ft::is_integral<InputIterator>::value,
+		// 		   InputIterator>::type first,
+		// 	   InputIterator last, const allocator_type& alloc = allocator_type())  // throw(std::bad_alloc)
+		// 	: allocator_(alloc)
+		// {
+		// 	size_ = 0;
+		// 	capacity_ = 1;
+		// 	data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+		// 	for (; first != last; first++)
+		// 		push_back(*first);
+		// }
+		vector(const vector& x) throw(std::bad_alloc)
 			: allocator_(x.allocator_), size_(x.size_), capacity_(x.capacity_)
 		{
+			if (capacity_ > max_size())
+				throw std::bad_alloc();
 			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
 			for (size_type i = 0; i < size_; i++)
 			{
@@ -162,13 +172,13 @@ namespace ft
 				allocator_.construct(&data_[i], val);
 		}
 
-		reference at(size_type n)  // throw(std::out_of_range)
+		reference at(size_type n) throw(std::out_of_range)
 		{
 			if (size_ <= n)
 				throw std::out_of_range("at: out of range");
 			return (data_[n]);
 		}
-		const_reference at(size_type n) const  // throw(std::out_of_range)
+		const_reference at(size_type n) const throw(std::out_of_range)
 		{
 			if (size_ <= n)
 				throw std::out_of_range("at: out of range");
@@ -373,7 +383,9 @@ namespace ft
 			size_type i;
 
 			if (capacity_ < x.size_)
+			{
 				resize(x.size_);  // TODO: capacity에 x.capacity_를 넣을지 아니면 size_를 넣을 지 확인
+			}
 
 			for (i = 0; i < x.size_; i++)
 			{
@@ -454,6 +466,8 @@ namespace ft
 			size_type i;
 
 			// TODO: optimization using checking is type trivial destructible
+			if (n > max_size())
+				throw std::bad_alloc();
 			if (size_ < n)
 			{
 				tmp = allocator_.allocate(sizeof(value_type) * n);
