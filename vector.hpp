@@ -61,8 +61,6 @@ namespace ft
 			for (size_type i = 0; i < size_; i++)
 				allocator_.construct(&data_[i], val);
 		}
-		// &&
-		// 			   ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value
 		template <class InputIterator>
 		vector(typename ft::enable_if<
 				   !ft::is_integral<InputIterator>::value,
@@ -70,39 +68,41 @@ namespace ft
 			   InputIterator last, const allocator_type& alloc = allocator_type()) throw(std::bad_alloc)
 			: allocator_(alloc)
 		{
-			size_type n = 0;
-			if (ft::is_same<ft::random_access_iterator_tag, InputIterator>::value)
-				n = last - first;
-			else
+			if (ft::is_same<ft::input_iterator_tag,
+							typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
-				for (InputIterator start = first; start != last; start++)
-					n++;
+				size_ = 0;
+				capacity_ = 1;
+				data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+				for (; first != last; first++)
+					push_back(*first);
 			}
-			if (n > max_size())
-				throw std::bad_alloc();
-			size_ = capacity_ = n;
-			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
-			for (size_type i = 0; i < n; i++)
+			else if (ft::is_base_of<ft::forward_iterator_tag,
+									typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
-				allocator_.construct(&data_[i], *first++);
+				size_type n = 0;
+				if (ft::is_same<ft::random_access_iterator_tag,
+								typename ft::iterator_traits<InputIterator>::iterator_category>::value)
+				{
+					n = last - first;
+				}
+				else
+				{
+					for (InputIterator start = first; start != last; start++)
+						n++;
+				}
+				if (n > max_size())
+				{
+					throw std::bad_alloc();
+				}
+				size_ = capacity_ = n;
+				data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+				for (size_type i = 0; i < n; i++)
+				{
+					allocator_.construct(&data_[i], *first++);
+				}
 			}
 		}
-		//  &&
-		// 			   !ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value &&
-		// 			   ft::is_base_of<ft::input_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value
-		// template <class InputIterator>
-		// vector(typename ft::enable_if<
-		// 		   !ft::is_integral<InputIterator>::value,
-		// 		   InputIterator>::type first,
-		// 	   InputIterator last, const allocator_type& alloc = allocator_type())  // throw(std::bad_alloc)
-		// 	: allocator_(alloc)
-		// {
-		// 	size_ = 0;
-		// 	capacity_ = 1;
-		// 	data_ = allocator_.allocate(sizeof(value_type) * capacity_);
-		// 	for (; first != last; first++)
-		// 		push_back(*first);
-		// }
 		vector(const vector& x) throw(std::bad_alloc)
 			: allocator_(x.allocator_), size_(x.size_), capacity_(x.capacity_)
 		{
@@ -114,55 +114,81 @@ namespace ft
 				allocator_.construct(&data_[i], x.data_[i]);
 			}
 		}
+		~vector()
+		{
+			// TODO: Trivial destructible 에 대해서 최적화 하기
+			clear();
+			allocator_.deallocate(data_, capacity_);
+			size_ = 0;
+			capacity_ = 0;
+		}
 
 	public:
+		// &&ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value,
 		template <class InputIterator>
 		void assign(typename ft::enable_if<
-						!ft::is_integral<InputIterator>::value &&
-							ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value,
+						!ft::is_integral<InputIterator>::value,
 						InputIterator>::type first,
-					InputIterator last)
+					InputIterator last) throw(std::bad_alloc)
 		{
-			std::allocator<void>::const_pointer hint = &data_[0];
-			size_type n = 0;
-			if (ft::is_same<ft::random_access_iterator_tag, InputIterator>::value)
-				n = last - first;
-			else
+			if (ft::is_same<ft::input_iterator_tag,
+							typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
-				for (InputIterator start = first; start != last; start++)
-					n++;
-			}
+				clear();
+				// TODO: 주석 확인하고 지우기
+				//  allocator_.deallocate(data_, capacity_);
 
-			if (capacity_ < n)
-			{
-				resize(n);
+				// capacity_ = 1;
+				// data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+				for (; first != last; first++)
+					push_back(*first);
 			}
-			clear();
-			data_ = allocator_.allocate((sizeof(value_type) * capacity_), hint);
-			for (size_type i = 0; i < n; i++)
+			else if (ft::is_base_of<ft::forward_iterator_tag,
+									typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
-				allocator_.construct(&data_[i], *first++);
+				std::allocator<void>::const_pointer hint = &data_[0];
+				size_type n = 0;
+				if (ft::is_same<ft::random_access_iterator_tag, InputIterator>::value)
+				{
+					n = last - first;
+				}
+				else
+				{
+					for (InputIterator start = first; start != last; start++)
+						n++;
+				}
+				if (capacity_ < n)
+				{
+					resize(n);
+				}
+				clear();
+				data_ = allocator_.allocate((sizeof(value_type) * capacity_), hint);
+				for (size_type i = 0; i < n; i++)
+				{
+					allocator_.construct(&data_[i], *first++);
+				}
+				size_ = n;
 			}
-			size_ = n;
 		}
-		template <class InputIterator>
-		void assign(typename ft::enable_if<
-						!ft::is_integral<InputIterator>::value &&
-							!ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value &&
-							ft::is_base_of<ft::input_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value,
-						InputIterator>::type first,
-					InputIterator last)
-		{
-			clear();
-			// TODO: 주석 확인하고 지우기
-			//  allocator_.deallocate(data_, capacity_);
+		// &&
+		// 					!ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value &&
+		// 					ft::is_base_of<ft::input_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value
+		// template <class InputIterator>
+		// void assign(typename ft::enable_if<
+		// 				!ft::is_integral<InputIterator>::value,
+		// 				InputIterator>::type first,
+		// 			InputIterator last)
+		// {
+		// 	clear();
+		// 	// TODO: 주석 확인하고 지우기
+		// 	//  allocator_.deallocate(data_, capacity_);
 
-			// capacity_ = 1;
-			// data_ = allocator_.allocate(sizeof(value_type) * capacity_);
-			for (; first != last; first++)
-				push_back(*first);
-		}
-		void assign(size_type n, const value_type& val)
+		// 	// capacity_ = 1;
+		// 	// data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+		// 	for (; first != last; first++)
+		// 		push_back(*first);
+		// }
+		void assign(size_type n, const value_type& val) throw(std::bad_alloc)
 		{
 			if (capacity_ < n)
 				resize(n);
@@ -290,9 +316,10 @@ namespace ft
 			return (allocator_type(allocator_));
 		}
 
-		iterator insert(iterator position, const value_type& val)
+		iterator insert(iterator position, const value_type& val) throw(std::bad_alloc)
 		{
 			// position 앞에 insert를 진행
+			// TODO: end() 일 땐 참조되면 안됨 -> 모든 부분 고치기
 			if (size_ + 1 >= capacity_)
 				resize(capacity_ * 2);
 			iterator start = end();
@@ -305,7 +332,7 @@ namespace ft
 			size_++;
 			return start;
 		}
-		void insert(iterator position, size_type n, const value_type& val)
+		void insert(iterator position, size_type n, const value_type& val) throw(std::bad_alloc)
 		{
 			if (size_ + n >= capacity_)
 				resize(capacity_ * 2);
@@ -321,63 +348,85 @@ namespace ft
 			}
 			size_ += n;
 		}
+
+		// &&
+		// 					ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value
 		template <class InputIterator>
 		void insert(iterator position,
 					typename ft::enable_if<
-						!ft::is_integral<InputIterator>::value &&
-							ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value,
+						!ft::is_integral<InputIterator>::value,
 						InputIterator>::type first,
-					InputIterator last)
+					InputIterator last) throw(std::bad_alloc)
 		{
-			size_type n = 0;
-			if (ft::is_same<ft::random_access_iterator_tag, InputIterator>::value)
-				n = last - first;
-			else
+			if (ft::is_same<ft::input_iterator_tag,
+							typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
-				for (InputIterator start = first; start != last; start++)
-					n++;
-			}
+				vector tmp = *this;
+				iterator start = begin();
+				iterator finish = end();
 
-			if (size_ + n >= capacity_)
-				resize(capacity_ * 2);
-			for (iterator start = end() + n - 1; start - (n - 1) != position; start--)
-			{
-				allocator_.construct(&(*start), (*(start - n)));
-				allocator_.destroy(&(*(start - n)));
+				for (; start != position; start++)
+					tmp.push_back(*start);
+				for (; first != last; first++, start++)
+					tmp.push_back(*first);
+				for (; start != finish; start++)
+					tmp.push_back(*start);
 			}
-			for (size_type i = 0; i < n && first != last; i++)
+			else if (ft::is_base_of<ft::forward_iterator_tag,
+									typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
-				allocator_.construct(&(*position), *first++);
-			}
-			size_ += n;
-		}
-		template <class InputIterator>
-		void insert(iterator position,
-					typename ft::enable_if<
-						!ft::is_integral<InputIterator>::value &&
-							!ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value &&
-							ft::is_base_of<ft::input_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value,
-						InputIterator>::type first,
-					InputIterator last)
-		{
-			vector tmp = *this;
-			iterator start = begin();
-			iterator finish = end();
+				size_type n = 0;
+				if (ft::is_same<ft::random_access_iterator_tag, InputIterator>::value)
+					n = last - first;
+				else
+				{
+					for (InputIterator start = first; start != last; start++)
+						n++;
+				}
 
-			for (; start != position; start++)
-				tmp.push_back(*start);
-			for (; first != last; first++, start++)
-				tmp.push_back(*first);
-			for (; start != finish; start++)
-				tmp.push_back(*start);
+				if (size_ + n >= capacity_)
+					resize(capacity_ * 2);
+				for (iterator start = end() + n - 1; start - (n - 1) != position; start--)
+				{
+					allocator_.construct(&(*start), (*(start - n)));
+					allocator_.destroy(&(*(start - n)));
+				}
+				for (size_type i = 0; i < n && first != last; i++)
+				{
+					allocator_.construct(&(*position), *first++);
+				}
+				size_ += n;
+			}
 		}
+
+		// &&
+		// 					!ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value &&
+		// 					ft::is_base_of<ft::input_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value
+		// template <class InputIterator>
+		// void insert(iterator position,
+		// 			typename ft::enable_if<
+		// 				!ft::is_integral<InputIterator>::value,
+		// 				InputIterator>::type first,
+		// 			InputIterator last) throw(std::bad_alloc)
+		// {
+		// 	vector tmp = *this;
+		// 	iterator start = begin();
+		// 	iterator finish = end();
+
+		// 	for (; start != position; start++)
+		// 		tmp.push_back(*start);
+		// 	for (; first != last; first++, start++)
+		// 		tmp.push_back(*first);
+		// 	for (; start != finish; start++)
+		// 		tmp.push_back(*start);
+		// }
 
 		size_type max_size() const throw()
 		{
 			return (allocator_.max_size());
 		}
 
-		vector& operator=(const vector& x)
+		vector& operator=(const vector& x) throw(std::bad_alloc)
 		{
 			// modify size, not capacity
 			size_type i;
@@ -408,7 +457,7 @@ namespace ft
 			return (*this);
 		}
 
-		reference operator[](size_type n)
+		reference operator[](size_type n)  // does not check bound
 		{
 			return (data_[n]);
 		}
@@ -429,7 +478,7 @@ namespace ft
 				resize(capacity_ / 2);
 		}
 
-		void push_back(const value_type& val)
+		void push_back(const value_type& val) throw(std::bad_alloc)
 		{
 			if (size_ == capacity_)
 				resize(capacity_ * 2);
@@ -454,13 +503,13 @@ namespace ft
 			return (const_reverse_iterator(begin() - 1));
 		}
 
-		void reserve(size_type n)  // TODO: length_error and bad_alloc
+		void reserve(size_type n) throw(std::length_error, std::bad_alloc)
 		{
 			if (capacity_ < n)
 				resize(n);
 		}
 
-		void resize(size_type n, value_type val = value_type())
+		void resize(size_type n, value_type val = value_type()) throw(std::bad_alloc)
 		{
 			pointer tmp;
 			size_type i;

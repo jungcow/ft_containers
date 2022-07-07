@@ -145,8 +145,31 @@ int main(void)
 		for (unsigned i = 0; i < bar.size(); i++)
 			std::cout << ' ' << bar[i];
 		std::cout << '\n';
+	}
+	{
+		try
+		{
+			std::cout << "calll!!\n";
+			std::vector<int> stdvec(std::vector<int>().max_size() + 1);
+		}
+		catch (const std::exception &e)
+		{
+			std::cout << "hihi\n";
+			std::cerr << e.what() << '\n';
+		}
+	}
+	{
+		ft::vector<int> ft_c0;
+		std::vector<int> std_c0;
+		int testSize = 42;
 
-		return 0;
+		for (int i = 0; i < testSize; i++)
+		{
+			ft_c0.insert(ft_c0.end(), i);
+			std_c0.insert(std_c0.end(), i);
+		}
+		// ft::vector<int>::iterator ft_it0;
+		// std::vector<int>::iterator std_it0;
 	}
 	return (0);
 }
