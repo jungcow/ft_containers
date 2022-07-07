@@ -241,7 +241,7 @@ namespace ft
 			for (; start + 1 != finish; start++)
 			{
 				allocator_.destroy(&(*start));
-				allocator_.construct(&(*start), &(*(start + 1)));
+				allocator_.construct(&(*start), (*(start + 1)));
 			}
 			allocator_.destroy(&(*start));
 			size_--;
@@ -256,7 +256,7 @@ namespace ft
 			for (; start + n != finish; start++)
 			{
 				allocator_.destroy(&(*start));
-				allocator_.construct(&(*start), &(*(start + n)));
+				allocator_.construct(&(*start), (*(start + n)));
 			}
 			for (; start != finish; start++)
 			{
@@ -288,7 +288,7 @@ namespace ft
 			iterator start = end();
 			for (; start != position; start--)
 			{
-				allocator_.construct(&(*start), &(*(start - 1)));
+				allocator_.construct(&(*start), (*(start - 1)));
 				allocator_.destroy(&(*(start - 1)));
 			}
 			allocator_.construct(&(*start), val);
@@ -302,7 +302,7 @@ namespace ft
 			iterator start = end() + n - 1;
 			for (; start - (n - 1) != position; start--)
 			{
-				allocator_.construct(&(*start), &(*(start - n)));
+				allocator_.construct(&(*start), (*(start - n)));
 				allocator_.destroy(&(*(start - n)));
 			}
 			for (size_type i = 0; i < n; i++, position++)
@@ -332,7 +332,7 @@ namespace ft
 				resize(capacity_ * 2);
 			for (iterator start = end() + n - 1; start - (n - 1) != position; start--)
 			{
-				allocator_.construct(&(*start), &(*(start - n)));
+				allocator_.construct(&(*start), (*(start - n)));
 				allocator_.destroy(&(*(start - n)));
 			}
 			for (size_type i = 0; i < n && first != last; i++)
@@ -627,6 +627,17 @@ namespace ft
 		{
 			vector_iterator tmp = *this;
 			++(*this);
+			return (tmp);
+		}
+		vector_iterator& operator--()
+		{
+			--base_;
+			return (*this);
+		}
+		vector_iterator operator--(int)
+		{
+			vector_iterator tmp = *this;
+			--(*this);
 			return (tmp);
 		}
 
