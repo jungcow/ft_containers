@@ -1,11 +1,12 @@
 #ifndef __FT_VECTOR_H__
 #define __FT_VECTOR_H__
 
-#include <exception> // bad_alloc, length_error, out_of_range
-#include <iostream>  //temporary include TODO: 지우기
-#include <iterator>  // std::distance
-#include <memory> // allocator
+#include <exception>  // bad_alloc, length_error, out_of_range
+#include <iostream>   //temporary include TODO: 지우기
+#include <iterator>   // std::distance
+#include <memory>     // allocator
 
+#include "algorithm.hpp"
 #include "iterator.hpp"
 #include "type_traits.hpp"
 
@@ -64,7 +65,14 @@ namespace ft
 			   InputIterator last, const allocator_type& alloc = allocator_type())
 			: allocator_(alloc)
 		{
-			size_type n = std::distance(first, last);
+			size_type n = 0;
+			if (ft::is_same<ft::random_access_iterator_tag, InputIterator>::value)
+				n = last - first;
+			else
+			{
+				for (InputIterator start = first; start != last; start++)
+					n++;
+			}
 			size_ = capacity_ = n;
 			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
 			for (size_type i = 0; i < n; i++)
@@ -106,7 +114,14 @@ namespace ft
 					InputIterator last)
 		{
 			std::allocator<void>::const_pointer hint = &data_[0];
-			size_type n = std::distance(first, last);
+			size_type n = 0;
+			if (ft::is_same<ft::random_access_iterator_tag, InputIterator>::value)
+				n = last - first;
+			else
+			{
+				for (InputIterator start = first; start != last; start++)
+					n++;
+			}
 
 			if (capacity_ < n)
 			{
@@ -241,7 +256,7 @@ namespace ft
 			for (; start + n != finish; start++)
 			{
 				allocator_.destroy(&(*start));
-				allocator_.construct(&(*start), &(*start + n));
+				allocator_.construct(&(*start), &(*(start + n)));
 			}
 			for (; start != finish; start++)
 			{
@@ -273,8 +288,8 @@ namespace ft
 			iterator start = end();
 			for (; start != position; start--)
 			{
-				allocator_.construct(&(*start), &(*start - 1));
-				allocator_.destroy(&(*start - 1));
+				allocator_.construct(&(*start), &(*(start - 1)));
+				allocator_.destroy(&(*(start - 1)));
 			}
 			allocator_.construct(&(*start), val);
 			size_++;
@@ -287,8 +302,8 @@ namespace ft
 			iterator start = end() + n - 1;
 			for (; start - (n - 1) != position; start--)
 			{
-				allocator_.construct(&(*start), &(*start - n));
-				allocator_.destroy(&(*start - n));
+				allocator_.construct(&(*start), &(*(start - n)));
+				allocator_.destroy(&(*(start - n)));
 			}
 			for (size_type i = 0; i < n; i++, position++)
 			{
@@ -304,14 +319,21 @@ namespace ft
 						InputIterator>::type first,
 					InputIterator last)
 		{
-			size_type n = std::distance(first, last);
+			size_type n = 0;
+			if (ft::is_same<ft::random_access_iterator_tag, InputIterator>::value)
+				n = last - first;
+			else
+			{
+				for (InputIterator start = first; start != last; start++)
+					n++;
+			}
 
 			if (size_ + n >= capacity_)
 				resize(capacity_ * 2);
 			for (iterator start = end() + n - 1; start - (n - 1) != position; start--)
 			{
-				allocator_.construct(&(*start), &(*start - n));
-				allocator_.destroy(&(*start - n));
+				allocator_.construct(&(*start), &(*(start - n)));
+				allocator_.destroy(&(*(start - n)));
 			}
 			for (size_type i = 0; i < n && first != last; i++)
 			{
@@ -481,22 +503,41 @@ namespace ft
 			x.allocator_ = tmp;
 		}
 	};
-#if 0
-template <class T, class Alloc>
-  bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {}
-template <class T, class Alloc>
-  bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {}
-template <class T, class Alloc>
-  bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {}
-template <class T, class Alloc>
-  bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {}
-template <class T, class Alloc>
-  bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {}
-template <class T, class Alloc>
-  bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {}
-template <class T, class Alloc>
-  void swap (vector<T,Alloc>& x, vector<T,Alloc>& y) {}
-#endif
+	template <class T, class Alloc>
+	bool operator==(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+	{
+		return (lhs.size() == rhs.size() && ft::equal(lhs.begin(), rhs.begin(), rhs.end()));
+	}
+	template <class T, class Alloc>
+	bool operator!=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+	{
+		return !(lhs == rhs);
+	}
+	template <class T, class Alloc>
+	bool operator<(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+	{
+		return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+	}
+	template <class T, class Alloc>
+	bool operator<=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+	{
+		return !(rhs < lhs);
+	}
+	template <class T, class Alloc>
+	bool operator>(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+	{
+		return (rhs < lhs);
+	}
+	template <class T, class Alloc>
+	bool operator>=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+	{
+		return !(lhs < rhs);
+	}
+	template <class T, class Alloc>
+	void swap(vector<T, Alloc>& x, vector<T, Alloc>& y)
+	{
+		x.swap(y);
+	}
 
 	template <class Iterator, class Pointer>
 	class vector_iterator

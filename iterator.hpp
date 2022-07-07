@@ -100,6 +100,11 @@ namespace ft
 		typedef char iterator_category;
 	};
 	template <>
+	struct iterator_traits_wrapper<float>
+	{
+		typedef char iterator_category;
+	};
+	template <>
 	struct iterator_traits_wrapper<ft::input_iterator_tag>
 	{
 		typedef ft::input_iterator_tag iterator_category;
