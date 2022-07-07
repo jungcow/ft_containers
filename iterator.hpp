@@ -273,6 +273,19 @@ namespace ft
 	{
 		return (rhs.base_ - lhs.base_);
 	}
+
+	template <class InputIterator>
+	typename iterator_traits<InputIterator>::difference_type
+	distance(InputIterator first, InputIterator last)
+	{
+		if (ft::is_same<ft::random_access_iterator_tag, typename iterator_traits<InputIterator>::iterator_category>::value)
+			return last - first;
+		typename iterator_traits<InputIterator>::difference_type diff = 0;
+		if (ft::is_base_of<ft::forward_iterator_tag, typename iterator_traits<InputIterator>::iterator_category>::value)
+			for (; first != last; first++)
+				diff++;
+		return diff;
+	}
 };
 
 #endif

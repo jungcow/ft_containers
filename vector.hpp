@@ -82,27 +82,14 @@ namespace ft
 									typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
 				size_type n = 0;
-				if (ft::is_same<ft::random_access_iterator_tag,
-								typename ft::iterator_traits<InputIterator>::iterator_category>::value)
-				{
-					n = last - first;
-				}
-				else
-				{
-					for (InputIterator start = first; start != last; start++)
-						n++;
-				}
+				n = ft::distance(first, last);
 				if (n > max_size())
-				{
 					throw std::bad_alloc();
-				}
 				size_ = n;
 				capacity_ = n + 1;
 				data_ = allocator_.allocate(sizeof(value_type) * capacity_);
 				for (size_type i = 0; i < n; i++)
-				{
 					allocator_.construct(&data_[i], *first++);
-				}
 			}
 		}
 		vector(const vector& x) throw(std::bad_alloc)
@@ -112,9 +99,7 @@ namespace ft
 				throw std::bad_alloc();
 			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
 			for (size_type i = 0; i < size_; i++)
-			{
 				allocator_.construct(&data_[i], x.data_[i]);
-			}
 		}
 		~vector()
 		{
@@ -149,29 +134,17 @@ namespace ft
 			{
 				std::allocator<void>::const_pointer hint = &data_[0];
 				size_type n = 0;
-				if (ft::is_same<ft::random_access_iterator_tag, InputIterator>::value)
-				{
-					n = last - first;
-				}
-				else
-				{
-					for (InputIterator start = first; start != last; start++)
-						n++;
-				}
+				n = ft::distance(first, last);
 				if (capacity_ < n)
-				{
 					resize(n);
-				}
 				clear();
 				data_ = allocator_.allocate((sizeof(value_type) * capacity_), hint);
 				for (size_type i = 0; i < n; i++)
-				{
 					allocator_.construct(&data_[i], *first++);
-				}
 				size_ = n;
 			}
 		}
-		
+
 		void assign(size_type n, const value_type& val) throw(std::bad_alloc)
 		{
 			if (capacity_ < n)
@@ -392,20 +365,11 @@ namespace ft
 					pos++;
 				}
 				size_type n = 0;
-				if (ft::is_same<ft::random_access_iterator_tag, InputIterator>::value)
-					n = last - first;
-				else
-				{
-					for (InputIterator start = first; start != last; start++)
-						n++;
-				}
-
+				n = ft::distance(first, last);
 				if (size_ + n >= capacity_)
 					resize(size_ + n + 1);
 				for (size_type i = 0; i < n; i++)
-				{
 					allocator_.construct(&data_[size_ + i], value_type());
-				}
 				iterator start = end() + n - 1;
 				iterator finish = end() - (pos);
 				for (; start - (n - 1) != finish; start--)
@@ -414,9 +378,7 @@ namespace ft
 					allocator_.destroy(&(*(start - n)));
 				}
 				for (size_type i = 0; i < n; i++, pos++, first++)
-				{
 					allocator_.construct(&data_[pos - 1], *first++);
-				}
 				size_ += n;
 			}
 		}
