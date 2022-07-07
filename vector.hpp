@@ -126,7 +126,6 @@ namespace ft
 		}
 
 	public:
-		// &&ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value,
 		template <class InputIterator>
 		void assign(typename ft::enable_if<
 						!ft::is_integral<InputIterator>::value,
@@ -172,24 +171,7 @@ namespace ft
 				size_ = n;
 			}
 		}
-		// &&
-		// 					!ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value &&
-		// 					ft::is_base_of<ft::input_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value
-		// template <class InputIterator>
-		// void assign(typename ft::enable_if<
-		// 				!ft::is_integral<InputIterator>::value,
-		// 				InputIterator>::type first,
-		// 			InputIterator last)
-		// {
-		// 	clear();
-		// 	// TODO: 주석 확인하고 지우기
-		// 	//  allocator_.deallocate(data_, capacity_);
-
-		// 	// capacity_ = 1;
-		// 	// data_ = allocator_.allocate(sizeof(value_type) * capacity_);
-		// 	for (; first != last; first++)
-		// 		push_back(*first);
-		// }
+		
 		void assign(size_type n, const value_type& val) throw(std::bad_alloc)
 		{
 			if (capacity_ < n)
@@ -375,8 +357,6 @@ namespace ft
 			size_ += n;
 		}
 
-		// &&
-		// 					ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value
 		template <class InputIterator>
 		void insert(iterator position,
 					typename ft::enable_if<

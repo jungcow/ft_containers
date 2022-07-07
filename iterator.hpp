@@ -88,28 +88,6 @@ namespace ft
 		typedef random_access_iterator_tag iterator_category;
 	};
 
-	template <class T>
-	struct iterator_traits_wrapper
-	{
-		typedef typename iterator_traits<T>::iterator_category iterator_category;
-	};
-
-	template <>
-	struct iterator_traits_wrapper<int>
-	{
-		typedef char iterator_category;
-	};
-	template <>
-	struct iterator_traits_wrapper<float>
-	{
-		typedef char iterator_category;
-	};
-	template <>
-	struct iterator_traits_wrapper<ft::input_iterator_tag>
-	{
-		typedef ft::input_iterator_tag iterator_category;
-	};
-
 	/**
 	 * reverse_iterator class
 	 *
