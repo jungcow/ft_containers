@@ -286,6 +286,6 @@ namespace ft
 				diff++;
 		return diff;
 	}
-};
+}
 
 #endif

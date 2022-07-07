@@ -60,12 +60,12 @@ namespace ft
 								  ft::is_same<T, short int>::value ||
 								  ft::is_same<T, int>::value ||
 								  ft::is_same<T, long int>::value ||
-								  ft::is_same<T, long long int>::value ||
+								//   ft::is_same<T, long long int>::value ||
 								  ft::is_same<T, unsigned char>::value ||
 								  ft::is_same<T, unsigned short int>::value ||
 								  ft::is_same<T, unsigned int>::value ||
-								  ft::is_same<T, unsigned long int>::value ||
-								  ft::is_same<T, unsigned long long int>::value;
+								  ft::is_same<T, unsigned long int>::value;
+								//   ft::is_same<T, unsigned long long int>::value;
 	};
 
 	/**
