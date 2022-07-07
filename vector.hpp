@@ -1,6 +1,7 @@
 #ifndef __FT_VECTOR_H__
 #define __FT_VECTOR_H__
 
+#include <algorithm>  // std::min, std::max
 #include <exception>  // bad_alloc, length_error, out_of_range
 #include <iostream>   //temporary include TODO: 지우기
 #include <iterator>   // std::distance
@@ -53,7 +54,7 @@ namespace ft
 		}
 		explicit vector(size_type n, const value_type& val = value_type(),
 						const allocator_type& alloc = allocator_type()) throw(std::bad_alloc)
-			: allocator_(alloc), size_(n), capacity_(n)
+			: allocator_(alloc), size_(n), capacity_(n + 1)
 		{
 			if (n > max_size())
 				throw std::bad_alloc();
@@ -95,7 +96,8 @@ namespace ft
 				{
 					throw std::bad_alloc();
 				}
-				size_ = capacity_ = n;
+				size_ = n;
+				capacity_ = n + 1;
 				data_ = allocator_.allocate(sizeof(value_type) * capacity_);
 				for (size_type i = 0; i < n; i++)
 				{
@@ -196,6 +198,7 @@ namespace ft
 			data_ = allocator_.allocate(sizeof(value_type) * capacity_, &data_[0]);
 			for (size_type i = 0; i < n; i++)
 				allocator_.construct(&data_[i], val);
+			size_ = n;
 		}
 
 		reference at(size_type n) throw(std::out_of_range)
@@ -264,7 +267,10 @@ namespace ft
 
 		iterator erase(iterator position)
 		{
-			// TODO: iterator의 위치가 잘못됐을 시, undefined behavior 발생
+			/**
+			 * TODO:iterator의 위치가 잘못됐을 시, undefined behavior 발생
+			 * -> 그러나 컨테이너느 valid한 상태로 나와야함
+			 */
 			if (position == end() - 1)
 			{
 				allocator_.destroy(&data_[size_ - 1]);
@@ -316,35 +322,55 @@ namespace ft
 			return (allocator_type(allocator_));
 		}
 
-		iterator insert(iterator position, const value_type& val) throw(std::bad_alloc)
+		iterator insert(iterator position, const value_type& val)
 		{
-			// position 앞에 insert를 진행
-			// TODO: end() 일 땐 참조되면 안됨 -> 모든 부분 고치기
+			size_type pos = 0;
+
+			for (size_type i = size_; i <= 0; i--)
+			{
+				if (iterator(&data_[i]) == position)
+					break;
+				pos++;
+			}
 			if (size_ + 1 >= capacity_)
 				resize(capacity_ * 2);
+			allocator_.construct(&data_[size_], value_type());
 			iterator start = end();
-			for (; start != position; start--)
+			iterator finish = end() - (pos);
+			for (; start != finish; start--)
 			{
-				allocator_.construct(&(*start), (*(start - 1)));
+				allocator_.construct(&(*start), *(start - 1));
 				allocator_.destroy(&(*(start - 1)));
 			}
 			allocator_.construct(&(*start), val);
 			size_++;
 			return start;
 		}
-		void insert(iterator position, size_type n, const value_type& val) throw(std::bad_alloc)
+		void insert(iterator position, size_type n, const value_type& val)  // throw(std::bad_alloc)
 		{
-			if (size_ + n >= capacity_)
-				resize(capacity_ * 2);
+			size_type pos = 0;
+			for (size_type i = size_; i <= 0; i--)
+			{
+				if (iterator(&data_[i]) == position)
+					break;
+				pos++;
+			}
+			if (size_ + n + 1 >= capacity_)
+				resize(size_ + n + 1);
+			for (size_type i = 0; i < n; i++)
+			{
+				allocator_.construct(&data_[size_ + i], value_type());
+			}
 			iterator start = end() + n - 1;
-			for (; start - (n - 1) != position; start--)
+			iterator finish = end() - (pos);
+			for (; start - (n - 1) != finish; start--)
 			{
 				allocator_.construct(&(*start), (*(start - n)));
 				allocator_.destroy(&(*(start - n)));
 			}
-			for (size_type i = 0; i < n; i++, position++)
+			for (size_type i = 0; i < n; i++, pos++)
 			{
-				allocator_.construct(&(*position), val);
+				allocator_.construct(&data_[pos - 1], val);
 			}
 			size_ += n;
 		}
@@ -371,10 +397,20 @@ namespace ft
 					tmp.push_back(*first);
 				for (; start != finish; start++)
 					tmp.push_back(*start);
+				clear();
+				allocator_.deallocate(data_, capacity_);
+				*this = tmp;
 			}
 			else if (ft::is_base_of<ft::forward_iterator_tag,
 									typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
+				size_type pos = 0;
+				for (size_type i = size_; i <= 0; i--)
+				{
+					if (iterator(&data_[i]) == position)
+						break;
+					pos++;
+				}
 				size_type n = 0;
 				if (ft::is_same<ft::random_access_iterator_tag, InputIterator>::value)
 					n = last - first;
@@ -385,48 +421,33 @@ namespace ft
 				}
 
 				if (size_ + n >= capacity_)
-					resize(capacity_ * 2);
-				for (iterator start = end() + n - 1; start - (n - 1) != position; start--)
+					resize(size_ + n + 1);
+				for (size_type i = 0; i < n; i++)
+				{
+					allocator_.construct(&data_[size_ + i], value_type());
+				}
+				iterator start = end() + n - 1;
+				iterator finish = end() - (pos);
+				for (; start - (n - 1) != finish; start--)
 				{
 					allocator_.construct(&(*start), (*(start - n)));
 					allocator_.destroy(&(*(start - n)));
 				}
-				for (size_type i = 0; i < n && first != last; i++)
+				for (size_type i = 0; i < n; i++, pos++, first++)
 				{
-					allocator_.construct(&(*position), *first++);
+					allocator_.construct(&data_[pos - 1], *first++);
 				}
 				size_ += n;
 			}
 		}
 
-		// &&
-		// 					!ft::is_base_of<ft::forward_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value &&
-		// 					ft::is_base_of<ft::input_iterator_tag, typename ft::iterator_traits_wrapper<InputIterator>::iterator_category>::value
-		// template <class InputIterator>
-		// void insert(iterator position,
-		// 			typename ft::enable_if<
-		// 				!ft::is_integral<InputIterator>::value,
-		// 				InputIterator>::type first,
-		// 			InputIterator last) throw(std::bad_alloc)
-		// {
-		// 	vector tmp = *this;
-		// 	iterator start = begin();
-		// 	iterator finish = end();
-
-		// 	for (; start != position; start++)
-		// 		tmp.push_back(*start);
-		// 	for (; first != last; first++, start++)
-		// 		tmp.push_back(*first);
-		// 	for (; start != finish; start++)
-		// 		tmp.push_back(*start);
-		// }
-
 		size_type max_size() const throw()
 		{
-			return (allocator_.max_size());
+			// return (allocator_.max_size()); // why not?
+			return (std::numeric_limits<size_type>::max() / std::max(2, static_cast<int>(sizeof(value_type))));
 		}
 
-		vector& operator=(const vector& x) throw(std::bad_alloc)
+		vector& operator=(const vector& x)
 		{
 			// modify size, not capacity
 			size_type i;
@@ -480,27 +501,27 @@ namespace ft
 
 		void push_back(const value_type& val) throw(std::bad_alloc)
 		{
-			if (size_ == capacity_)
+			if (size_ + 1 >= capacity_)
 				resize(capacity_ * 2);
 			data_[size_++] = val;
 		}
 
 		reverse_iterator rbegin() throw()
 		{
-			return (reverse_iterator(end() - 1));
+			return (reverse_iterator(end()));
 		}
 		const_reverse_iterator rbegin() const throw()
 		{
-			return (const_reverse_iterator(end() - 1));
+			return (const_reverse_iterator(end()));
 		}
 
 		reverse_iterator rend() throw()
 		{
-			return (reverse_iterator(begin() - 1));
+			return (reverse_iterator(begin()));
 		}
 		const_reverse_iterator rend() const throw()
 		{
-			return (const_reverse_iterator(begin() - 1));
+			return (const_reverse_iterator(begin()));
 		}
 
 		void reserve(size_type n) throw(std::length_error, std::bad_alloc)
