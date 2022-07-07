@@ -59,8 +59,7 @@ namespace ft
 			if (n > max_size())
 				throw std::bad_alloc();
 			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
-			for (size_type i = 0; i < size_; i++)
-				allocator_.construct(&data_[i], val);
+			constructRange(0, size_, val);
 		}
 		template <class InputIterator>
 		vector(typename ft::enable_if<
@@ -121,11 +120,6 @@ namespace ft
 							typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
 				clear();
-				// TODO: 주석 확인하고 지우기
-				//  allocator_.deallocate(data_, capacity_);
-
-				// capacity_ = 1;
-				// data_ = allocator_.allocate(sizeof(value_type) * capacity_);
 				for (; first != last; first++)
 					push_back(*first);
 			}
@@ -151,8 +145,9 @@ namespace ft
 				reserve(n + 1);
 			clear();
 			data_ = allocator_.allocate(sizeof(value_type) * capacity_, &data_[0]);
-			for (size_type i = 0; i < n; i++)
-				allocator_.construct(&data_[i], val);
+			constructRange(0, n, val);
+			// for (size_type i = 0; i < n; i++)
+			// 	allocator_.construct(&data_[i], val);
 			size_ = n;
 		}
 
@@ -226,41 +221,22 @@ namespace ft
 			 * TODO:iterator의 위치가 잘못됐을 시, undefined behavior 발생
 			 * -> 그러나 컨테이너느 valid한 상태로 나와야함
 			 */
-			if (position == end() - 1)
-			{
-				allocator_.destroy(&data_[size_ - 1]);
-				size_--;
-				return end();
-			}
-			iterator start = position;
-			iterator ret = start;
-			iterator finish = end();
-			for (; start + 1 != finish; start++)
-			{
-				allocator_.destroy(&(*start));
-				allocator_.construct(&(*start), (*(start + 1)));
-			}
-			allocator_.destroy(&(*start));
+			iterator ret = position;
+			moveFrontByInterval(position, end(), 1);
+			destructRange(size_ - 1, size_);
 			size_--;
 			return ret;
 		}
+
 		iterator erase(iterator first, iterator last)
 		{
 			size_type n = last - first;
-			iterator start = first;
-			iterator ret = first;
-			iterator finish = last;
-			for (; start + n != finish; start++)
-			{
-				allocator_.destroy(&(*start));
-				allocator_.construct(&(*start), (*(start + n)));
-			}
-			for (; start != finish; start++)
-			{
-				allocator_.destroy(&(*start));
-			}
+			iterator finish = end();
+
+			moveFrontByInterval(first, finish, n);
+			destructRange(first + (finish - last), finish);
 			size_ -= n;
-			return ret;
+			return first;
 		}
 
 		reference front()
@@ -279,54 +255,26 @@ namespace ft
 
 		iterator insert(iterator position, const value_type& val)
 		{
-			size_type pos = 0;
+			size_type pos = getOffsetFromEnd(position);
 
-			for (size_type i = size_; i >= 0; i--)
-			{
-				if (iterator(&data_[i]) == position)
-					break;
-				pos++;
-			}
 			if (size_ + 1 >= capacity_)
 				reserve(capacity_ * 2);
-			allocator_.construct(&data_[size_], value_type());
-			iterator start = end();
-			iterator finish = end() - (pos);
-			for (; start != finish; start--)
-			{
-				allocator_.construct(&(*start), *(start - 1));
-				allocator_.destroy(&(*(start - 1)));
-			}
-			allocator_.construct(&(*start), val);
+			constructRange(size_, size_ + 1);
+			moveBackByInterval(end(), end() - pos, 1);
+			constructRange(size_ - pos, size_ - pos + 1, val);
 			size_++;
-			return start;
+			return iterator(&data_[(size_ - 1) - pos]);
 		}
+
 		void insert(iterator position, size_type n, const value_type& val)  // throw(std::bad_alloc)
 		{
-			size_type pos = 0;
-			for (size_type i = size_; i >= 0; i--)
-			{
-				if (iterator(&data_[i]) == position)
-					break;
-				pos++;
-			}
+			size_type pos = getOffsetFromEnd(position);
+
 			if (size_ + n + 1 >= capacity_)
 				reserve(std::max((size_ + n + 1), (2 * capacity_)));
-			for (size_type i = 0; i < n; i++)
-			{
-				allocator_.construct(&data_[size_ + i], value_type());
-			}
-			iterator start = end() + n - 1;
-			iterator finish = end() - pos;
-			for (; start - (n - 1) != finish; start--)
-			{
-				allocator_.construct(&(*start), (*(start - n)));
-				allocator_.destroy(&(*(start - n)));
-			}
-			for (size_type i = 0; i < n; i++)
-			{
-				allocator_.construct(&data_[size_ - pos + i], val);
-			}
+			constructRange(size_, size_ + n);
+			moveBackByInterval(end() + n - 1, end() - pos, n);
+			constructRange(size_ - pos, size_ - pos + n, val);
 			size_ += n;
 		}
 
@@ -357,34 +305,15 @@ namespace ft
 			else if (ft::is_base_of<ft::forward_iterator_tag,
 									typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
-				size_type pos = 0;
-				for (size_type i = size_; i >= 0; i--)
-				{
-					if (iterator(&data_[i]) == position)
-						break;
-					pos++;
-				}
+				size_type pos = getOffsetFromEnd(position);
+				size_type n = ft::distance(first, last);
 
-				size_type n = 0;
-
-				n = ft::distance(first, last);
 				if (size_ + n >= capacity_)
 					reserve(std::max((size_ + n + 1), (2 * capacity_)));
-
+				constructRange(size_, size_ + 1);
+				moveBackByInterval(end() + n - 1, end() - pos, n);
 				for (size_type i = 0; i < n; i++)
-					allocator_.construct(&data_[size_ + i], value_type());
-				iterator start = end() + n - 1;
-				iterator finish = end() - (pos);
-				for (; start - (n - 1) != finish; start--)
-				{
-					allocator_.construct(&(*start), (*(start - n)));
-					allocator_.destroy(&(*(start - n)));
-				}
-
-				for (size_type i = 0; i < n; i++)
-				{
 					allocator_.construct(&data_[size_ - pos + i], *first++);
-				}
 				size_ += n;
 			}
 		}
@@ -401,26 +330,17 @@ namespace ft
 			size_type i;
 
 			if (capacity_ < x.size_)
-			{
-				reserve(x.size_);  // TODO: capacity에 x.capacity_를 넣을지 아니면 size_를 넣을 지 확인
-			}
-
+				reserve(x.capacity_);
+			/**
+			 * value_type에서 operator=가 오버로딩 안되어있으면 ub
+			 * https://m.cplusplus.com/reference/vector/vector/operator=/
+			 */
 			for (i = 0; i < x.size_; i++)
-			{
-				/**
-				 * value_type에서 operator=가 오버로딩 안되어있으면 ub
-				 * https://m.cplusplus.com/reference/vector/vector/operator=/
-				 */
 				data_[i] = x.data_[i];
-			}
-
-			// TODO: optimization using checking is type trivial destructible
 			if (!ft::is_trivial_destructible_junior<value_type>::value)
 			{
 				for (; i < size_; i++)
-				{
 					allocator_.destroy(&data_[i]);
-				}
 			}
 			size_ = x.size_;
 			return (*this);
@@ -443,11 +363,10 @@ namespace ft
 			if (!ft::is_trivial_destructible_junior<value_type>::value)
 				allocator_.destroy(&data_[size_ - 1]);
 			size_--;
-			// if (size_ < capacity_ / 4)
-			// 	allocator_.deallocate(&data_[capacity_ / 2], capacity_ / 2);
+			// TODO: capacity 줄여서 공간 최적화 하기
 		}
 
-		void push_back(const value_type& val) throw(std::bad_alloc)
+		void push_back(const value_type& val)  // throw(std::bad_alloc)
 		{
 			if (size_ + 1 >= capacity_)
 				reserve(capacity_ * 2);
@@ -472,7 +391,7 @@ namespace ft
 			return (const_reverse_iterator(begin()));
 		}
 
-		void reserve(size_type n) throw(std::length_error, std::bad_alloc)
+		void reserve(size_type n)  // throw(std::length_error, std::bad_alloc)
 		{
 			pointer tmp;
 			size_type i;
@@ -545,6 +464,50 @@ namespace ft
 			allocator_type tmp = get_allocator();
 			allocator_ = x.get_allocator();
 			x.allocator_ = tmp;
+		}
+
+	private:
+		size_type getOffsetFromEnd(iterator position)
+		{
+			size_type pos = 0;
+			for (size_type i = size_; i >= 0; i--)
+			{
+				if (iterator(&data_[i]) == position)
+					break;
+				pos++;
+			}
+			return pos;
+		}
+		void constructRange(size_type from, size_type to, value_type val = value_type())
+		{
+			for (size_type i = from; i < to; i++)
+				allocator_.construct(&data_[i], val);
+		}
+		void destructRange(size_type from, size_type to)
+		{
+			for (size_type i = from; i < to; i++)
+				allocator_.destroy(&data_[i]);
+		}
+		void destructRange(iterator from, iterator to)
+		{
+			for (iterator i = from; i < to; i++)
+				allocator_.destroy(&(*i));
+		}
+		void moveBackByInterval(iterator start, iterator finish, size_type interval)
+		{
+			for (; start - (interval - 1) != finish; start--)
+			{
+				allocator_.construct(&(*start), (*(start - interval)));
+				allocator_.destroy(&(*(start - interval)));
+			}
+		}
+		void moveFrontByInterval(iterator start, iterator finish, size_type interval)
+		{
+			for (; start + interval != finish; start++)
+			{
+				allocator_.destroy(&(*start));
+				allocator_.construct(&(*start), (*(start + interval)));
+			}
 		}
 	};
 	template <class T, class Alloc>
