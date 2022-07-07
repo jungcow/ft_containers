@@ -136,7 +136,7 @@ namespace ft
 				size_type n = 0;
 				n = ft::distance(first, last);
 				if (capacity_ < n)
-					resize(n);
+					reserve(n + 1);
 				clear();
 				data_ = allocator_.allocate((sizeof(value_type) * capacity_), hint);
 				for (size_type i = 0; i < n; i++)
@@ -148,7 +148,7 @@ namespace ft
 		void assign(size_type n, const value_type& val) throw(std::bad_alloc)
 		{
 			if (capacity_ < n)
-				resize(n);
+				reserve(n + 1);
 			clear();
 			data_ = allocator_.allocate(sizeof(value_type) * capacity_, &data_[0]);
 			for (size_type i = 0; i < n; i++)
@@ -281,14 +281,14 @@ namespace ft
 		{
 			size_type pos = 0;
 
-			for (size_type i = size_; i <= 0; i--)
+			for (size_type i = size_; i >= 0; i--)
 			{
 				if (iterator(&data_[i]) == position)
 					break;
 				pos++;
 			}
 			if (size_ + 1 >= capacity_)
-				resize(capacity_ * 2);
+				reserve(capacity_ * 2);
 			allocator_.construct(&data_[size_], value_type());
 			iterator start = end();
 			iterator finish = end() - (pos);
@@ -304,28 +304,28 @@ namespace ft
 		void insert(iterator position, size_type n, const value_type& val)  // throw(std::bad_alloc)
 		{
 			size_type pos = 0;
-			for (size_type i = size_; i <= 0; i--)
+			for (size_type i = size_; i >= 0; i--)
 			{
 				if (iterator(&data_[i]) == position)
 					break;
 				pos++;
 			}
 			if (size_ + n + 1 >= capacity_)
-				resize(size_ + n + 1);
+				reserve(std::max((size_ + n + 1), (2 * capacity_)));
 			for (size_type i = 0; i < n; i++)
 			{
 				allocator_.construct(&data_[size_ + i], value_type());
 			}
 			iterator start = end() + n - 1;
-			iterator finish = end() - (pos);
+			iterator finish = end() - pos;
 			for (; start - (n - 1) != finish; start--)
 			{
 				allocator_.construct(&(*start), (*(start - n)));
 				allocator_.destroy(&(*(start - n)));
 			}
-			for (size_type i = 0; i < n; i++, pos++)
+			for (size_type i = 0; i < n; i++)
 			{
-				allocator_.construct(&data_[pos - 1], val);
+				allocator_.construct(&data_[size_ - pos + i], val);
 			}
 			size_ += n;
 		}
@@ -358,16 +358,19 @@ namespace ft
 									typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
 				size_type pos = 0;
-				for (size_type i = size_; i <= 0; i--)
+				for (size_type i = size_; i >= 0; i--)
 				{
 					if (iterator(&data_[i]) == position)
 						break;
 					pos++;
 				}
+
 				size_type n = 0;
+
 				n = ft::distance(first, last);
 				if (size_ + n >= capacity_)
-					resize(size_ + n + 1);
+					reserve(std::max((size_ + n + 1), (2 * capacity_)));
+
 				for (size_type i = 0; i < n; i++)
 					allocator_.construct(&data_[size_ + i], value_type());
 				iterator start = end() + n - 1;
@@ -377,8 +380,11 @@ namespace ft
 					allocator_.construct(&(*start), (*(start - n)));
 					allocator_.destroy(&(*(start - n)));
 				}
-				for (size_type i = 0; i < n; i++, pos++, first++)
-					allocator_.construct(&data_[pos - 1], *first++);
+
+				for (size_type i = 0; i < n; i++)
+				{
+					allocator_.construct(&data_[size_ - pos + i], *first++);
+				}
 				size_ += n;
 			}
 		}
@@ -396,7 +402,7 @@ namespace ft
 
 			if (capacity_ < x.size_)
 			{
-				resize(x.size_);  // TODO: capacity에 x.capacity_를 넣을지 아니면 size_를 넣을 지 확인
+				reserve(x.size_);  // TODO: capacity에 x.capacity_를 넣을지 아니면 size_를 넣을 지 확인
 			}
 
 			for (i = 0; i < x.size_; i++)
@@ -437,14 +443,14 @@ namespace ft
 			if (!ft::is_trivial_destructible_junior<value_type>::value)
 				allocator_.destroy(&data_[size_ - 1]);
 			size_--;
-			if (size_ < (capacity_ / 4))
-				resize(capacity_ / 2);
+			// if (size_ < capacity_ / 4)
+			// 	allocator_.deallocate(&data_[capacity_ / 2], capacity_ / 2);
 		}
 
 		void push_back(const value_type& val) throw(std::bad_alloc)
 		{
 			if (size_ + 1 >= capacity_)
-				resize(capacity_ * 2);
+				reserve(capacity_ * 2);
 			data_[size_++] = val;
 		}
 
@@ -468,42 +474,54 @@ namespace ft
 
 		void reserve(size_type n) throw(std::length_error, std::bad_alloc)
 		{
-			if (capacity_ < n)
-				resize(n);
-		}
-
-		void resize(size_type n, value_type val = value_type()) throw(std::bad_alloc)
-		{
 			pointer tmp;
 			size_type i;
 
+			if (n > max_size())
+				throw(std::length_error("reserve"));
+			if (capacity_ >= n)
+				return;
+			tmp = allocator_.allocate(sizeof(value_type) * (n));
+			if (!ft::is_trivial_destructible_junior<value_type>::value)
+			{
+				for (i = 0; i < size_; i++)
+				{
+					allocator_.construct(&tmp[i], data_[i]);
+					allocator_.destroy(&data_[i]);
+				}
+			}
+			else
+			{
+				for (i = 0; i < size_; i++)
+					allocator_.construct(&tmp[i], data_[i]);
+			}
+			allocator_.deallocate(data_, capacity_);
+			data_ = tmp;
+			capacity_ = n;
+		}
+
+		void resize(size_type n, value_type val = value_type()) throw(std::bad_alloc, std::length_error)
+		{
 			// TODO: optimization using checking is type trivial destructible
 			if (n > max_size())
-				throw std::bad_alloc();
-			if (size_ < n)
+				throw std::length_error("resize");
+			if (size_ > n)
 			{
-				tmp = allocator_.allocate(sizeof(value_type) * n);
-				if (!ft::is_trivial_destructible_junior<value_type>::value)
-				{
-					for (i = 0; i < size_; i++)
-					{
-						allocator_.construct(&tmp[i], data_[i]);
-						allocator_.destroy(&data_[i]);
-					}
-				}
-				else
-				{
-					for (i = 0; i < size_; i++)
-						allocator_.construct(&tmp[i], data_[i]);
-				}
-				allocator_.deallocate(data_, capacity_);
-				for (; i < n; i++)
-				{
-					allocator_.construct(&tmp[i], val);
-				}
-				data_ = tmp;
-				capacity_ = n;
+				for (size_type i = n; i < size_; i++)
+					allocator_.destroy(&data_[i]);
 			}
+			else if (size_ < n && n < capacity_)
+			{
+				for (size_type i = size_; i < n; i++)
+					allocator_.construct(&data_[i], val);
+			}
+			else if (capacity_ <= n)
+			{
+				reserve(n + 1);
+				for (size_type i = size_; i < n; i++)
+					allocator_.construct(&data_[i], val);
+			}
+			size_ = n;
 		}
 		size_type size() const throw()
 		{
@@ -597,7 +615,6 @@ namespace ft
 													 Pointer>::type>& other)
 			: base_(other.base())
 		{
-			std::cout << "copy constructor of vector iterator\n";
 		}
 
 		explicit vector_iterator(const Iterator& otherIter)
