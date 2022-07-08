@@ -45,28 +45,28 @@ namespace ft
 		size_type capacity_;
 
 	public:
-		explicit vector(const allocator_type& alloc = allocator_type()) throw(std::bad_alloc)
-			: allocator_(alloc), size_(0), capacity_(1)
+		explicit vector(const allocator_type& alloc = allocator_type())
+			: allocator_(alloc), data_(0), size_(0), capacity_(1)
 		{
 			if (capacity_ > max_size())
 				throw std::bad_alloc();
 			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
 		}
+
 		explicit vector(size_type n, const value_type& val = value_type(),
-						const allocator_type& alloc = allocator_type()) throw(std::bad_alloc)
-			: allocator_(alloc), size_(n), capacity_(n + 1)
+						const allocator_type& alloc = allocator_type())
+			: allocator_(alloc), data_(0), size_(n), capacity_(n + 1)
 		{
 			if (n > max_size())
 				throw std::bad_alloc();
 			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
 			constructRange(0, size_, val);
 		}
+
 		template <class InputIterator>
-		vector(typename ft::enable_if<
-				   !ft::is_integral<InputIterator>::value,
-				   InputIterator>::type first,
-			   InputIterator last, const allocator_type& alloc = allocator_type()) throw(std::bad_alloc)
-			: allocator_(alloc)
+		vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
+			   typename ft::check_type<typename ft::iterator_traits<InputIterator>::iterator_category>::type* = 0)
+			: allocator_(alloc), data_(0), size_(0), capacity_(0)
 		{
 			if (ft::is_same<ft::input_iterator_tag,
 							typename ft::iterator_traits<InputIterator>::iterator_category>::value)
@@ -76,23 +76,19 @@ namespace ft
 				data_ = allocator_.allocate(sizeof(value_type) * capacity_);
 				for (; first != last; first++)
 					push_back(*first);
+				return;
 			}
-			else if (ft::is_base_of<ft::forward_iterator_tag,
-									typename ft::iterator_traits<InputIterator>::iterator_category>::value)
-			{
-				size_type n = 0;
-				n = ft::distance(first, last);
-				if (n > max_size())
-					throw std::bad_alloc();
-				size_ = n;
-				capacity_ = n + 1;
-				data_ = allocator_.allocate(sizeof(value_type) * capacity_);
-				for (size_type i = 0; i < n; i++)
-					allocator_.construct(&data_[i], *first++);
-			}
+			size_type n = ft::distance(first, last);
+			if (n > max_size())
+				throw std::bad_alloc();
+			size_ = n;
+			capacity_ = n + 1;
+			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+			for (size_type i = 0; i < n; i++)
+				allocator_.construct(&data_[i], *first++);
 		}
-		vector(const vector& x) throw(std::bad_alloc)
-			: allocator_(x.allocator_), size_(x.size_), capacity_(x.capacity_)
+		vector(const vector& x)
+			: allocator_(x.allocator_), data_(0), size_(x.size_), capacity_(x.capacity_)
 		{
 			if (capacity_ > max_size())
 				throw std::bad_alloc();
@@ -111,10 +107,8 @@ namespace ft
 
 	public:
 		template <class InputIterator>
-		void assign(typename ft::enable_if<
-						!ft::is_integral<InputIterator>::value,
-						InputIterator>::type first,
-					InputIterator last) throw(std::bad_alloc)
+		void assign(InputIterator first, InputIterator last,
+					typename ft::check_type<typename ft::iterator_traits<InputIterator>::iterator_category>::type* = 0)
 		{
 			if (ft::is_same<ft::input_iterator_tag,
 							typename ft::iterator_traits<InputIterator>::iterator_category>::value)
@@ -122,42 +116,38 @@ namespace ft
 				clear();
 				for (; first != last; first++)
 					push_back(*first);
+				return;
 			}
-			else if (ft::is_base_of<ft::forward_iterator_tag,
-									typename ft::iterator_traits<InputIterator>::iterator_category>::value)
-			{
-				std::allocator<void>::const_pointer hint = &data_[0];
-				size_type n = 0;
-				n = ft::distance(first, last);
-				if (capacity_ < n)
-					reserve(n + 1);
-				clear();
-				data_ = allocator_.allocate((sizeof(value_type) * capacity_), hint);
-				for (size_type i = 0; i < n; i++)
-					allocator_.construct(&data_[i], *first++);
-				size_ = n;
-			}
+			size_type n = 0;
+			n = ft::distance(first, last);
+			if (capacity_ < n)
+				reserve(n + 1);
+			clear();
+			allocator_.deallocate(data_, capacity_);
+			data_ = allocator_.allocate((sizeof(value_type) * capacity_), 0);
+			for (size_type i = 0; i < n; i++)
+				allocator_.construct(&data_[i], *first++);
+			size_ = n;
 		}
 
-		void assign(size_type n, const value_type& val) throw(std::bad_alloc)
+		void assign(size_type n, const value_type& val)
 		{
 			if (capacity_ < n)
 				reserve(n + 1);
 			clear();
-			data_ = allocator_.allocate(sizeof(value_type) * capacity_, &data_[0]);
+			allocator_.deallocate(data_, capacity_);
+			data_ = allocator_.allocate(sizeof(value_type) * capacity_, 0);
 			constructRange(0, n, val);
-			// for (size_type i = 0; i < n; i++)
-			// 	allocator_.construct(&data_[i], val);
 			size_ = n;
 		}
 
-		reference at(size_type n) throw(std::out_of_range)
+		reference at(size_type n)
 		{
 			if (size_ <= n)
 				throw std::out_of_range("at: out of range");
 			return (data_[n]);
 		}
-		const_reference at(size_type n) const throw(std::out_of_range)
+		const_reference at(size_type n) const
 		{
 			if (size_ <= n)
 				throw std::out_of_range("at: out of range");
@@ -189,10 +179,6 @@ namespace ft
 
 		void clear()
 		{
-			// size to 0, not modify capacity(not guaranted)
-			/**
-			 * TODO: destroy 하지 않아도 될 것들은 상수 시간내에 clear할 수 있음
-			 */
 			if (!ft::is_trivial_destructible_junior<value_type>::value)
 			{
 				for (size_type i = 0; i < size_; i++)
@@ -217,13 +203,9 @@ namespace ft
 
 		iterator erase(iterator position)
 		{
-			/**
-			 * TODO:iterator의 위치가 잘못됐을 시, undefined behavior 발생
-			 * -> 그러나 컨테이너느 valid한 상태로 나와야함
-			 */
 			iterator ret = position;
 			moveFrontByInterval(position, end(), 1);
-			destructRange(size_ - 1, size_);
+			destroyRange(size_ - 1, size_);
 			size_--;
 			return ret;
 		}
@@ -234,7 +216,7 @@ namespace ft
 			iterator finish = end();
 
 			moveFrontByInterval(first, finish, n);
-			destructRange(first + (finish - last), finish);
+			destroyRange(first + (finish - last), finish);
 			size_ -= n;
 			return first;
 		}
@@ -266,7 +248,7 @@ namespace ft
 			return iterator(&data_[(size_ - 1) - pos]);
 		}
 
-		void insert(iterator position, size_type n, const value_type& val)  // throw(std::bad_alloc)
+		void insert(iterator position, size_type n, const value_type& val)
 		{
 			size_type pos = getOffsetFromEnd(position);
 
@@ -279,11 +261,8 @@ namespace ft
 		}
 
 		template <class InputIterator>
-		void insert(iterator position,
-					typename ft::enable_if<
-						!ft::is_integral<InputIterator>::value,
-						InputIterator>::type first,
-					InputIterator last) throw(std::bad_alloc)
+		void insert(iterator position, InputIterator first, InputIterator last,
+					typename ft::check_type<typename ft::iterator_traits<InputIterator>::iterator_category>::type* = 0)
 		{
 			if (ft::is_same<ft::input_iterator_tag,
 							typename ft::iterator_traits<InputIterator>::iterator_category>::value)
@@ -301,21 +280,18 @@ namespace ft
 				clear();
 				allocator_.deallocate(data_, capacity_);
 				*this = tmp;
+				return;
 			}
-			else if (ft::is_base_of<ft::forward_iterator_tag,
-									typename ft::iterator_traits<InputIterator>::iterator_category>::value)
-			{
-				size_type pos = getOffsetFromEnd(position);
-				size_type n = ft::distance(first, last);
+			size_type pos = getOffsetFromEnd(position);
+			size_type n = ft::distance(first, last);
 
-				if (size_ + n >= capacity_)
-					reserve(std::max((size_ + n + 1), (2 * capacity_)));
-				constructRange(size_, size_ + 1);
-				moveBackByInterval(end() + n - 1, end() - pos, n);
-				for (size_type i = 0; i < n; i++)
-					allocator_.construct(&data_[size_ - pos + i], *first++);
-				size_ += n;
-			}
+			if (size_ + n >= capacity_)
+				reserve(std::max((size_ + n + 1), (2 * capacity_)));
+			constructRange(size_, size_ + 1);
+			moveBackByInterval(end() + n - 1, end() - pos, n);
+			for (size_type i = 0; i < n; i++)
+				allocator_.construct(&data_[size_ - pos + i], *first++);
+			size_ += n;
 		}
 
 		size_type max_size() const throw()
@@ -326,7 +302,6 @@ namespace ft
 
 		vector& operator=(const vector& x)
 		{
-			// modify size, not capacity
 			size_type i;
 
 			if (capacity_ < x.size_)
@@ -338,10 +313,7 @@ namespace ft
 			for (i = 0; i < x.size_; i++)
 				data_[i] = x.data_[i];
 			if (!ft::is_trivial_destructible_junior<value_type>::value)
-			{
-				for (; i < size_; i++)
-					allocator_.destroy(&data_[i]);
-			}
+				destroyRange(x.size_, size_);
 			size_ = x.size_;
 			return (*this);
 		}
@@ -359,14 +331,13 @@ namespace ft
 		{
 			if (empty())
 				return;
-			// TODO: optimization using checking is type trivial destructible
 			if (!ft::is_trivial_destructible_junior<value_type>::value)
 				allocator_.destroy(&data_[size_ - 1]);
 			size_--;
 			// TODO: capacity 줄여서 공간 최적화 하기
 		}
 
-		void push_back(const value_type& val)  // throw(std::bad_alloc)
+		void push_back(const value_type& val)
 		{
 			if (size_ + 1 >= capacity_)
 				reserve(capacity_ * 2);
@@ -391,7 +362,7 @@ namespace ft
 			return (const_reverse_iterator(begin()));
 		}
 
-		void reserve(size_type n)  // throw(std::length_error, std::bad_alloc)
+		void reserve(size_type n)
 		{
 			pointer tmp;
 			size_type i;
@@ -419,15 +390,16 @@ namespace ft
 			capacity_ = n;
 		}
 
-		void resize(size_type n, value_type val = value_type()) throw(std::bad_alloc, std::length_error)
+		void resize(size_type n, value_type val = value_type())  // throw(std::bad_alloc, std::length_error)
 		{
 			// TODO: optimization using checking is type trivial destructible
 			if (n > max_size())
 				throw std::length_error("resize");
 			if (size_ > n)
 			{
-				for (size_type i = n; i < size_; i++)
-					allocator_.destroy(&data_[i]);
+				if (!ft::is_trivial_destructible_junior<value_type>::value)
+					for (size_type i = n; i < size_; i++)
+						allocator_.destroy(&data_[i]);
 			}
 			else if (size_ < n && n < capacity_)
 			{
@@ -483,15 +455,17 @@ namespace ft
 			for (size_type i = from; i < to; i++)
 				allocator_.construct(&data_[i], val);
 		}
-		void destructRange(size_type from, size_type to)
+		void destroyRange(size_type from, size_type to)
 		{
-			for (size_type i = from; i < to; i++)
-				allocator_.destroy(&data_[i]);
+			if (!ft::is_trivial_destructible_junior<value_type>::value)
+				for (size_type i = from; i < to; i++)
+					allocator_.destroy(&data_[i]);
 		}
-		void destructRange(iterator from, iterator to)
+		void destroyRange(iterator from, iterator to)
 		{
-			for (iterator i = from; i < to; i++)
-				allocator_.destroy(&(*i));
+			if (!ft::is_trivial_destructible_junior<value_type>::value)
+				for (iterator i = from; i < to; i++)
+					allocator_.destroy(&(*i));
 		}
 		void moveBackByInterval(iterator start, iterator finish, size_type interval)
 		{

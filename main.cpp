@@ -1,175 +1,68 @@
-#include <iostream>
+#include <list>
 #include <vector>
 
-using namespace std;
-
-#include <iostream>  // std::cout
-#include <iterator>  // std::reverse_iterator
-#include <type_traits>
-#include <vector>  // std::vector
-
-#include "algorithm.hpp"
-#include "iterator.hpp"
-#include "type_traits.hpp"
-#include "utility.hpp"
 #include "vector.hpp"
-
-// a case-insensitive comparison function:
-bool mycomp(char c1, char c2)
-{
-	return std::tolower(c1) < std::tolower(c2);
-}
-
-struct inputclass : public ft::input_iterator_tag
-{
-	int a;
-
-	bool operator!=(const inputclass &other)
-	{
-		return (this != &other);
-	}
-	int getA()
-	{
-		return a;
-	}
-};
-struct A
-{
-	void fn(){};
-};
-
 int main(void)
 {
-	std::vector<int> vec(30, 30);
-	std::vector<std::vector<int> > vv(2, vec);
-	ft::vector<int>::iterator vi;
-	// std::vector<std::vector<int> >::const_iterator vic = vv.begin();
-
-	std::vector<int>::iterator ii;
-	++(++ii);
-	ii++;
-	*ii++;
-
-	ii + 3 + 4;
-
-	std::vector<int>::iterator ii2 = 3 + ii;
-
-	std::cout << boolalpha;
-	std::cout << (ii2 > ii) << std::endl;
-
-	int arr[] = {1, 2, 3, 4};
-	std::vector<int>::iterator ii3;
-
-	ii2 = ii3 += 6;
 	{
-		// is_base_of 테스트
-		std::cout << ft::is_base_of<ft::input_iterator_tag, ft::forward_iterator_tag>::value << std::endl;
-		std::cout << ft::is_arithmetic<float>::value << std::endl;
-		std::cout << ft::is_arithmetic<double>::value << std::endl;
-		std::cout << ft::is_arithmetic<long double>::value << std::endl;
-		std::cout << ft::is_arithmetic<short>::value << std::endl;
-		std::cout << ft::is_arithmetic<int>::value << std::endl;
-		std::cout << ft::is_integral<char>::value << std::endl;
-		std::cout << ft::is_arithmetic<int *>::value << std::endl;
-		std::cout << ft::is_arithmetic<int &>::value << std::endl;
-		std::cout << ft::is_arithmetic<inputclass>::value << std::endl;
-		std::cout << ft::is_array<int[]>::value << std::endl;
-		std::cout << ft::is_array<double[]>::value << std::endl;
-		std::cout << ft::is_array<int *[]>::value << std::endl;
-		std::cout << ft::is_array<int *>::value << std::endl;
-	}
-	ft::vector<int> vi2(3l, 4);
-	ft::vector<int> vi3(arr, arr + 4);
+		std::vector<int> vector;
 
-	{
-		ft::vector<int> vec6(arr, arr + 4);
-		ft::vector<int>::iterator consvi = vec6.begin();
+		int _ratio = 10000;
+		std::vector<int> v;
+		std::cout << "size: " << vector.size() << std::endl;
+		vector.assign(9900 * _ratio, 1);
+		std::cout << "size: " << vector.size() << std::endl;
+		vector.resize(5000 * _ratio);
+		std::cout << "size: " << vector.size() << std::endl;
+		vector.reserve(5000 * _ratio);
+		std::cout << "size: " << vector.size() << std::endl;
+		v.push_back(vector.size());
+		v.push_back(vector.capacity());
+		vector.resize(7000 * _ratio);
+		std::cout << "size: " << vector.size() << std::endl;
+		v.push_back(vector.size());
+		v.push_back(vector.capacity());
+		vector.resize(15300 * _ratio, 3);
+		std::cout << "size: " << vector.size() << std::endl;
+		v.push_back(vector.size());
+		v.push_back(vector.capacity());
+		v.push_back(vector[65]);
+		std::cout << "size: " << vector.size() << std::endl;
+		std::cout << "capacity: " << vector.capacity() << std::endl;
 
-		std::vector<int> vec7(arr, arr + 4);
-		int pushi = 9;
-		vec7.push_back(pushi);
-		pushi++;
-		std::cout << *(vec7.end() - 1) << std::endl;
+		ft::vector<int> vectorft;
 
-		ft::vector<int> vec8(arr, arr + 4);
-		vec8.push_back(pushi);
-		pushi++;
-		std::cout << *(vec8.end() - 1) << std::endl;
+		std::vector<int> vft;
+		std::cout << "size: " << vectorft.size() << std::endl;
+		vectorft.assign(9900 * _ratio, 1);
+		std::cout << "size: " << vectorft.size() << std::endl;
+		vectorft.resize(5000 * _ratio);
+		std::cout << "size: " << vectorft.size() << std::endl;
+		vectorft.reserve(5000 * _ratio);
+		std::cout << "size: " << vectorft.size() << std::endl;
+		vft.push_back(vectorft.size());
+		vft.push_back(vectorft.capacity());
+		vectorft.resize(7000 * _ratio);
+		std::cout << "size: " << vectorft.size() << std::endl;
+		vft.push_back(vectorft.size());
+		vft.push_back(vectorft.capacity());
+		vectorft.resize(15300 * _ratio, 3);
+		std::cout << "size: " << vectorft.size() << std::endl;
+		vft.push_back(vectorft.size());
+		vft.push_back(vectorft.capacity());
+		vft.push_back(vectorft[65]);
+		std::cout << "size: " << vectorft.size() << std::endl;
+		std::cout << "capacity: " << vectorft.capacity() << std::endl;
 
-		ft::vector<int> vec9(10, 10);
-		ft::vector<int> vec10 = vec9;
-	}
-	{
-		ft::vector<int> vec7(arr, arr + 4);
-		ft::vector<int>::iterator vec7i = vec7.begin();
-		for (int i = 0; i < 4; i++)
-			std::cout << vec7i[i] << std::endl;
-	}
-
-	{
-		std::vector<int> vec8(1000, 10);
-		std::vector<int> vec7(3, 12);
-
-		vec8 = vec7;
-		for (size_t i = 0; i < vec8.size(); i++)
+		for (size_t i = 0; i < vector.size(); i++)
 		{
-			std::cout << vec8[i] << std::endl;
-		}
-		std::cout << "capacity: " << vec8.capacity() << std::endl;
-	}
-	{
-		std::vector<int> vec7(arr, arr + 4);
-		std::reverse_iterator<std::vector<int>::iterator> rvi(vec7.begin());
-		rvi.base();
-
-		vec7.clear();
-		std::cout << vec7.size() << std::endl;
-		std::cout << vec7.capacity() << std::endl;
-	}
-	{
-		ft::vector<int> foo(3, 100);  // three ints with a value of 100
-		ft::vector<int> bar(5, 200);  // five ints with a value of 200
-
-		std::cout << &foo[0] << std::endl;
-		std::cout << &bar[0] << std::endl;
-		foo.swap(bar);
-		std::cout << &foo[0] << std::endl;
-		std::cout << &bar[0] << std::endl;
-
-		std::cout << "foo contains:";
-		for (unsigned i = 0; i < foo.size(); i++)
-			std::cout << ' ' << foo[i];
-		std::cout << '\n';
-
-		std::cout << "bar contains:";
-		for (unsigned i = 0; i < bar.size(); i++)
-			std::cout << ' ' << bar[i];
-		std::cout << '\n';
-	}
-	{
-		try
-		{
-			std::cout << "calll!!\n";
-			std::vector<int> stdvec(std::vector<int>().max_size() + 1);
-		}
-		catch (const std::exception &e)
-		{
-			std::cout << "hihi\n";
-			std::cerr << e.what() << '\n';
+			if (vector[i] != vectorft[i])
+				std::cout << "i: " << i << ", value-> (" << vector[i] << ", " << vectorft[i] << ")" << std::endl;
 		}
 	}
 	{
-		ft::vector<int> ft_c0;
-		std::vector<int> std_c0;
-		int testSize = 42;
-
-		for (int i = 0; i < testSize; i++)
-		{
-			ft_c0.insert(ft_c0.end(), i);
-			std_c0.insert(std_c0.end(), i);
-		}
-		// ft::vector<int>::iterator ft_it0;
-		// std::vector<int>::iterator std_it0;
+		std::list<int> stdli(10000, 1);
+		ft::vector<int> stdvec(stdli.begin(), stdli.end());
+		std::cout << "vec from list size: " << stdvec.size() << std::endl;
 	}
-	return (0);
 }
