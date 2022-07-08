@@ -1,119 +1,139 @@
-#ifndef _TYPE_TRAITS_H__
-#define _TYPE_TRAITS_H__
+#ifndef __FT_TYPE_TRAITS_H__
+#define __FT_TYPE_TRAITS_H__
 
-#include <iostream>
+/**
+ * enable_if
+ * is_same
+ * is_integral
+ * is_arithmetic
+ * is_base_of
+ * is_pointer
+ * is_array
+ * is_trivial_destructible_junior
+ */
 
-#include "iterator.hpp"
+#include <cstdint>
 
 namespace ft
 {
-	struct input_iterator_tag;
-	struct true_type {
-	};
-	struct false_type {
-	};
-
-	template <bool, class T = void>
-	struct enable_if {
+	/**
+	 * enable_if
+	 */
+	template <bool Cond, typename T = void>
+	struct enable_if
+	{
 	};
 
-	template <class T>
-	struct enable_if<true, T> {
-	public:
+	template <typename T>
+	struct enable_if<true, T>
+	{
 		typedef T type;
 	};
 
-	template <typename, typename>
-	struct is_same {
-		enum { value = 0 };
-		typedef false_type type;
+	template <class>
+	struct check_type
+	{
+		typedef void type;
 	};
-	template <typename T>
-	struct is_same<T, T> {
-		enum { value = 1 };
-		typedef true_type type;
+
+	/**
+	 * is_same
+	 */
+	template <typename T, typename U>
+	struct is_same
+	{
+		static const bool value = false;
 	};
 
 	template <typename T>
-	struct is_integral {
-		enum { value = 0 };
-		typedef false_type type;
+	struct is_same<T, T>
+	{
+		static const bool value = true;
 	};
 
-	template <>
-	struct is_integral<bool> {
-		enum { value = 1 };
-		typedef true_type type;
+	/**
+	 * is_integral
+	 */
+	template <typename T>
+	struct is_integral
+	{
+		static const bool value = ft::is_same<T, bool>::value ||
+								  ft::is_same<T, char>::value ||
+								  ft::is_same<T, char16_t>::value ||
+								  ft::is_same<T, char32_t>::value ||
+								  ft::is_same<T, wchar_t>::value ||
+								  ft::is_same<T, signed char>::value ||
+								  ft::is_same<T, short int>::value ||
+								  ft::is_same<T, int>::value ||
+								  ft::is_same<T, long int>::value ||
+								  //   ft::is_same<T, long long int>::value ||
+								  ft::is_same<T, unsigned char>::value ||
+								  ft::is_same<T, unsigned short int>::value ||
+								  ft::is_same<T, unsigned int>::value ||
+								  ft::is_same<T, unsigned long int>::value;
+		//   ft::is_same<T, unsigned long long int>::value;
 	};
-	template <>
-	struct is_integral<char> {
-		enum { value = 1 };
-		typedef true_type type;
+
+	/**
+	 * is_arithmetic
+	 */
+	template <typename T>
+	struct is_arithmetic
+	{
+		typedef T type;
+		static const bool value = ft::is_integral<T>::value ||
+								  ft::is_same<T, float>::value ||
+								  ft::is_same<T, double>::value ||
+								  ft::is_same<T, long double>::value;
 	};
-	template <>
-	struct is_integral<char16_t> {
-		enum { value = 1 };
-		typedef true_type type;
+
+	/**
+	 * is_base_of
+	 */
+	template <class Base, class Derived>
+	struct is_base_of
+	{
+		struct two
+		{
+			char c[2];
+		};
+		static two test_base(Base*);
+		static char test_base(...);
+
+		static const bool value = sizeof(test_base(static_cast<Derived*>(0))) == 2;
 	};
-	template <>
-	struct is_integral<char32_t> {
-		enum { value = 1 };
-		typedef true_type type;
+
+	/**
+	 * is_pointer
+	 */
+	template <typename T>
+	struct is_pointer
+	{
+		static const bool value = false;
 	};
-	template <>
-	struct is_integral<wchar_t> {
-		enum { value = 1 };
-		typedef true_type type;
+	template <typename T>
+	struct is_pointer<T*>
+	{
+		static const bool value = true;
 	};
-	template <>
-	struct is_integral<signed char> {
-		enum { value = 1 };
-		typedef true_type type;
+
+	template <typename T>
+	struct is_array
+	{
+		static const bool value = false;
 	};
-	template <>
-	struct is_integral<short int> {
-		enum { value = 1 };
-		typedef true_type type;
+	template <typename T>
+	struct is_array<T[]>
+	{
+		static const bool value = true;
 	};
-	template <>
-	struct is_integral<int> {
-		enum { value = 1 };
-		typedef true_type type;
-	};
-	template <>
-	struct is_integral<long int> {
-		enum { value = 1 };
-		typedef true_type type;
-	};
-	template <>
-	struct is_integral<long long int> {
-		enum { value = 1 };
-		typedef true_type type;
-	};
-	template <>
-	struct is_integral<unsigned char> {
-		enum { value = 1 };
-		typedef true_type type;
-	};
-	template <>
-	struct is_integral<unsigned short int> {
-		enum { value = 1 };
-		typedef true_type type;
-	};
-	template <>
-	struct is_integral<unsigned int> {
-		enum { value = 1 };
-		typedef true_type type;
-	};
-	template <>
-	struct is_integral<unsigned long int> {
-		enum { value = 1 };
-		typedef true_type type;
-	};
-	template <>
-	struct is_integral<unsigned long long int> {
-		enum { value = 1 };
-		typedef true_type type;
+
+	template <typename T>
+	struct is_trivial_destructible_junior
+	{
+		static const bool value = ft::is_arithmetic<T>::value ||
+								  ft::is_pointer<T>::value ||
+								  ft::is_array<T>::value;
 	};
 }
 
