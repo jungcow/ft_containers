@@ -237,7 +237,7 @@ namespace ft
 
 		iterator insert(iterator position, const value_type& val)
 		{
-			size_type pos = getOffsetFromEnd(position);
+			size_type pos = getOffsetFromEndTo(position);
 
 			if (size_ + 1 >= capacity_)
 				reserve(capacity_ * 2);
@@ -250,7 +250,7 @@ namespace ft
 
 		void insert(iterator position, size_type n, const value_type& val)
 		{
-			size_type pos = getOffsetFromEnd(position);
+			size_type pos = getOffsetFromEndTo(position);
 
 			if (size_ + n + 1 >= capacity_)
 				reserve(std::max((size_ + n + 1), (2 * capacity_)));
@@ -282,7 +282,7 @@ namespace ft
 				*this = tmp;
 				return;
 			}
-			size_type pos = getOffsetFromEnd(position);
+			size_type pos = getOffsetFromEndTo(position);
 			size_type n = ft::distance(first, last);
 
 			if (size_ + n >= capacity_)
@@ -439,7 +439,7 @@ namespace ft
 		}
 
 	private:
-		size_type getOffsetFromEnd(iterator position)
+		size_type getOffsetFromEndTo(iterator position)
 		{
 			size_type pos = 0;
 			for (size_type i = size_; i >= 0; i--)

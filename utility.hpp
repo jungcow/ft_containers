@@ -30,6 +30,7 @@ namespace ft
 		{
 			first = pr.first;
 			second = pr.second;
+			return (*this);
 		}
 
 		template <class U1, class U2>
