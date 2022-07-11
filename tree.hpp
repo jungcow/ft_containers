@@ -154,7 +154,21 @@ public:
 		return 1;
 	}
 
+	void printByInOrderTraversal() const
+	{
+		printByInOrderTraversal(root_);
+		std::cout << "\n";
+	}
+
 private:
+	void printByInOrderTraversal(Node* node) const
+	{
+		if (node == NULL)
+			return;
+		printByInOrderTraversal(node->getLeft());
+		std::cout << node->getValue().first << '-';
+		printByInOrderTraversal(node->getRight());
+	}
 	Node* find(Node* node, const value_type& value) const
 	{
 		if (node == NULL)
