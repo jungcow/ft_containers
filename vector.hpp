@@ -50,7 +50,7 @@ namespace ft
 		{
 			if (capacity_ > max_size())
 				throw std::bad_alloc();
-			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+			data_ = allocator_.allocate(capacity_);
 		}
 
 		explicit vector(size_type n, const value_type& val = value_type(),
@@ -59,7 +59,7 @@ namespace ft
 		{
 			if (n > max_size())
 				throw std::bad_alloc();
-			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+			data_ = allocator_.allocate(capacity_);
 			constructRange(0, size_, val);
 		}
 
@@ -73,7 +73,7 @@ namespace ft
 			{
 				size_ = 0;
 				capacity_ = 1;
-				data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+				data_ = allocator_.allocate(capacity_);
 				for (; first != last; first++)
 					push_back(*first);
 				return;
@@ -83,7 +83,7 @@ namespace ft
 				throw std::bad_alloc();
 			size_ = n;
 			capacity_ = n + 1;
-			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+			data_ = allocator_.allocate(capacity_);
 			for (size_type i = 0; i < n; i++)
 				allocator_.construct(&data_[i], *first++);
 		}
@@ -92,7 +92,7 @@ namespace ft
 		{
 			if (capacity_ > max_size())
 				throw std::bad_alloc();
-			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+			data_ = allocator_.allocate(capacity_);
 			for (size_type i = 0; i < size_; i++)
 				allocator_.construct(&data_[i], x.data_[i]);
 		}
@@ -124,7 +124,7 @@ namespace ft
 				reserve(n + 1);
 			clear();
 			allocator_.deallocate(data_, capacity_);
-			data_ = allocator_.allocate((sizeof(value_type) * capacity_), 0);
+			data_ = allocator_.allocate(capacity_, 0);
 			for (size_type i = 0; i < n; i++)
 				allocator_.construct(&data_[i], *first++);
 			size_ = n;
@@ -136,7 +136,7 @@ namespace ft
 				reserve(n + 1);
 			clear();
 			allocator_.deallocate(data_, capacity_);
-			data_ = allocator_.allocate(sizeof(value_type) * capacity_, 0);
+			data_ = allocator_.allocate(capacity_, 0);
 			constructRange(0, n, val);
 			size_ = n;
 		}
@@ -371,7 +371,7 @@ namespace ft
 				throw(std::length_error("reserve"));
 			if (capacity_ >= n)
 				return;
-			tmp = allocator_.allocate(sizeof(value_type) * (n));
+			tmp = allocator_.allocate(n);
 			if (!ft::is_trivial_destructible_junior<value_type>::value)
 			{
 				for (i = 0; i < size_; i++)
@@ -487,7 +487,6 @@ namespace ft
 	template <class T, class Alloc>
 	bool operator==(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
 	{
-		// std::cout << lhs.size() << ' ' << rhs.size() << std::endl;
 		return (lhs.size() == rhs.size() && ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
 	}
 	template <class T, class Alloc>
