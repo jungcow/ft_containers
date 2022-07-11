@@ -68,7 +68,7 @@ namespace ft
 			   typename ft::check_type<typename ft::iterator_traits<InputIterator>::iterator_category>::type* = 0)
 			: allocator_(alloc), data_(0), size_(0), capacity_(0)
 		{
-			if (ft::is_same<ft::input_iterator_tag,
+			if (ft::is_same<std::input_iterator_tag,
 							typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
 				size_ = 0;
@@ -110,7 +110,7 @@ namespace ft
 		void assign(InputIterator first, InputIterator last,
 					typename ft::check_type<typename ft::iterator_traits<InputIterator>::iterator_category>::type* = 0)
 		{
-			if (ft::is_same<ft::input_iterator_tag,
+			if (ft::is_same<std::input_iterator_tag,
 							typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
 				clear();
@@ -174,7 +174,7 @@ namespace ft
 
 		size_type capacity() const
 		{
-			return (capacity_);
+			return (capacity_ - 1);
 		}
 
 		void clear()
@@ -264,7 +264,7 @@ namespace ft
 		void insert(iterator position, InputIterator first, InputIterator last,
 					typename ft::check_type<typename ft::iterator_traits<InputIterator>::iterator_category>::type* = 0)
 		{
-			if (ft::is_same<ft::input_iterator_tag,
+			if (ft::is_same<std::input_iterator_tag,
 							typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
 				vector tmp = *this;
