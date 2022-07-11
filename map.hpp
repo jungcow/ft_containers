@@ -18,15 +18,19 @@ namespace ft
 			  class Alloc = std::allocator<ft::pair<const Key, T> > >
 	class map
 	{
-	private:
 	public:
 		typedef Key 									key_type;
 		typedef T 										mapped_type;
 		typedef ft::pair<const key_type, mapped_type>	value_type;
 
 		typedef Compare									key_compare;
-		class value_compare : public std::binary_function<value_type, value_type, bool>  // TODO : 마저 완성하기
+		class value_compare : public std::binary_function<value_type, value_type, bool>
 		{
+		public:
+			bool operator()(const value_type& lhs, const value_type& rhs)
+			{
+				return comp(lhs.first, rhs.first);
+			}
 		protected:
 			Compare comp;
 			value_compare(Compare c) : comp(c) {}
@@ -39,10 +43,14 @@ namespace ft
 		typedef const value_type&						const_reference;
 		typedef typename allocator_type::pointer		pointer;
 		typedef typename allocator_type::const_pointer	const_pointer;
-		typedef map_iterator<value_type>				iterator;
-		typedef map_iterator<const value_type>			const_iterator;
+		// typedef map_iterator<value_type>				iterator;
+		// typedef map_iterator<const value_type>			const_iterator;
 		typedef ft::reverse_iterator<iterator>			reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
+	private:
+		// RBT
+
+	public:
 
 #if 0
 		explicit map(const key_compare& comp = key_compare(),
