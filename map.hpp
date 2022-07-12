@@ -4,8 +4,8 @@
 #include <cstddef>     // ptrdiff_t
 #include <functional>  // std::less, std::binary_function
 
-#include "iterator.hpp" // ft::reverse_iterator
-#include "utility.hpp" // ft::pair
+#include "iterator.hpp"  // ft::reverse_iterator
+#include "utility.hpp"   // ft::pair
 
 namespace ft
 {
@@ -19,45 +19,36 @@ namespace ft
 	class map
 	{
 	public:
-		typedef Key 									key_type;
-		typedef T 										mapped_type;
-		typedef ft::pair<const key_type, mapped_type>	value_type;
+		typedef Key key_type;
+		typedef T mapped_type;
+		typedef ft::pair<const key_type, mapped_type> value_type;
 
-		typedef Compare									key_compare;
-		class value_compare : public std::binary_function<value_type, value_type, bool>
-		{
-		public:
-			bool operator()(const value_type& lhs, const value_type& rhs)
-			{
-				return comp(lhs.first, rhs.first);
-			}
-		protected:
-			Compare comp;
-			value_compare(Compare c) : comp(c) {}
-		};
+		typedef Compare key_compare;
+		class value_compare;
 
-		typedef Alloc									allocator_type;
-		typedef ptrdiff_t								difference_type;
-		typedef size_t									size_type;
-		typedef value_type&								reference;
-		typedef const value_type&						const_reference;
-		typedef typename allocator_type::pointer		pointer;
-		typedef typename allocator_type::const_pointer	const_pointer;
+		typedef Alloc allocator_type;
+		typedef ptrdiff_t difference_type;
+		typedef size_t size_type;
+		typedef value_type& reference;
+		typedef const value_type& const_reference;
+		typedef typename allocator_type::pointer pointer;
+		typedef typename allocator_type::const_pointer const_pointer;
 		// typedef map_iterator<value_type>				iterator;
 		// typedef map_iterator<const value_type>			const_iterator;
-		typedef ft::reverse_iterator<iterator>			reverse_iterator;
-		typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
+		// typedef ft::reverse_iterator<iterator> reverse_iterator;
+		// typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
+
 	private:
 		// RBT
 
 	public:
+		Compare compare;
 
-#if 0
 		explicit map(const key_compare& comp = key_compare(),
-				const allocator_type& alloc = allocator_type())
+					 const allocator_type& alloc = allocator_type()) : compare(Compare())
 		{
-
-		} // comparison object도 같이 설정
+		}  // comparison object도 같이 설정
+#if 0
  
 		template <class InputIterator>
 		map(InputIterator first, InputIterator last,
@@ -120,9 +111,12 @@ namespace ft
 
 		iterator upper_bound(const key_type& k);
 		const_iterator upper_bound(const key_type& k) const;
-
-		value_compare value_comp() const;
-
+#endif
+		value_compare value_comp() const
+		{
+			return (value_compare(compare));
+		}
+#if 0
 		template <class K, class V, class Comp, class A>
 		friend bool operator==(const map<K, V, Comp, A>& lhs,
 				const map<K, V, Comp, A>& rhs);
@@ -164,6 +158,27 @@ namespace ft
 	bool operator>=(const map<K, V, Comp, A>& lhs,
 			const map<K, V, Comp, A>& rhs);
 #endif
+	template <class Key,
+			  class T,
+			  class Compare ,
+			  class Alloc>
+	class map<Key, T, Compare, Alloc>::value_compare : public std::binary_function<value_type, value_type, bool>
+	{
+	private:
+		friend class map;
+
+	public:
+		bool operator()(const value_type& lhs, const value_type& rhs) const
+		{
+			return comp(lhs.first, rhs.first);
+		}
+
+	protected:  // TODO: protected 로 바꾸기
+		Compare comp;
+		value_compare(Compare c) : comp(c) {}
+		value_compare() : comp(Compare()) {}  // TODO: 반드시 지우기 (테스트 용으로 임시로 만든것임)
+	};
+
 	template <class T>
 	class map_iterator
 	{

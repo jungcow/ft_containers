@@ -15,7 +15,7 @@ namespace ft
 		class Node;
 
 		template <class T, class Comp, class Alloc>
-		class BST;
+		class BSTree;
 
 		template <class T, class Comp, class Alloc>
 		class RBTree;
@@ -41,7 +41,16 @@ private:
 	size_type rank_;
 
 public:
-	Node(const value_type& value) : val_(value), left_(NULL), right_(NULL), rank_(0) {}
+	Node(const value_type& value) : val_(value), left_(NULL), right_(NULL), rank_(1) {}
+	Node(const Node& other) : val_(other.val_), left_(other.left_), right_(other.right_), rank_(other.rank_) {}
+	Node& operator=(const Node& other)
+	{
+		val_ = other.val_;
+		left_ = other.left_;
+		right_ = other.right_;
+		rank_ = other.rank_;
+		return (*this);
+	}
 
 	const_reference getValue(void) const
 	{
@@ -79,7 +88,7 @@ public:
 };
 
 template <class T, class Comp, class Alloc = std::allocator<T> >
-class ft::tree::BST
+class ft::tree::BSTree
 {
 private:
 	typedef ft::tree::Node<T> Node;
@@ -102,7 +111,7 @@ private:
 	Comp compareValue;
 
 public:
-	BST(Comp compare, node_allocator_type alloc = node_allocator_type())
+	BSTree(Comp compare, node_allocator_type alloc = node_allocator_type())
 		: root_(NULL), size_(0), allocator_(alloc), compareValue(compare)
 	{
 	}
@@ -113,7 +122,7 @@ public:
 	 * 대입 연산자?
 	 */
 
-	~BST()
+	~BSTree()
 	{
 		deleteAllNodes(root_);
 	}
@@ -166,7 +175,7 @@ private:
 		if (node == NULL)
 			return;
 		printByInOrderTraversal(node->getLeft());
-		std::cout << node->getValue().first << '-';
+		std::cout << node->getValue().first << "(" << node->getRank() << ")" << '-';
 		printByInOrderTraversal(node->getRight());
 	}
 	Node* find(Node* node, const value_type& value) const
@@ -190,6 +199,7 @@ private:
 			node->setRight(insert(node->getRight(), value));
 		else if (compareValue(value, node->getValue()))
 			node->setLeft(insert(node->getLeft(), value));
+		node->setRank(calculateRankFrom(node));
 		return node;
 	}
 
@@ -197,6 +207,7 @@ private:
 	{
 		if (node == NULL)
 			return NULL;
+
 		if (compareValue(node->getValue(), value))
 			node->setRight(erase(node->getRight(), value));
 		else if (compareValue(value, node->getValue()))
@@ -222,7 +233,7 @@ private:
 			node->setLeft(tmp->getLeft());
 			deleteNode(tmp);
 		}
-
+		node->setRank(calculateRankFrom(node));
 		return node;
 	}
 
@@ -237,10 +248,12 @@ private:
 	{
 		if (node->getLeft() == NULL)
 		{
-			deleteNode(node);
-			return NULL;
+			Node* tmp = node->getRight();
+			return tmp;
 		}
-		return eraseMinNodeFrom(node);
+		node->setLeft(eraseMinNodeFrom(node->getLeft()));
+		node->setRank(calculateRankFrom(node));
+		return node;
 	}
 
 private:
@@ -265,6 +278,17 @@ private:
 		deleteAllNodes(node->getLeft());
 		allocator_.destroy(node);
 		allocator_.deallocate(node, 1);
+	}
+
+	size_type calculateRankFrom(Node* node)
+	{
+		size_type lRank = 0;
+		size_type rRank = 0;
+		if (node->getLeft())
+			lRank = node->getLeft()->getRank();
+		if (node->getRight())
+			rRank = node->getRight()->getRank();
+		return (lRank + rRank + 1);
 	}
 };
 

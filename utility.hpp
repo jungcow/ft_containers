@@ -1,9 +1,12 @@
 #ifndef __FT_UTILITY_H__
 #define __FT_UTILITY_H__
 
+#include "type_traits.hpp"  // check_type
+
 /**
  * make_pair
  * pair
+ * is_pair
  */
 
 namespace ft
@@ -87,6 +90,26 @@ namespace ft
 	{
 		return pair<T1, T2>(x, y);
 	}
+
+	template <class T>
+	struct is_pair
+	{
+	private:
+		struct two
+		{
+			char c[2];
+		};
+
+		template <class U>
+		static two test(...);
+
+		template <class U>
+		static char test(typename ft::check_type<typename U::first_type>::type* = 0,
+						 typename ft::check_type<typename U::second_type>::type* = 0);
+
+	public:
+		static const bool value = (sizeof(test<T>(0, 0)) == 1);
+	};
 }
 
 #endif
