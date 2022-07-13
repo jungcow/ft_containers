@@ -26,10 +26,11 @@ private:
 	typedef typename Node::const_pointer const_pointer;
 	typedef typename Node::reference reference;
 	typedef typename Node::const_reference const_reference;
+	typedef typename Node::size_type size_type;
 
 	typedef Alloc allocator_type;
 	typedef typename allocator_type::template rebind<Node>::other node_allocator_type;
-	
+
 	typedef typename node_allocator_type::size_type node_size_type;
 	typedef typename node_allocator_type::value_type node_value_type;
 
@@ -64,7 +65,7 @@ public:
 		return size_ == 0;
 	}
 
-	size_type size() const
+	node_size_type size() const
 	{
 		return size_;
 	}
@@ -84,7 +85,7 @@ public:
 		return (root_);
 	}
 
-	size_type erase(const value_type& value)
+	node_size_type erase(const value_type& value)
 	{
 		if (empty())
 			return 0;
