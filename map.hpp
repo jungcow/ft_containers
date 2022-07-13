@@ -5,11 +5,13 @@
 #include <functional>  // std::less, std::binary_function
 
 #include "iterator.hpp"  // ft::reverse_iterator
-#include "utility.hpp"   // ft::pair
+#include "node.hpp"
+#include "type.hpp"     // TODO: type 출력, 디버깅용
+#include "utility.hpp"  // ft::pair
 
 namespace ft
 {
-	template <class T>
+	template <class Iterator, class VIter, class VPointer>
 	class map_iterator;
 
 	template <class Key,
@@ -18,28 +20,39 @@ namespace ft
 			  class Alloc = std::allocator<ft::pair<const Key, T> > >
 	class map
 	{
+	private:
+		template <class Iterator, class VIter, class VPointer>
+		friend class ft::map_iterator;
+
 	public:
 		typedef Key key_type;
 		typedef T mapped_type;
-		typedef ft::pair<const key_type, mapped_type> value_type;
 
 		typedef Compare key_compare;
 		class value_compare;
 
 		typedef Alloc allocator_type;
-		typedef ptrdiff_t difference_type;
-		typedef size_t size_type;
-		typedef value_type& reference;
-		typedef const value_type& const_reference;
+
+		typedef typename allocator_type::size_type size_type;
+		typedef typename allocator_type::difference_type difference_type;
+
+		typedef typename allocator_type::value_type value_type;
 		typedef typename allocator_type::pointer pointer;
+		typedef typename allocator_type::reference reference;
 		typedef typename allocator_type::const_pointer const_pointer;
-		// typedef map_iterator<value_type>				iterator;
-		// typedef map_iterator<const value_type>			const_iterator;
-		// typedef ft::reverse_iterator<iterator> reverse_iterator;
-		// typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
+		typedef typename allocator_type::const_reference const_reference;
+
+		typedef ft::tree::Node<pointer, pointer, Alloc> node_type;
+		typedef ft::tree::Node<const_pointer, pointer, Alloc> const_node_type;
+
+		typedef map_iterator<typename node_type::iterator, pointer, pointer> iterator;
+		typedef map_iterator<typename const_node_type::const_iterator, const_pointer, pointer> const_iterator;
+
+		typedef ft::reverse_iterator<iterator> reverse_iterator;
+		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
 	private:
-		// RBT
+		// RBTree
 
 	public:
 		Compare compare;
@@ -160,7 +173,7 @@ namespace ft
 #endif
 	template <class Key,
 			  class T,
-			  class Compare ,
+			  class Compare,
 			  class Alloc>
 	class map<Key, T, Compare, Alloc>::value_compare : public std::binary_function<value_type, value_type, bool>
 	{
@@ -179,10 +192,91 @@ namespace ft
 		value_compare() : comp(Compare()) {}  // TODO: 반드시 지우기 (테스트 용으로 임시로 만든것임)
 	};
 
-	template <class T>
+	template <class Iterator, class VIter, class VPointer>
 	class map_iterator
 	{
+	private:
+		typedef typename Iterator::inner_value_type inner_value_type;
+		typedef typename Iterator::inner_pointer inner_pointer;
+		typedef typename Iterator::inner_reference inner_reference;
+		typedef typename Iterator::const_inner_pointer const_inner_pointer;
+		typedef typename Iterator::const_inner_reference const_inner_reference;
+
+	public:
+		typedef typename Iterator::value_type value_type;
+		typedef typename Iterator::pointer pointer;
+		typedef typename Iterator::reference reference;
+		typedef typename Iterator::difference_type difference_type;
+		typedef typename Iterator::iterator_category iterator_category;
+
+	private:
+		Iterator base_;  // Iterator: node_iterator
+
+	public:
+		map_iterator()
+		{
+			std::cout << "map iterator default constructor\n";
+		}
+
+		template <class Iter, class I>
+		map_iterator(const map_iterator<
+					 Iter, I, typename ft::enable_if<ft::is_same<I, Vp>::value, Vp>::type>& other)
+			: base_(other.base())
+		{
+			std::cout << "map iterator copy constructor\n";
+		}
+
+		explicit map_iterator(const Iterator& otherIter)  // node_iterator로 생성
+			: base_(otherIter)
+		{
+			std::cout << "map iterator iterator constructor\n";
+		}
+
+		map_iterator& operator=(const map_iterator& other)
+		{
+			std::cout << "map iterator assignment operator\n";
+
+			base_ = other.base_;
+			return (*this);
+		}
+
+		~map_iterator() {}
+
+		Iterator base(void) const
+		{
+			return base_;
+		}
+
+		inner_reference operator*() const
+		{
+			return (*base_);
+		}
+
+		inner_pointer operator->() const
+		{
+			return (base_.operator->());
+		}
+
+		template <class Iter, class Vi, class Vp>
+		friend bool operator==(const map_iterator<Iter, Vi, Vp>& lhs, const map_iterator<Iter, Vi, Vp>& rhs);
+		template <class Iter, class Vi, class Vp>
+		friend bool operator!=(const map_iterator<Iter, Vi, Vp>& lhs, const map_iterator<Iter, Vi, Vp>& rhs);
+
+		/**
+		 * ++a, a++, *a++
+		 * --a, a--, *a--
+		 */
 	};
+	template <class Iter, class Vi, class Vp>
+	bool operator==(const map_iterator<Iter, Vi, Vp>& lhs, const map_iterator<Iter, Vi, Vp>& rhs)
+	{
+		return (lhs.base_ == rhs.base_);
+	}
+	template <class Iter, class Vi, class Vp>
+	bool operator!=(const map_iterator<Iter, Vi, Vp>& lhs, const map_iterator<Iter, Vi, Vp>& rhs)
+	{
+		return !(lhs == rhs);
+	}
 }
 
 #endif

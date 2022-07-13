@@ -1,6 +1,7 @@
 #ifndef __FT_NODE_H__
 #define __FT_NODE_H__
 
+#include "iterator.hpp"
 #include "type_traits.hpp"
 
 namespace ft
@@ -10,7 +11,7 @@ namespace ft
 		template <class P1, class P2, class Alloc>
 		class Node;
 
-		template <class Iterator, class Pointer, class ValueIter, class ValuePointer>
+		template <class Iterator, class ValueIter, class ValuePointer>
 		class node_iterator;
 	}
 }
@@ -31,8 +32,8 @@ public:
 
 	typedef Node* node_pointer;
 	typedef const Node* const_node_pointer;
-	typedef node_iterator<node_pointer, node_pointer, P1, P2> iterator;
-	typedef node_iterator<const_node_pointer, node_pointer, P1, P2> const_iterator;
+	typedef node_iterator<node_pointer, P1, P2> iterator;
+	typedef node_iterator<const_node_pointer, P1, P2> const_iterator;
 
 private:
 	pointer val_;
@@ -50,9 +51,7 @@ public:
 	}
 
 	template <class Pointer>
-	Node(const Node<Pointer, ft::enable_if<
-								 ft::is_same<Pointer, P2>::value,
-								 P2>::type>& other,
+	Node(const Node<Pointer, typename ft::enable_if<ft::is_same<Pointer, P2>::value, P2>::type, Alloc>& other,
 		 const allocator_type& alloc = allocator_type())
 		: val_(NULL), left_(other.left_), right_(other.right_), rank_(other.rank_), allocator_(alloc)
 	{
@@ -71,12 +70,7 @@ public:
 		return (*this);
 	}
 
-	reference operator*() const
-	{
-		return (*val);
-	}
-
-	const_reference getValue(void) const
+	reference getValue(void) const
 	{
 		return (*val_);
 	}
@@ -111,37 +105,41 @@ public:
 	}
 };
 
-template <class Iterator, class Pointer, class ValueIter, class ValuePointer>
-class node_iterator
+template <class Iterator, class ValueIter, class ValuePointer>
+class ft::tree::node_iterator
 {
+private:
+	typedef ft::iterator<std::bidirectional_iterator_tag, typename ft::remove_pointer<Iterator>::type> iterator;
+
 public:
-	typedef ft::iterator<std::bidirectional_iterator_tag, ft::remove_pointer<Iterator>::type> iterator;
-	// typedef ft::iterator<std::bidirectional_iterator_tag, ft::remove_pointer<ValueIter>::type> value_iterator;
-
-	typedef typename iterator::value_type value_type;
-	typedef typename iterator::pointer pointer;
-	typedef typename iterator::reference reference;
-	typedef typename iterator::difference_type difference_type;
-	typedef typename iterator::iterator_category iterator_category;
-
 	typedef typename ft::remove_pointer<ValueIter>::type inner_value_type;
 	typedef inner_value_type* inner_pointer;
 	typedef inner_value_type& inner_reference;
 	typedef const inner_value_type* const_inner_pointer;
 	typedef const inner_value_type& const_inner_reference;
 
+public:
+	typedef typename iterator::value_type value_type;
+	typedef typename iterator::pointer pointer;
+	typedef typename iterator::reference reference;
+	typedef typename iterator::difference_type difference_type;
+	typedef typename iterator::iterator_category iterator_category;
+
 private:
 	Iterator base_;
 
 public:
-	node_iterator() {}
+	node_iterator()
+	{
+		std::cout << "node iterator default constructor\n";
+	}
 
 	template <class P, class Vp>
-	node_iterator(const node_iterator<
-				  P, typename ft::enable_if<ft::is_same<P, Pointer>::value, Pointer>::type,
-				  Vp, typename ft::enable_if<ft::is_same<Vp, ValuePointer>::value, ValuePointer>::type>& other)
-		: base_(node_iterator.base())
+	node_iterator(const node_iterator<P, Vp,
+									  typename ft::enable_if<ft::is_same<Vp, ValuePointer>::value, ValuePointer>::type>& other)
+		: base_(reinterpret_cast<Iterator>(other.base()))
 	{
+		std::cout << "node iterator copy constructor\n";
 	}
 
 	explicit node_iterator(const Iterator& otherNode)
@@ -157,63 +155,40 @@ public:
 
 	~node_iterator() {}
 
-	Iterator base(void)
+	Iterator base(void) const
 	{
 		return base_;
 	}
 
 	inner_reference operator*() const
 	{
-		return (*base_);
+		return (base_->getValue());
 	}
 
-	template <class I, class P, class V, class Vp>
-	friend bool operator==(const node_iterator<I, P, V, Vp>& lhs, const node_iterator<I, P, V, Vp>& rhs);
-	template <class I, class P, class V, class Vp>
-	friend bool operator!=(const node_iterator<I, P, V, Vp>& lhs, const node_iterator<I, P, V, Vp>& rhs);
-	template <class I, class P, class V, class Vp>
-	friend bool operator<(const node_iterator<I, P, V, Vp>& lhs, const node_iterator<I, P, V, Vp>& rhs);
-	template <class I, class P, class V, class Vp>
-	friend bool operator<=(const node_iterator<I, P, V, Vp>& lhs, const node_iterator<I, P, V, Vp>& rhs);
-	template <class I, class P, class V, class Vp>
-	friend bool operator>(const node_iterator<I, P, V, Vp>& lhs, const node_iterator<I, P, V, Vp>& rhs);
-	template <class I, class P, class V, class Vp>
-	friend bool operator>=(const node_iterator<I, P, V, Vp>& lhs, const node_iterator<I, P, V, Vp>& rhs);
+	inner_pointer operator->() const
+	{
+		return &(base_->getValue());
+	}
+
+	template <class I, class V, class Vp>
+	friend bool operator==(const node_iterator<I, V, Vp>& lhs, const node_iterator<I, V, Vp>& rhs);
+	template <class I, class V, class Vp>
+	friend bool operator!=(const node_iterator<I, V, Vp>& lhs, const node_iterator<I, V, Vp>& rhs);
 };
 
 namespace ft
 {
 	namespace tree
 	{
-		template <class I, class P, class V, class Vp>
-		bool operator==(const node_iterator<I, P, V, Vp>& lhs, const node_iterator<I, P, V, Vp>& rhs)
+		template <class I, class V, class Vp>
+		bool operator==(const node_iterator<I, V, Vp>& lhs, const node_iterator<I, V, Vp>& rhs)
 		{
 			return (lhs.base_ == rhs.base_);
 		}
-		template <class I, class P, class V, class Vp>
-		bool operator!=(const node_iterator<I, P, V, Vp>& lhs, const node_iterator<I, P, V, Vp>& rhs)
+		template <class I, class V, class Vp>
+		bool operator!=(const node_iterator<I, V, Vp>& lhs, const node_iterator<I, V, Vp>& rhs)
 		{
 			return !(lhs == rhs);
-		}
-		template <class I, class P, class V, class Vp>
-		bool operator<(const node_iterator<I, P, V, Vp>& lhs, const node_iterator<I, P, V, Vp>& rhs)
-		{
-			return (lhs.base_ < rhs.base_);
-		}
-		template <class I, class P, class V, class Vp>
-		bool operator<=(const node_iterator<I, P, V, Vp>& lhs, const node_iterator<I, P, V, Vp>& rhs)
-		{
-			return !(rhs < lhs);
-		}
-		template <class I, class P, class V, class Vp>
-		bool operator>(const node_iterator<I, P, V, Vp>& lhs, const node_iterator<I, P, V, Vp>& rhs)
-		{
-			return (rhs < lhs);
-		}
-		template <class I, class P, class V, class Vp>
-		bool operator>=(const node_iterator<I, P, V, Vp>& lhs, const node_iterator<I, P, V, Vp>& rhs)
-		{
-			return !(lhs < rhs);
 		}
 	}
 }
