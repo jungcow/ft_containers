@@ -542,9 +542,11 @@ namespace ft
 		 * ft::is_same의 두번째 템플릿 인자는 복사 생성에 이용하는 iterator의 type을 의미한다.
 		 * i) const_iterator = iterator (O)
 		 * ii) iterator = const_iterator (X)
-		 * 위와 같은 상황을 고려하여 is_same 두번째 인자에 const가 올 때에는 허용을 하도록 해야 한다(위 첫번째 경우에 해당한다.)
-		 * _Up는 무조건 비상수 iterator, Container::pointer는 상수든 아니든 Container의 pointer를 가져오기 때문에 비상수.
-		 * 때문에 is_same의 value가 1이 되면서 enable_if의 type이 Container로 정의되어 진다.
+		 * 따라서 들어오는 템플릿 인자에 대해선 const 포인터인지 non-const 포인터인지를 그대로 받고,
+		 * 현재 받는 템플릿 인자의 두번째 인자인 Pointer 타입과 비교한다.
+		 * 즉, const_iterator는 <const int*, int*> 타입이고 iterator는 <int*, int*> 타입이기 때문에
+		 * const_iterator = iterator의 과정은 다음과 같다. -> is_same<int *, int*>
+		 * iterator = const_iterator의 과정은 다음과 같다. -> is_same<const int*, int*>
 		 */
 		template <class P /*pointer를 받는다. */>
 		vector_iterator(const vector_iterator<P, typename ft::enable_if<
@@ -561,7 +563,6 @@ namespace ft
 		 * can be assigned by same type
 		 * 복사 생성자 처럼 호환 가능한 것들을 인자로 받을 필욘 없음
 		 */
-		template <class P>
 		vector_iterator& operator=(const vector_iterator& other)
 		{
 			base_ = other.base_;
