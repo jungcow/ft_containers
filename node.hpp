@@ -30,8 +30,11 @@ public:
 	typedef typename allocator_type::reference reference;
 	typedef typename allocator_type::const_reference const_reference;
 
+private:
 	typedef Node* node_pointer;
 	typedef const Node* const_node_pointer;
+
+public:
 	typedef node_iterator<node_pointer, P1, P2> iterator;
 	typedef node_iterator<const_node_pointer, P1, P2> const_iterator;
 

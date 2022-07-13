@@ -10,16 +10,16 @@ namespace ft
 {
 	namespace tree
 	{
-		template <class P1, class P2, class Comp, class Alloc>
+		template <class Node, class Comp, class Alloc>
 		class BSTree;
 	}
 }
 
-template <class P1, class P2, class Comp, class Alloc>
+template <class Node, class Comp, class Alloc>
 class ft::tree::BSTree
 {
 private:
-	typedef ft::tree::Node<P1, P2, Alloc> Node;
+	// typedef ft::tree::Node<P1, P2, Alloc> Node;
 
 	typedef typename Node::value_type value_type;
 	typedef typename Node::pointer pointer;
@@ -41,7 +41,7 @@ private:
 	Comp compareValue;
 
 public:
-	BSTree(Comp compare, node_allocator_type alloc = node_allocator_type())
+	BSTree(const Comp& compare = Comp(), const node_allocator_type& alloc = node_allocator_type())
 		: root_(NULL), size_(0), allocator_(alloc), compareValue(compare)
 	{
 		root_ = createNode();

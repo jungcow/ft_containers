@@ -42,9 +42,26 @@ namespace ft
 		typedef typename allocator_type::const_pointer const_pointer;
 		typedef typename allocator_type::const_reference const_reference;
 
+	private:
 		typedef ft::tree::Node<pointer, pointer, Alloc> node_type;
 		typedef ft::tree::Node<const_pointer, pointer, Alloc> const_node_type;
 
+	private:
+		typedef typename allocator_type::template rebind<node_type>::other node_allocator_type;
+
+		typedef typename node_allocator_type::value_type node_value_type;
+		typedef typename node_allocator_type::pointer node_pointer;
+		typedef typename node_allocator_type::reference node_reference;
+		typedef typename node_allocator_type::const_pointer node_const_pointer;
+		typedef typename node_allocator_type::const_reference node_const_reference;
+
+		typedef typename node_allocator_type::size_type node_size_type;
+		typedef typename node_allocator_type::difference_type node_difference_type;
+
+	private:
+		typedef ft::tree::BSTree<node_type, value_compare, allocator_type> bstree;
+
+	public:
 		typedef map_iterator<typename node_type::iterator, pointer, pointer> iterator;
 		typedef map_iterator<typename const_node_type::const_iterator, const_pointer, pointer> const_iterator;
 
@@ -53,14 +70,17 @@ namespace ft
 
 	private:
 		// RBTree
+		bstree mapData_;
+		Compare compare;
+		size_type size_;
+		allocator_type allocator_;
 
 	public:
-		Compare compare;
-
 		explicit map(const key_compare& comp = key_compare(),
-					 const allocator_type& alloc = allocator_type()) : compare(Compare())
+					 const allocator_type& alloc = allocator_type())
+			: compare(Compare()), allocator_(alloc), size_(0)
 		{
-		}  // comparison object도 같이 설정
+		}
 #if 0
  
 		template <class InputIterator>
@@ -171,6 +191,15 @@ namespace ft
 	bool operator>=(const map<K, V, Comp, A>& lhs,
 			const map<K, V, Comp, A>& rhs);
 #endif
+
+	/**
+	 * @class: value_compare
+	 *
+	 * @param Iterator: a key to find value
+	 * @param T: a value, are paired with Key type
+	 * @param Compare: class comparator for compare Keys
+	 * @param Alloc: allocator for allocate value type which is ft::pair<Key, T> type
+	 */
 	template <class Key,
 			  class T,
 			  class Compare,
@@ -192,6 +221,13 @@ namespace ft
 		value_compare() : comp(Compare()) {}  // TODO: 반드시 지우기 (테스트 용으로 임시로 만든것임)
 	};
 
+	/**
+	 * @class map_iterator
+	 *
+	 * @param Iterator: node iterator
+	 * @param VIter: value iterator, here is ft::pair<Key, T>
+	 * @param VPointer: value pointer, used to be compatible with const pointer
+	 */
 	template <class Iterator, class VIter, class VPointer>
 	class map_iterator
 	{
@@ -220,7 +256,7 @@ namespace ft
 
 		template <class Iter, class I>
 		map_iterator(const map_iterator<
-					 Iter, I, typename ft::enable_if<ft::is_same<I, Vp>::value, Vp>::type>& other)
+					 Iter, I, typename ft::enable_if<ft::is_same<I, VPointer>::value, VPointer>::type>& other)
 			: base_(other.base())
 		{
 			std::cout << "map iterator copy constructor\n";
