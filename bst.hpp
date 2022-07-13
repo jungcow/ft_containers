@@ -1,99 +1,25 @@
-#ifndef __FT_TREE_H__
-#define __FT_TREE_H__
+#ifndef __FT_BST_H__
+#define __FT_BST_H__
 
 #include <iostream>  // TODO: 지우기
-#include <limits>
-#include <memory>
+#include <memory>    // TODO: 지우기 -> default argument로 적은 std 지우기
 
-#include "utility.hpp"
+#include "node.hpp"
 
 namespace ft
 {
 	namespace tree
 	{
-		template <class T>
-		class Node;
-
-		template <class T, class Comp, class Alloc>
+		template <class P1, class P2, class Comp, class Alloc>
 		class BSTree;
-
-		template <class T, class Comp, class Alloc>
-		class RBTree;
 	}
 }
 
-template <class T>
-class ft::tree::Node
-{
-public:
-	typedef T value_type;
-	typedef value_type* pointer;
-	typedef const value_type* const_pointer;
-	typedef value_type& reference;
-	typedef const value_type& const_reference;
-
-	typedef size_t size_type;
-
-private:
-	value_type val_;
-	Node* left_;
-	Node* right_;
-	size_type rank_;
-
-public:
-	Node(const value_type& value) : val_(value), left_(NULL), right_(NULL), rank_(1) {}
-	Node(const Node& other) : val_(other.val_), left_(other.left_), right_(other.right_), rank_(other.rank_) {}
-	Node& operator=(const Node& other)
-	{
-		val_ = other.val_;
-		left_ = other.left_;
-		right_ = other.right_;
-		rank_ = other.rank_;
-		return (*this);
-	}
-
-	const_reference getValue(void) const
-	{
-		return (val_);
-	}
-	Node* getLeft(void) const
-	{
-		return (left_);
-	}
-	Node* getRight(void) const
-	{
-		return (right_);
-	}
-	size_type getRank(void) const
-	{
-		return (rank_);
-	}
-
-	void setValue(const_reference value)
-	{
-		val_ = value;
-	}
-	void setLeft(Node* node)
-	{
-		left_ = node;
-	}
-	void setRight(Node* node)
-	{
-		right_ = node;
-	}
-	void setRank(size_type r)
-	{
-		rank_ = r;
-	}
-};
-
-template <class T, class Comp, class Alloc = std::allocator<T> >
+template <class P1, class P2, class Comp, class Alloc>
 class ft::tree::BSTree
 {
 private:
-	typedef ft::tree::Node<T> Node;
-
-	typedef typename Node::size_type size_type;
+	typedef ft::tree::Node<P1, P2, Alloc> Node;
 
 	typedef typename Node::value_type value_type;
 	typedef typename Node::pointer pointer;
@@ -103,10 +29,13 @@ private:
 
 	typedef Alloc allocator_type;
 	typedef typename allocator_type::template rebind<Node>::other node_allocator_type;
+	
+	typedef typename node_allocator_type::size_type node_size_type;
+	typedef typename node_allocator_type::value_type node_value_type;
 
 private:
 	Node* root_;
-	size_type size_;
+	node_size_type size_;
 	node_allocator_type allocator_;
 	Comp compareValue;
 
@@ -114,6 +43,7 @@ public:
 	BSTree(Comp compare, node_allocator_type alloc = node_allocator_type())
 		: root_(NULL), size_(0), allocator_(alloc), compareValue(compare)
 	{
+		root_ = createNode();
 	}
 
 	/**
@@ -124,7 +54,8 @@ public:
 
 	~BSTree()
 	{
-		deleteAllNodes(root_);
+		deleteAllNodes(root_->getLeft());
+		deleteNode(root_);
 	}
 
 public:
@@ -140,16 +71,17 @@ public:
 
 	Node* find(const value_type& value) const
 	{
-		return (find(root_, value));
+		return (find(root_->getLeft(), value));
 	}
 
 	Node* insert(const value_type& value)
 	{
-		Node* result = insert(root_, value);
+		Node* result = insert(root_->getLeft(), value);
 		if (!result)
 			return NULL;
 		size_++;
-		return (root_ = result);
+		root_->setLeft(result);
+		return (root_);
 	}
 
 	size_type erase(const value_type& value)
@@ -157,7 +89,7 @@ public:
 		if (empty())
 			return 0;
 
-		if (!erase(root_, value))
+		if (!erase(root_->getLeft(), value))
 			return 0;
 		size_--;
 		return 1;
@@ -165,7 +97,7 @@ public:
 
 	void printByInOrderTraversal() const
 	{
-		printByInOrderTraversal(root_);
+		printByInOrderTraversal(root_->getLeft());
 		std::cout << "\n";
 	}
 
@@ -257,10 +189,10 @@ private:
 	}
 
 private:
-	Node* createNode(const value_type& value)
+	Node* createNode(const value_type& value = value_type())
 	{
 		Node* newNode = allocator_.allocate(1);
-		allocator_.construct(newNode, value);
+		allocator_.construct(newNode, node_value_type(value));  // TODO: 확인해보기
 		return newNode;
 	}
 
