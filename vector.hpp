@@ -50,7 +50,7 @@ namespace ft
 		{
 			if (capacity_ > max_size())
 				throw std::bad_alloc();
-			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+			data_ = allocator_.allocate(capacity_);
 		}
 
 		explicit vector(size_type n, const value_type& val = value_type(),
@@ -59,7 +59,7 @@ namespace ft
 		{
 			if (n > max_size())
 				throw std::bad_alloc();
-			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+			data_ = allocator_.allocate(capacity_);
 			constructRange(0, size_, val);
 		}
 
@@ -68,12 +68,12 @@ namespace ft
 			   typename ft::check_type<typename ft::iterator_traits<InputIterator>::iterator_category>::type* = 0)
 			: allocator_(alloc), data_(0), size_(0), capacity_(0)
 		{
-			if (ft::is_same<ft::input_iterator_tag,
+			if (ft::is_same<std::input_iterator_tag,
 							typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
 				size_ = 0;
 				capacity_ = 1;
-				data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+				data_ = allocator_.allocate(capacity_);
 				for (; first != last; first++)
 					push_back(*first);
 				return;
@@ -83,7 +83,7 @@ namespace ft
 				throw std::bad_alloc();
 			size_ = n;
 			capacity_ = n + 1;
-			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+			data_ = allocator_.allocate(capacity_);
 			for (size_type i = 0; i < n; i++)
 				allocator_.construct(&data_[i], *first++);
 		}
@@ -92,7 +92,7 @@ namespace ft
 		{
 			if (capacity_ > max_size())
 				throw std::bad_alloc();
-			data_ = allocator_.allocate(sizeof(value_type) * capacity_);
+			data_ = allocator_.allocate(capacity_);
 			for (size_type i = 0; i < size_; i++)
 				allocator_.construct(&data_[i], x.data_[i]);
 		}
@@ -109,7 +109,7 @@ namespace ft
 		void assign(InputIterator first, InputIterator last,
 					typename ft::check_type<typename ft::iterator_traits<InputIterator>::iterator_category>::type* = 0)
 		{
-			if (ft::is_same<ft::input_iterator_tag,
+			if (ft::is_same<std::input_iterator_tag,
 							typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
 				clear();
@@ -123,7 +123,7 @@ namespace ft
 				reserve(n + 1);
 			clear();
 			allocator_.deallocate(data_, capacity_);
-			data_ = allocator_.allocate((sizeof(value_type) * capacity_), 0);
+			data_ = allocator_.allocate(capacity_, 0);
 			for (size_type i = 0; i < n; i++)
 				allocator_.construct(&data_[i], *first++);
 			size_ = n;
@@ -135,7 +135,7 @@ namespace ft
 				reserve(n + 1);
 			clear();
 			allocator_.deallocate(data_, capacity_);
-			data_ = allocator_.allocate(sizeof(value_type) * capacity_, 0);
+			data_ = allocator_.allocate(capacity_, 0);
 			constructRange(0, n, val);
 			size_ = n;
 		}
@@ -173,7 +173,7 @@ namespace ft
 
 		size_type capacity() const
 		{
-			return (capacity_);
+			return (capacity_ - 1);
 		}
 
 		void clear()
@@ -236,7 +236,7 @@ namespace ft
 
 		iterator insert(iterator position, const value_type& val)
 		{
-			size_type pos = getOffsetFromEnd(position);
+			size_type pos = getOffsetFromEndTo(position);
 
 			if (size_ + 1 >= capacity_)
 				reserve(capacity_ * 2);
@@ -249,7 +249,7 @@ namespace ft
 
 		void insert(iterator position, size_type n, const value_type& val)
 		{
-			size_type pos = getOffsetFromEnd(position);
+			size_type pos = getOffsetFromEndTo(position);
 
 			if (size_ + n + 1 >= capacity_)
 				reserve(std::max((size_ + n + 1), (2 * capacity_)));
@@ -263,7 +263,7 @@ namespace ft
 		void insert(iterator position, InputIterator first, InputIterator last,
 					typename ft::check_type<typename ft::iterator_traits<InputIterator>::iterator_category>::type* = 0)
 		{
-			if (ft::is_same<ft::input_iterator_tag,
+			if (ft::is_same<std::input_iterator_tag,
 							typename ft::iterator_traits<InputIterator>::iterator_category>::value)
 			{
 				vector tmp = *this;
@@ -281,7 +281,7 @@ namespace ft
 				*this = tmp;
 				return;
 			}
-			size_type pos = getOffsetFromEnd(position);
+			size_type pos = getOffsetFromEndTo(position);
 			size_type n = ft::distance(first, last);
 
 			if (size_ + n >= capacity_)
@@ -369,7 +369,7 @@ namespace ft
 				throw(std::length_error("reserve"));
 			if (capacity_ >= n)
 				return;
-			tmp = allocator_.allocate(sizeof(value_type) * (n));
+			tmp = allocator_.allocate(n);
 			if (!ft::is_trivial_destructible_junior<value_type>::value)
 			{
 				for (i = 0; i < size_; i++)
@@ -436,7 +436,7 @@ namespace ft
 		}
 
 	private:
-		size_type getOffsetFromEnd(iterator position)
+		size_type getOffsetFromEndTo(iterator position)
 		{
 			size_type pos = 0;
 			for (size_type i = size_; i >= 0; i--)
@@ -484,7 +484,6 @@ namespace ft
 	template <class T, class Alloc>
 	bool operator==(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
 	{
-		// std::cout << lhs.size() << ' ' << rhs.size() << std::endl;
 		return (lhs.size() == rhs.size() && ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
 	}
 	template <class T, class Alloc>
@@ -540,9 +539,11 @@ namespace ft
 		 * ft::is_same의 두번째 템플릿 인자는 복사 생성에 이용하는 iterator의 type을 의미한다.
 		 * i) const_iterator = iterator (O)
 		 * ii) iterator = const_iterator (X)
-		 * 위와 같은 상황을 고려하여 is_same 두번째 인자에 const가 올 때에는 허용을 하도록 해야 한다(위 첫번째 경우에 해당한다.)
-		 * _Up는 무조건 비상수 iterator, Container::pointer는 상수든 아니든 Container의 pointer를 가져오기 때문에 비상수.
-		 * 때문에 is_same의 value가 1이 되면서 enable_if의 type이 Container로 정의되어 진다.
+		 * 따라서 들어오는 템플릿 인자에 대해선 const 포인터인지 non-const 포인터인지를 그대로 받고,
+		 * 현재 받는 템플릿 인자의 두번째 인자인 Pointer 타입과 비교한다.
+		 * 즉, const_iterator는 <const int*, int*> 타입이고 iterator는 <int*, int*> 타입이기 때문에
+		 * const_iterator = iterator의 과정은 다음과 같다. -> is_same<int *, int*>
+		 * iterator = const_iterator의 과정은 다음과 같다. -> is_same<const int*, int*>
 		 */
 		template <class P /*pointer를 받는다. */>
 		vector_iterator(const vector_iterator<P, typename ft::enable_if<
@@ -559,7 +560,6 @@ namespace ft
 		 * can be assigned by same type
 		 * 복사 생성자 처럼 호환 가능한 것들을 인자로 받을 필욘 없음
 		 */
-		template <class P>
 		vector_iterator& operator=(const vector_iterator& other)
 		{
 			base_ = other.base_;
