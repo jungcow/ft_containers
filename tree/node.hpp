@@ -16,6 +16,14 @@ namespace ft
 	}
 }
 
+/**
+ * @class
+ *
+ * @param P1: real pointer used for compatibility with const Node
+ * @param P2: origin pointer used for compatiblity with const Node
+ * @param Compare: class comparator for compare between values
+ * @param Alloc: class for allocate value type
+ */
 template <class P1, class P2, class Compare, class Alloc>
 class ft::tree::Node
 {
@@ -25,6 +33,7 @@ public:
 
 	typedef typename allocator_type::value_type value_type;
 	typedef typename allocator_type::size_type size_type;
+	typedef typename allocator_type::difference_type difference_type;
 
 	typedef typename allocator_type::pointer pointer;
 	typedef typename allocator_type::const_pointer const_pointer;
@@ -57,6 +66,18 @@ private:
 	compare_type compare_value_;
 
 public:
+	Node()
+		: val_(NULL),
+		  left_(NULL),
+		  right_(NULL),
+		  rank_(1),
+		  compare_value_(compare_type()),
+		  allocator_(allocator_type()),
+		  node_allocator_(node_allocator_type())
+	{
+		std::cout << "Base Node Class Default Constructor\n";
+	}
+
 	Node(const value_type& value, const compare_type& comp = compare_type(), const allocator_type& alloc = allocator_type())
 		: val_(NULL),
 		  left_(NULL),
@@ -68,10 +89,13 @@ public:
 	{
 		val_ = allocator_.allocate(1);
 		allocator_.construct(val_, value);
+		std::cout << "Base Node Class Value Constructor\n";
 	}
 
 	template <class Pointer>
-	Node(const Node<Pointer, typename ft::enable_if<ft::is_same<Pointer, P2>::value, P2>::type, Compare, Alloc>& other,
+	Node(const Node<Pointer,
+					typename ft::enable_if<ft::is_same<Pointer, P2>::value, P2>::type,
+					Compare, Alloc>& other,
 		 const compare_type& comp = compare_type(), const allocator_type& alloc = allocator_type())
 		: val_(NULL),
 		  left_(other.left_),
@@ -83,12 +107,14 @@ public:
 	{
 		val_ = allocator_.allocate(1);
 		allocator_.construct(val_, *other.val_);
+		std::cout << "Base Node Class Copy Constructor\n";
 	}
 
 	~Node()
 	{
-		allocator_.destroy(val_);
-		allocator_.deallocate(val_, 1);
+		std::cout << "Base Node Class Default Destructor\n";
+		// allocator_.destroy(val_);
+		// allocator_.deallocate(val_, 1);
 	}
 
 	Node& operator=(const Node& other)
@@ -103,39 +129,39 @@ public:
 		return (*this);
 	}
 
-	reference getValue(void) const
-	{
-		return (*val_);
-	}
-	Node* getLeft(void) const
-	{
-		return (left_);
-	}
-	Node* getRight(void) const
-	{
-		return (right_);
-	}
-	size_type getRank(void) const
-	{
-		return (rank_);
-	}
+	// reference getValue(void) const
+	// {
+	// 	return (*val_);
+	// }
+	// Node* getLeft(void) const
+	// {
+	// 	return (left_);
+	// }
+	// Node* getRight(void) const
+	// {
+	// 	return (right_);
+	// }
+	// size_type getRank(void) const
+	// {
+	// 	return (rank_);
+	// }
 
-	void setValue(const_reference value)
-	{
-		*val_ = value;
-	}
-	void setLeft(Node* node)
-	{
-		left_ = node;
-	}
-	void setRight(Node* node)
-	{
-		right_ = node;
-	}
-	void setRank(size_type r)
-	{
-		rank_ = r;
-	}
+	// void setValue(const_reference value)
+	// {
+	// 	*val_ = value;
+	// }
+	// void setLeft(Node* node)
+	// {
+	// 	left_ = node;
+	// }
+	// void setRight(Node* node)
+	// {
+	// 	right_ = node;
+	// }
+	// void setRank(size_type r)
+	// {
+	// 	rank_ = r;
+	// }
 
 	Node* find(Node* node, const value_type& value) const
 	{
@@ -197,72 +223,82 @@ public:
 	}
 
 protected:
-	bool operator<(const value_type& lhs, const value_type& rhs) const
+	bool operator<(const value_type& rhs) const
 	{
-		return compare_value_(lhs, rhs);
+		return compare_value_(this->getValue(), rhs);
 	}
 
-	Node* createNode(const value_type& value = value_type())
-	{
-		Node* newNode = node_allocator_.allocate(1);
-		node_allocator_.construct(newNode, node_value_type(value));
-		return newNode;
-	}
+	// Node* createNode(const value_type& value = value_type())
+	// {
+	// 	Node* newNode = node_allocator_.allocate(1);
+	// 	node_allocator_.construct(newNode, node_value_type(value));
+	// 	return newNode;
+	// }
 
-	void deleteNode(Node* node)
-	{
-		node_allocator_.destroy(node);
-		node_allocator_.deallocate(node, 1);
-	}
+	// void deleteNode(Node* node)
+	// {
+	// 	node_allocator_.destroy(node);
+	// 	node_allocator_.deallocate(node, 1);
+	// }
 
-	Node* getMinNodeFrom(Node* node)
-	{
-		if (node->getLeft() == NULL)
-			return node;
-		return (getMinNodeFrom(node->getLeft()));
-	}
+	// void deleteAllNodes(Node* node)
+	// {
+	// 	if (node == NULL)
+	// 		return;
+	// 	deleteAllNodes(node->getRight());
+	// 	deleteAllNodes(node->getLeft());
+	// 	node_allocator_.destroy(node);
+	// 	node_allocator_.deallocate(node, 1);
+	// }
 
-	Node* eraseMinNodeFrom(Node* node)
-	{
-		if (node->getLeft() == NULL)
-		{
-			Node* tmp = node->getRight();
-			return tmp;
-		}
-		node->setLeft(eraseMinNodeFrom(node->getLeft()));
-		node->setRank(calculateNodeRank(node));
-		return node;
-	}
+	// Node* getMinNodeFrom(Node* node)
+	// {
+	// 	if (node->getLeft() == NULL)
+	// 		return node;
+	// 	return (getMinNodeFrom(node->getLeft()));
+	// }
 
-	size_type calculateNodeRank(Node* node)
-	{
-		size_type lRank = 0;
-		size_type rRank = 0;
-		if (node->getLeft())
-			lRank = node->getLeft()->getRank();
-		if (node->getRight())
-			rRank = node->getRight()->getRank();
-		return (lRank + rRank + 1);
-	}
+	// Node* eraseMinNodeFrom(Node* node)
+	// {
+	// 	if (node->getLeft() == NULL)
+	// 	{
+	// 		Node* tmp = node->getRight();
+	// 		return tmp;
+	// 	}
+	// 	node->setLeft(eraseMinNodeFrom(node->getLeft()));
+	// 	node->setRank(calculateNodeRank(node));
+	// 	return node;
+	// }
 
-	Node* calculateAllNodesRank(Node* node)
-	{
-		if (!node->getLeft() && !node->getRight())
-		{
-			node->setRank(1);
-			return node;
-		}
+	// size_type calculateNodeRank(Node* node)
+	// {
+	// 	size_type lRank = 0;
+	// 	size_type rRank = 0;
+	// 	if (node->getLeft())
+	// 		lRank = node->getLeft()->getRank();
+	// 	if (node->getRight())
+	// 		rRank = node->getRight()->getRank();
+	// 	return (lRank + rRank + 1);
+	// }
 
-		size_type lRank = 0;
-		size_type rRank = 0;
+	// Node* calculateAllNodesRank(Node* node)
+	// {
+	// 	if (!node->getLeft() && !node->getRight())
+	// 	{
+	// 		node->setRank(1);
+	// 		return node;
+	// 	}
 
-		if (node->getLeft())
-			lRank = calculateAllNodesRank(node->getLeft())->getRank();
-		if (node->getRight())
-			rRank = calculateAllNodesRank(node->getRight())->getRank();
-		node->setRank(lRank + rRank + 1);
-		return (node);
-	}
+	// 	size_type lRank = 0;
+	// 	size_type rRank = 0;
+
+	// 	if (node->getLeft())
+	// 		lRank = calculateAllNodesRank(node->getLeft())->getRank();
+	// 	if (node->getRight())
+	// 		rRank = calculateAllNodesRank(node->getRight())->getRank();
+	// 	node->setRank(lRank + rRank + 1);
+	// 	return (node);
+	// }
 };
 
 template <class Iterator, class ValueIter, class ValuePointer>
