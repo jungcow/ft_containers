@@ -58,9 +58,12 @@ namespace ft
 
 		typedef ft::Tree<balance_node_type> map_tree;
 
+		typedef typename node_type::iterator node_iterator;
+		typedef typename const_node_type::iterator const_node_iterator;
+
 	public:
-		typedef map_iterator<typename node_type::iterator, pointer, pointer> iterator;
-		typedef map_iterator<typename const_node_type::const_iterator, const_pointer, pointer> const_iterator;
+		typedef map_iterator<node_iterator, pointer, pointer> iterator;
+		typedef map_iterator<const_node_iterator, const_pointer, pointer> const_iterator;
 
 		typedef ft::reverse_iterator<iterator> reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
@@ -114,9 +117,7 @@ namespace ft
 #endif
 		ft::pair<iterator, bool> insert(const value_type& val)
 		{
-			// return ft::make_pair(iterator(mapData_.insert(val)), true);
-			mapData_.insert(val);
-			return ft::make_pair(iterator(), true);
+			return ft::make_pair(node_iterator(mapData_.insert(val)), true);
 		}
 #if 0
 		iterator insert(iterator position, const value_type& val);

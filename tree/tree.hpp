@@ -103,7 +103,7 @@ private:
 
 	void deleteAllNodes(Node* node)
 	{
-		// Node::deleteAllNodes(node);
+		Node::deleteAllNodes(node);
 	}
 };
 
