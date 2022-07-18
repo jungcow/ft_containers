@@ -5,7 +5,9 @@
 #include <functional>  // std::less, std::binary_function
 
 #include "iterator.hpp"  // ft::reverse_iterator
-#include "node.hpp"
+#include "tree/node_base.hpp"
+#include "tree/node_wrapper.hpp"
+#include "tree/tree.hpp"
 #include "type.hpp"     // TODO: type 출력, 디버깅용
 #include "utility.hpp"  // ft::pair
 
@@ -25,6 +27,9 @@ namespace ft
 		friend class ft::map_iterator;
 
 	public:
+		/**
+		 * Map Inner Type
+		 */
 		typedef Key key_type;
 		typedef T mapped_type;
 
@@ -43,23 +48,15 @@ namespace ft
 		typedef typename allocator_type::const_reference const_reference;
 
 	private:
-		typedef ft::tree::Node<pointer, pointer, Alloc> node_type;
-		typedef ft::tree::Node<const_pointer, pointer, Alloc> const_node_type;
+		typedef ft::node::NodeBase<pointer, pointer, value_compare, allocator_type> node_base;
+		typedef ft::node::NodeBase<const_pointer, pointer, value_compare, allocator_type> const_node_base;
 
-	private:
-		typedef typename allocator_type::template rebind<node_type>::other node_allocator_type;
+		typedef typename ft::NodeWrapper<node_base>::Node node_type;
+		typedef typename ft::NodeWrapper<const_node_base>::Node const_node_type;
 
-		typedef typename node_allocator_type::value_type node_value_type;
-		typedef typename node_allocator_type::pointer node_pointer;
-		typedef typename node_allocator_type::reference node_reference;
-		typedef typename node_allocator_type::const_pointer node_const_pointer;
-		typedef typename node_allocator_type::const_reference node_const_reference;
+		typedef typename ft::NodeWrapper<node_base>::BalanceNode balance_node_type;
 
-		typedef typename node_allocator_type::size_type node_size_type;
-		typedef typename node_allocator_type::difference_type node_difference_type;
-
-	private:
-		typedef ft::tree::BSTree<node_type, value_compare, allocator_type> bstree;
+		typedef ft::Tree<balance_node_type> map_tree;
 
 	public:
 		typedef map_iterator<typename node_type::iterator, pointer, pointer> iterator;
@@ -69,16 +66,15 @@ namespace ft
 		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
 	private:
-		// RBTree
-		bstree mapData_;
-		Compare compare;
+		map_tree mapData_;
+		key_compare compare_key_;
 		size_type size_;
 		allocator_type allocator_;
 
 	public:
 		explicit map(const key_compare& comp = key_compare(),
 					 const allocator_type& alloc = allocator_type())
-			: compare(Compare()), allocator_(alloc), size_(0)
+			: compare_key_(comp), allocator_(alloc), size_(0)
 		{
 		}
 #if 0
@@ -115,8 +111,14 @@ namespace ft
 		const_iterator find(const key_type& k) const;
 
 		allocator_type get_allocator() const;
-
-		ft::pair<iterator, bool> insert(const value_type& val);
+#endif
+		ft::pair<iterator, bool> insert(const value_type& val)
+		{
+			// return ft::make_pair(iterator(mapData_.insert(val)), true);
+			mapData_.insert(val);
+			return ft::make_pair(iterator(), true);
+		}
+#if 0
 		iterator insert(iterator position, const value_type& val);
 		template <class InputIterator>
 		void insert(InputIterator first, InputIterator last);
@@ -138,7 +140,17 @@ namespace ft
 		reverse_iterator rend();
 		const_reverse_iterator rend() const;
 
-		size_type size() const;
+#endif
+		size_type size() const
+		{
+			return mapData_.size();
+		}
+
+		void print() const
+		{
+			mapData_.printByInOrderTraversal();
+		}
+#if 0
 
 		void swap(map& x);
 
@@ -147,7 +159,7 @@ namespace ft
 #endif
 		value_compare value_comp() const
 		{
-			return (value_compare(compare));
+			return (value_compare(compare_key_));
 		}
 #if 0
 		template <class K, class V, class Comp, class A>
@@ -208,6 +220,7 @@ namespace ft
 	{
 	private:
 		friend class map;
+		friend class ft::node::NodeBase<value_type*, value_type*, value_compare, Alloc>;
 
 	public:
 		bool operator()(const value_type& lhs, const value_type& rhs) const

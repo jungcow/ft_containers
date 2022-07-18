@@ -3,12 +3,13 @@
 
 #include "../iterator.hpp"
 #include "../type_traits.hpp"
+#include "node_wrapper.hpp"
 
 namespace ft
 {
-	namespace tree
+	namespace node
 	{
-		template <class P1, class P2, class Compare, class Alloc>
+		template <class NodeBase, class BalanceType>
 		class Node;
 
 		template <class Iterator, class ValueIter, class ValuePointer>
@@ -19,290 +20,175 @@ namespace ft
 /**
  * @class
  *
- * @param P1: real pointer used for compatibility with const Node
- * @param P2: origin pointer used for compatiblity with const Node
- * @param Compare: class comparator for compare between values
- * @param Alloc: class for allocate value type
+ * @param NodeBase: base class of this Node class which have type definition all about the value_type
+ * @param BalanceType: derived class of this Node class which have balance
  */
-template <class P1, class P2, class Compare, class Alloc>
-class ft::tree::Node
+template <class NodeBase, class BalanceType>
+class ft::node::Node : public NodeBase
 {
-public:
-	typedef Compare compare_type;
-	typedef Alloc allocator_type;
+private:
+	typedef NodeBase base;
+	typedef typename base::value_iterator_type value_iterator_type;
+	typedef typename base::value_pointer_type value_pointer_type;
 
-	typedef typename allocator_type::value_type value_type;
+public:
+	/**
+	 * base type
+	 */
+	typedef typename base::compare_type compare_type;
+	typedef typename base::allocator_type allocator_type;
+
 	typedef typename allocator_type::size_type size_type;
 	typedef typename allocator_type::difference_type difference_type;
 
+	typedef typename allocator_type::value_type value_type;
 	typedef typename allocator_type::pointer pointer;
 	typedef typename allocator_type::const_pointer const_pointer;
 	typedef typename allocator_type::reference reference;
 	typedef typename allocator_type::const_reference const_reference;
 
-protected:
-	typedef typename allocator_type::template rebind<Node>::other node_allocator_type;
+	/**
+	 * derived type
+	 */
+	// typedef typename allocator_type::template rebind<BalanceType>::other node_allocator_type;
+	// typedef typename node_allocator_type::value_type node_value_type;
+	// typedef typename node_allocator_type::pointer node_pointer;
+	// typedef typename node_allocator_type::reference node_reference;
+	// typedef typename node_allocator_type::const_pointer node_const_pointer;
+	// typedef typename node_allocator_type::const_reference node_const_reference;
 
-	typedef typename node_allocator_type::value_type node_value_type;
-	typedef typename node_allocator_type::pointer node_pointer;
-	typedef typename node_allocator_type::reference node_reference;
-	typedef typename node_allocator_type::const_pointer node_const_pointer;
-	typedef typename node_allocator_type::const_reference node_const_reference;
-
-	typedef typename node_allocator_type::size_type node_size_type;
-	typedef typename node_allocator_type::difference_type node_difference_type;
+	// typedef typename node_allocator_type::size_type node_size_type;
+	// typedef typename node_allocator_type::difference_type node_difference_type;
 
 public:
-	typedef node_iterator<Node*, P1, P2> iterator;
-	typedef node_iterator<const Node*, P1, P2> const_iterator;
+	typedef node_iterator<Node*, value_iterator_type, value_pointer_type> iterator;
+	typedef node_iterator<const Node*, value_iterator_type, value_pointer_type> const_iterator;
+
+	// Node(BalanceType) {
+	// 	std::cout << "conversion constructor\n";
+	// }
 
 private:
-	pointer val_;
-	Node* left_;
-	Node* right_;
 	size_type rank_;
-	allocator_type allocator_;
-	node_allocator_type node_allocator_;
-	compare_type compare_value_;
 
 public:
-	Node()
-		: val_(NULL),
-		  left_(NULL),
-		  right_(NULL),
-		  rank_(1),
-		  compare_value_(compare_type()),
-		  allocator_(allocator_type()),
-		  node_allocator_(node_allocator_type())
+	Node() : NodeBase(), rank_(1)
 	{
-		std::cout << "Base Node Class Default Constructor\n";
 	}
 
-	Node(const value_type& value, const compare_type& comp = compare_type(), const allocator_type& alloc = allocator_type())
-		: val_(NULL),
-		  left_(NULL),
-		  right_(NULL),
-		  rank_(1),
-		  compare_value_(comp),
-		  allocator_(alloc),
-		  node_allocator_(node_allocator_type())
+	Node(const value_type& value) : NodeBase(value), rank_(1)
 	{
-		val_ = allocator_.allocate(1);
-		allocator_.construct(val_, value);
-		std::cout << "Base Node Class Value Constructor\n";
 	}
 
 	template <class Pointer>
 	Node(const Node<Pointer,
-					typename ft::enable_if<ft::is_same<Pointer, P2>::value, P2>::type,
-					Compare, Alloc>& other,
-		 const compare_type& comp = compare_type(), const allocator_type& alloc = allocator_type())
-		: val_(NULL),
-		  left_(other.left_),
-		  right_(other.right_),
-		  rank_(other.rank_),
-		  compare_value_(comp),
-		  allocator_(alloc),
-		  node_allocator_(node_allocator_type())
+					typename ft::enable_if<ft::is_same<Pointer, value_pointer_type>::value,
+										   value_pointer_type>::type>& other)
+		: NodeBase(other),
+		  rank_(other.getRank())
 	{
-		val_ = allocator_.allocate(1);
-		allocator_.construct(val_, *other.val_);
-		std::cout << "Base Node Class Copy Constructor\n";
 	}
 
 	~Node()
 	{
-		std::cout << "Base Node Class Default Destructor\n";
-		// allocator_.destroy(val_);
-		// allocator_.deallocate(val_, 1);
 	}
 
 	Node& operator=(const Node& other)
 	{
-		// TODO: assign operator가 필요한지 확인하기
-		// TODO: trivial_destructible 확인해서 최적화 하기
-		allocator_.destroy(val_);
-		allocator_.construct(val_, *other.val_);
-		left_ = other.left_;
-		right_ = other.right_;
-		rank_ = other.rank_;
-		return (*this);
+		return static_cast<BalanceType&>(*this).operator=(static_cast<BalanceType&>(other));
 	}
 
-	// reference getValue(void) const
-	// {
-	// 	return (*val_);
-	// }
-	// Node* getLeft(void) const
-	// {
-	// 	return (left_);
-	// }
-	// Node* getRight(void) const
-	// {
-	// 	return (right_);
-	// }
-	// size_type getRank(void) const
-	// {
-	// 	return (rank_);
-	// }
+	Node* getLeft(void) const
+	{
+		return (static_cast<BalanceType&>(*this).getLeft());
+	}
+	Node* getRight(void) const
+	{
+		return (static_cast<BalanceType&>(*this).getRight());
+	}
+	size_type getRank(void) const
+	{
+		return rank_;
+	}
 
-	// void setValue(const_reference value)
-	// {
-	// 	*val_ = value;
-	// }
-	// void setLeft(Node* node)
-	// {
-	// 	left_ = node;
-	// }
-	// void setRight(Node* node)
-	// {
-	// 	right_ = node;
-	// }
-	// void setRank(size_type r)
-	// {
-	// 	rank_ = r;
-	// }
+	void setLeft(Node* node)
+	{
+		static_cast<BalanceType&>(*this).setLeft(static_cast<BalanceType*>(node));
+	}
+	void setRight(Node* node)
+	{
+		static_cast<BalanceType&>(*this).setRight(static_cast<BalanceType*>(node));
+	}
+	void setRank(size_type r)
+	{
+		rank_ = r;
+	}
 
 	Node* find(Node* node, const value_type& value) const
 	{
-		if (node == NULL)
-			return NULL;
-
-		if (node->getValue() < value)
-			return find(node->getRight(), value);
-		else if (value < node->getValue())
-			return find(node->getLeft(), value);
-		return node;
+		return static_cast<BalanceType&>(*this).find(static_cast<BalanceType*>(node), value);
 	}
 
 	Node* insert(Node* node, const value_type& value)
 	{
-		if (node == NULL)
-			return (createNode(value));
-
-		if (node->getValue() < value)
-			node->setRight(insert(node->getRight(), value));
-		else if (value < node->getValue())
-			node->setLeft(insert(node->getLeft(), value));
-		node->setRank(calculateNodeRank(node));
-		return node;
+		return static_cast<BalanceType&>(*this).insert(static_cast<BalanceType*>(node), value);
 	}
 
 	Node* erase(Node* node, const value_type& value)
 	{
-		if (node == NULL)
-			return NULL;
-
-		if (node->getValue() < value)
-			node->setRight(erase(node->getRight(), value));
-		else if (value < node->getValue())
-			node->setLeft(erase(node->getLeft(), value));
-		else
-		{
-			Node* tmp;
-			if (node->getLeft() == NULL)
-			{
-				tmp = node->getRight();
-				deleteNode(node);
-				return tmp;
-			}
-			else if (node->getRight() == NULL)
-			{
-				tmp = node->getLeft();
-				deleteNode(node);
-				return tmp;
-			}
-			tmp = node;
-			node = getMinNodeFrom(node->getRight());
-			node->setRight(eraseMinNodeFrom(tmp->getRight()));
-			node->setLeft(tmp->getLeft());
-			deleteNode(tmp);
-		}
-		node->setRank(calculateNodeRank(node));
-		return node;
-	}
-
-protected:
-	bool operator<(const value_type& rhs) const
-	{
-		return compare_value_(this->getValue(), rhs);
+		return static_cast<BalanceType&>(*this).erase(static_cast<BalanceType*>(node), value);
 	}
 
 	// Node* createNode(const value_type& value = value_type())
 	// {
-	// 	Node* newNode = node_allocator_.allocate(1);
-	// 	node_allocator_.construct(newNode, node_value_type(value));
-	// 	return newNode;
+	// 	return static_cast<BalanceType&>(*this).createNode(value);
 	// }
 
 	// void deleteNode(Node* node)
 	// {
-	// 	node_allocator_.destroy(node);
-	// 	node_allocator_.deallocate(node, 1);
+	// 	return static_cast<BalanceType&>(*this).deleteNode(static_cast<BalanceType*>(node));
 	// }
 
 	// void deleteAllNodes(Node* node)
 	// {
-	// 	if (node == NULL)
-	// 		return;
-	// 	deleteAllNodes(node->getRight());
-	// 	deleteAllNodes(node->getLeft());
-	// 	node_allocator_.destroy(node);
-	// 	node_allocator_.deallocate(node, 1);
+	// 	return static_cast<BalanceType&>(*this).deleteAllNodes(static_cast<BalanceType*>(node));
 	// }
 
-	// Node* getMinNodeFrom(Node* node)
-	// {
-	// 	if (node->getLeft() == NULL)
-	// 		return node;
-	// 	return (getMinNodeFrom(node->getLeft()));
-	// }
+	size_type calculateNodeRank(Node* node)
+	{
+		// BalanceType* bNode = static_cast<BalanceType*>(node);
 
-	// Node* eraseMinNodeFrom(Node* node)
-	// {
-	// 	if (node->getLeft() == NULL)
-	// 	{
-	// 		Node* tmp = node->getRight();
-	// 		return tmp;
-	// 	}
-	// 	node->setLeft(eraseMinNodeFrom(node->getLeft()));
-	// 	node->setRank(calculateNodeRank(node));
-	// 	return node;
-	// }
+		size_type lRank = 0;
+		size_type rRank = 0;
+		if (static_cast<BalanceType*>(node)->getLeft())
+			lRank = static_cast<BalanceType*>(node)->getLeft()->getRank();
+		if (static_cast<BalanceType*>(node)->getRight())
+			rRank = static_cast<BalanceType*>(node)->getRight()->getRank();
+		return (lRank + rRank + 1);
+	}
 
-	// size_type calculateNodeRank(Node* node)
-	// {
-	// 	size_type lRank = 0;
-	// 	size_type rRank = 0;
-	// 	if (node->getLeft())
-	// 		lRank = node->getLeft()->getRank();
-	// 	if (node->getRight())
-	// 		rRank = node->getRight()->getRank();
-	// 	return (lRank + rRank + 1);
-	// }
+	Node* calculateAllNodesRank(Node* node)
+	{
+		if (!node->getLeft() && !node->getRight())
+		{
+			node->setRank(1);
+			return node;
+		}
 
-	// Node* calculateAllNodesRank(Node* node)
-	// {
-	// 	if (!node->getLeft() && !node->getRight())
-	// 	{
-	// 		node->setRank(1);
-	// 		return node;
-	// 	}
+		size_type lRank = 0;
+		size_type rRank = 0;
 
-	// 	size_type lRank = 0;
-	// 	size_type rRank = 0;
-
-	// 	if (node->getLeft())
-	// 		lRank = calculateAllNodesRank(node->getLeft())->getRank();
-	// 	if (node->getRight())
-	// 		rRank = calculateAllNodesRank(node->getRight())->getRank();
-	// 	node->setRank(lRank + rRank + 1);
-	// 	return (node);
-	// }
+		if (node->getLeft())
+			lRank = calculateAllNodesRank(node->getLeft())->getRank();
+		if (node->getRight())
+			rRank = calculateAllNodesRank(node->getRight())->getRank();
+		node->setRank(lRank + rRank + 1);
+		return (node);
+	}
 };
 
 template <class Iterator, class ValueIter, class ValuePointer>
-class ft::tree::node_iterator
+class ft::node::node_iterator
 {
 private:
 	typedef ft::iterator<std::bidirectional_iterator_tag, typename ft::remove_pointer<Iterator>::type> iterator;
@@ -334,7 +220,7 @@ public:
 	template <class P, class Vp>
 	node_iterator(const node_iterator<P, Vp,
 									  typename ft::enable_if<ft::is_same<Vp, ValuePointer>::value, ValuePointer>::type>& other)
-		: base_(reinterpret_cast<Iterator>(other.base()))
+		: base_(reinterpret_cast<Iterator>(other.base()))  // TODO: 확인하기
 	{
 		std::cout << "node iterator copy constructor\n";
 	}
@@ -375,7 +261,7 @@ public:
 
 namespace ft
 {
-	namespace tree
+	namespace node
 	{
 		template <class I, class V, class Vp>
 		bool operator==(const node_iterator<I, V, Vp>& lhs, const node_iterator<I, V, Vp>& rhs)

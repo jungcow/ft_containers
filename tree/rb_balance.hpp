@@ -1,17 +1,16 @@
 #ifndef __FT_RB_BALANCE_H__
 #define __FT_RB_BALANCE_H__
 
-namespace ft
+#include "../type.hpp"  // TODO: 지우기
+#include "node_wrapper.hpp"
+
+template <class N>
+class ft::NodeWrapper<N>::RBBalance : public TNode<RBBalance>::type
 {
-	namespace tree
-	{
-		template <class BaseNode>
-		class RBBalance;
-	}
-}
-template <class BaseNode>
-class ft::tree::RBBalance : public BaseNode
-{
+private:
+	// friend class NodeWrapper;  // TODO: 안써도 되는지 체크하기
+	typedef RBBalance Node;
+
 protected:
 	enum Color
 	{
@@ -19,18 +18,26 @@ protected:
 		Black
 	};
 
-	typedef typename BaseNode::value_type value_type;
-	typedef typename BaseNode::pointer pointer;
-	typedef typename BaseNode::reference reference;
-	typedef typename BaseNode::const_pointer const_pointer;
-	typedef typename BaseNode::const_reference const_reference;
-	typedef typename BaseNode::size_type size_type;
-	typedef typename BaseNode::difference_type difference_type;
+public:
+	/**
+	 * Base Type
+	 */
+	typedef typename TNode<RBBalance>::type base_node;
+	typedef typename base_node::allocator_type allocator_type;
 
-	typedef RBBalance<BaseNode> Node;
-	typedef typename BaseNode::node_allocator_type base_node_allocator_type;
+	typedef typename allocator_type::value_type value_type;
+	typedef typename allocator_type::pointer pointer;
+	typedef typename allocator_type::reference reference;
+	typedef typename allocator_type::const_pointer const_pointer;
+	typedef typename allocator_type::const_reference const_reference;
+	typedef typename allocator_type::size_type size_type;
+	typedef typename allocator_type::difference_type difference_type;
 
-	typedef typename base_node_allocator_type::template rebind<RBBalance>::other node_allocator_type;
+public:  // TODO: 지정자 확인하기
+	/**
+	 * RB Node Type
+	 */
+	typedef typename allocator_type::template rebind<RBBalance>::other node_allocator_type;
 	typedef typename node_allocator_type::value_type node_value_type;
 	typedef typename node_allocator_type::pointer node_pointer;
 	typedef typename node_allocator_type::reference node_reference;
@@ -41,42 +48,43 @@ protected:
 	typedef typename node_allocator_type::difference_type node_difference_type;
 
 private:
-	pointer val_;
-	size_type rank_;
 	Node* left_;
 	Node* right_;
 	Color color_;
 	node_allocator_type rb_node_allocator_;
 
 public:
-	RBBalance() : BaseNode(), color_(Red), rb_node_allocator_(node_allocator_type())
+	RBBalance()
+		: base_node(),
+		  left_(NULL),
+		  right_(NULL),
+		  color_(Red),
+		  rb_node_allocator_(node_allocator_type())
 	{
-		std::cout << "RB Balance class Default Constructor\n";
 	}
 
 	RBBalance(const value_type& value, const Color& color = Red)
-		: BaseNode(value), color_(color), rb_node_allocator_(node_allocator_type()), left_(NULL), right_(NULL), rank_(1)
+		: base_node(value),
+		  left_(NULL),
+		  right_(NULL),
+		  color_(color),
+		  rb_node_allocator_(node_allocator_type())
 	{
-		std::cout << value.first << std::endl;
-		std::cout << "RB Balance class Value Constructor\n";
 	}
 
-	template <class N>
-	RBBalance(const RBBalance<N>& other)
-		: BaseNode(other), color_(other.getColor()), rb_node_allocator_(node_allocator_type())
+	RBBalance(const RBBalance& other)
+		: base_node(other),
+		  left_(other.getLeft()),
+		  right_(other.getRight()),
+		  color_(other.getColor()),
+		  rb_node_allocator_(node_allocator_type())
 	{
-		std::cout << "RB Balance class Copy Constructor\n";
 	}
 
 	~RBBalance()
 	{
-		std::cout << "RB Balance class Default Destructor\n";
 	}
 
-	reference getValue(void) const
-	{
-		return (*val_);
-	}
 	Node* getLeft(void) const
 	{
 		return (left_);
@@ -85,15 +93,12 @@ public:
 	{
 		return (right_);
 	}
-	size_type getRank(void) const
+
+	Color getColor(void) const
 	{
-		return (rank_);
+		return (color_);
 	}
 
-	void setValue(const_reference value)
-	{
-		*val_ = value;
-	}
 	void setLeft(Node* node)
 	{
 		left_ = node;
@@ -102,16 +107,6 @@ public:
 	{
 		right_ = node;
 	}
-	void setRank(size_type r)
-	{
-		rank_ = r;
-	}
-
-	Color getColor(void) const
-	{
-		return (color_);
-	}
-
 	void setColor(const Color& color)
 	{
 		color_ = color;
@@ -133,18 +128,21 @@ public:
 
 	bool isRed(Node* node) const
 	{
-		if (node == NULL)
+		if (node == NULL || node->getColor() != Red)
 			return false;
-		return (isRed(node));
+		return true;
 	}
 
 	Node* rotateLeft(Node* node)
 	{
 		Node* tmp = node->getRight();
-		tmp->setLeft(node);
-		tmp->setRank(node->getRank());
-		tmp->setColor(node->getColor());
+
 		node->setRight(tmp->getLeft());
+
+		tmp->setLeft(node);
+		tmp->setColor(node->getColor());
+		tmp->setRank(node->getRank());
+
 		node->setRank(this->calculateNodeRank(node));
 		node->setColor(Red);
 		return tmp;
@@ -153,10 +151,13 @@ public:
 	Node* rotateRight(Node* node)
 	{
 		Node* tmp = node->getLeft();
-		tmp->setRight(node);
-		tmp->setRank(node->getRank());
-		tmp->setColor(node->getColor());
+
 		node->setLeft(tmp->getRight());
+
+		tmp->setRight(node);
+		tmp->setColor(node->getColor());
+		tmp->setRank(node->getRank());
+
 		node->setRank(this->calculateNodeRank(node));
 		node->setColor(Red);
 		return tmp;
@@ -164,15 +165,8 @@ public:
 
 	Node* insert(Node* node, const value_type& value)
 	{
-		std::cout << "node: " << reinterpret_cast<void*>(node) << std::endl;
-
 		if (node == NULL)
-		{
-			Node* tmp = createNode(value);
-			std::cout << reinterpret_cast<void*>(tmp) << std::endl;
-			return (tmp);
-			// return (createNode(value));
-		}
+			return (createNode(value));
 
 		if (isRed(node->getLeft()) && isRed(node->getRight()))
 			splitNode(node);
@@ -180,7 +174,7 @@ public:
 			node->setRight(insert(node->getRight(), value));
 		else if (value < node->getValue())
 			node->setLeft(insert(node->getLeft(), value));
-		node->setRank(calculateNodeRank(node));
+		node->setRank(this->calculateNodeRank(node));
 		return balance(node);
 	}
 
@@ -227,11 +221,11 @@ public:
 				node->setRight(erase(node->getRight(), value, &node));
 			}
 		}
-		node->setRank(calculateNodeRank(node));
+		node->setRank(this->calculateNodeRank(node));
 		return balance(node);
 	}
 
-protected:
+public:
 	Node* MoveNode(Node* node, Node** parent)
 	{
 		Node* sibling = (*parent)->getRight();
@@ -289,7 +283,7 @@ protected:
 	// TODO: 확인 필요
 	Node* balance(Node* node)
 	{
-		Node* tmp;
+		Node* tmp = node;
 
 		if (isRed(node->getLeft()))
 		{
@@ -334,15 +328,11 @@ protected:
 	{
 		Node* newNode = rb_node_allocator_.allocate(1);
 		rb_node_allocator_.construct(newNode, node_value_type(value));
-		newNode->setColor(Red);
-		std::cout << "RB: create: " << reinterpret_cast<void*>(newNode) << std::endl;
 		return newNode;
 	}
 
 	void deleteNode(Node* node)
 	{
-		std::cout << "RB: delete: " << reinterpret_cast<void*>(node) << std::endl;
-
 		rb_node_allocator_.destroy(node);
 		rb_node_allocator_.deallocate(node, 1);
 	}
@@ -355,18 +345,6 @@ protected:
 		deleteAllNodes(node->getLeft());
 		rb_node_allocator_.destroy(node);
 		rb_node_allocator_.deallocate(node, 1);
-	}
-
-	// 추가
-	size_type calculateNodeRank(Node* node)
-	{
-		size_type lRank = 0;
-		size_type rRank = 0;
-		if (node->getLeft())
-			lRank = node->getLeft()->getRank();
-		if (node->getRight())
-			rRank = node->getRight()->getRank();
-		return (lRank + rRank + 1);
 	}
 
 	Node* getMinNodeFrom(Node* node)
@@ -384,7 +362,7 @@ protected:
 			return tmp;
 		}
 		node->setLeft(eraseMinNodeFrom(node->getLeft()));
-		node->setRank(calculateNodeRank(node));
+		node->setRank(this->calculateNodeRank(node));
 		return node;
 	}
 
@@ -406,7 +384,7 @@ protected:
 			node->setRight(insert(node->getRight(), value, color));
 		else if (value < node->getValue())
 			node->setLeft(insert(node->getLeft(), value, color));
-		node->setRank(calculateNodeRank(node));
+		node->setRank(this->calculateNodeRank(node));
 		return node;
 	}
 };
