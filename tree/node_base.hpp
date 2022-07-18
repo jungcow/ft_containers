@@ -77,10 +77,20 @@ public:
 		val_ = value;
 	}
 
-	bool operator<(const value_type& rhs) const
+	bool compareValue(const value_type& lhs, const value_type& rhs)
 	{
-		return compare_value_(this->getValue(), rhs);
+		return compare_value_(lhs, rhs);
 	}
+	// template <class T1, class T2, class T3, class T4>
+	// friend bool operator<(const typename ft::node::NodeBase<T1, T2, T3, T4>::value_type& lhs,
+	// 					  const typename ft::node::NodeBase<T1, T2, T3, T4>::value_type& rhs, ft::node::NodeBase<T1, T2, T3, T4>);
 };
+
+// template <class T1, class T2, class T3, class T4>
+// bool operator<(const typename ft::node::NodeBase<T1, T2, T3, T4>::value_type& lhs,
+// 			   const typename ft::node::NodeBase<T1, T2, T3, T4>::value_type& rhs, ft::node::NodeBase<T1, T2, T3, T4>)
+// {
+// 	return ft::node::NodeBase<T1, T2>::compare_value_(lhs, rhs);
+// }
 
 #endif

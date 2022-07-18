@@ -170,9 +170,9 @@ public:
 
 		if (isRed(node->getLeft()) && isRed(node->getRight()))
 			splitNode(node);
-		if (node->getValue() < value)
+		if (base_node::compareValue(node->getValue(), value))
 			node->setRight(insert(node->getRight(), value));
-		else if (value < node->getValue())
+		else if (base_node::compareValue(value, node->getValue()))
 			node->setLeft(insert(node->getLeft(), value));
 		node->setRank(this->calculateNodeRank(node));
 		return balance(node);
@@ -183,14 +183,18 @@ public:
 		if (node == NULL)
 			return NULL;
 
-		if (node->getValue() < value)
+		std::cout << "erase key: " << node->getValue().first << std::endl;
+		if (base_node::compareValue(node->getValue(), value))
 			node->setRight(erase(node->getRight(), value, &node));
-		else if (value < node->getValue())
+		else if (base_node::compareValue(value, node->getValue()))
 			node->setLeft(erase(node->getLeft(), value, &node));
 		else
 		{
+			std::cout << "found it! key: " << node->getValue().first << std::endl;
 			if (isLeafNode(node))
 			{
+				std::cout << node->getValue().first << " is leaf node\n";
+				std::cout << node->getValue().first << " 's color is " << node->getColor() << std::endl;
 				if (!isRed(node))
 				{
 					Node* sibling = (*parent)->getRight();  // TODO:  sibling이 NULL인 경우는 없다고 생각했는데 다시 확인해보기
@@ -265,7 +269,7 @@ public:
 		if (isRed(sibling))
 		{
 			rotateLeft(*parent);
-			sibling = (*parent)->setRight();
+			sibling = (*parent)->getRight();
 			lNephew = sibling ? sibling->getLeft() : NULL;
 			rNephew = sibling ? sibling->getRight() : NULL;
 		}
@@ -380,9 +384,9 @@ protected:
 			newNode->setColor(color);
 			return (newNode);
 		}
-		if (node->getValue() < value)
+		if (base_node::compareValue(node->getValue(), value))
 			node->setRight(insert(node->getRight(), value, color));
-		else if (value < node->getValue())
+		else if (base_node::compareValue(value, node->getValue()))
 			node->setLeft(insert(node->getLeft(), value, color));
 		node->setRank(this->calculateNodeRank(node));
 		return node;

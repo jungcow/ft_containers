@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "../type.hpp" //TODO: 지우기
+#include "../type.hpp"  //TODO: 지우기
 
 namespace ft
 {
@@ -66,11 +66,14 @@ public:
 
 	node_size_type erase(const value_type& value)
 	{
+		std::cout << type(value) << std::endl;
 		if (empty())
 			return 0;
 
-		if (!Node::erase(root_->getLeft(), value))
+		Node* result = Node::erase(root_->getLeft(), value, &root_);
+		if (!result)
 			return 0;
+		root_->setLeft(result);
 		size_--;
 		return 1;
 	}
@@ -87,7 +90,13 @@ private:
 		if (node == NULL)
 			return;
 		printByInOrderTraversal(node->getLeft());
-		std::cout << node->getValue().first << "(" << node->getRank() << ")" << '-';
+
+		std::cout << node->getValue().first << "(" << node->getRank() << ", ";
+		if (node->getColor() == Node::Red)
+			std::cout << "R";
+		else
+			std::cout << "B";
+		std::cout << ")" << '-';
 		printByInOrderTraversal(node->getRight());
 	}
 

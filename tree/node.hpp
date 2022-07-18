@@ -185,7 +185,22 @@ public:
 		node->setRank(lRank + rRank + 1);
 		return (node);
 	}
+
+	bool compareValue(const value_type& lhs, const value_type& rhs)
+	{
+		return base::compareValue(lhs, rhs);
+	}
+	// template <class T1, class T2>
+	// friend bool operator<(const typename ft::node::Node<T1, T2>::value_type& lhs,
+	// 					  const typename ft::node::Node<T1, T2>::value_type& rh, ft::node::Node<T1, T2>);
 };
+
+// template <class T1, class T2>
+// bool operator<(const typename ft::node::Node<T1, T2>::value_type& lhs,
+// 			   const typename ft::node::Node<T1, T2>::value_type& rhs, ft::node::Node<T1, T2>)
+// {
+// 	return ft::node::Node<T1, T2>::comparator_(lhs, rhs, ft::node::Node<T1, T2>::base());
+// }
 
 template <class Iterator, class ValueIter, class ValuePointer>
 class ft::node::node_iterator
