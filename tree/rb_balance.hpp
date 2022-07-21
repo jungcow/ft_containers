@@ -11,7 +11,7 @@ private:
 	// friend class NodeWrapper;  // TODO: 안써도 되는지 체크하기
 	typedef RBBalance Node;
 
-protected:
+public:
 	enum Color
 	{
 		Red,
@@ -19,7 +19,6 @@ protected:
 		DoubleBlack
 	};
 
-public:
 	/**
 	 * Base Type
 	 */
@@ -215,6 +214,8 @@ public:
 			node->setLeft(erase(node->getLeft(), value, node));
 		else
 			return eraseImpl(node, value, parent);
+		std::cout << "erase key: " << node->getValue().first << std::endl;
+		std::cout << "erase parent key: " << parent->getValue().first << std::endl;
 		node = fixup(node, parent);
 		node->setRank(this->calculateRankFrom(node));
 		return node;
@@ -236,7 +237,6 @@ public:
 				toDelChild = createNilNode();
 			toDelParent = parent;
 			changeMyChild(toDel, toDelParent, toDelChild);
-			sibling = getSiblingNode(toDelChild, toDelParent);
 			if (!isRed(toDel) && !isRed(toDelChild))
 				toDelChild->setColor(DoubleBlack);
 			else if (isRed(toDel) && !isRed(toDelChild))
@@ -256,19 +256,21 @@ public:
 			if (toDel != node->getRight())
 				toDelParent = getMinParentNodeFrom(node->getRight());
 			changeMyChild(toDel, toDelParent, toDelChild);
-			sibling = getSiblingNode(toDelChild, toDelParent);
+
 			if (!isRed(toDel) && !isRed(toDelChild))
 				toDelChild->setColor(DoubleBlack);
 			else if (isRed(toDel) && !isRed(toDelChild))
 				toDelChild->setColor(Black);
 			else if (!isRed(toDel) && isRed(toDelChild))
 				toDelChild->setColor(Black);
+
 			toDel->setLeft(node->getLeft());
 			toDel->setRight(node->getRight());
 			toDel->setColor(node->getColor());
 			changeMyChild(node, parent, toDel);
 			deleteNode(node);
 			node = toDel;
+
 			if (toDelChild->getColor() == DoubleBlack)
 				node->setRight(postEraseImpl(node->getRight(), toDelChild->getValue(), node));
 			node = fixup(node, parent);
@@ -349,9 +351,15 @@ public:
 		{  //  case 4
 			std::cout << "case 4\n";
 			if (isLeft)
+			{
 				sibling = rotateRight(sibling);
+				parent->setRight(sibling);
+			}
 			else
+			{
 				sibling = rotateLeft(sibling);
+				parent->setLeft(sibling);
+			}
 			farNephew = getFarNephewNode(sibling, parent);
 		}
 
@@ -391,6 +399,7 @@ public:
 		Node* sibling = getSiblingNode(node, parent);
 		Node* nearNephew = getNearNephewNode(sibling, parent);
 		Node* farNephew = getFarNephewNode(sibling, parent);
+		Node* grandParent;
 		bool isLeft = isLeftChild(node, parent);
 
 		std::cout << "fusion operation start\n";
@@ -420,15 +429,15 @@ public:
 		{
 			std::cout << "case1\n";
 			if (isLeft)
-				rotateLeft(parent);
+				grandParent = rotateLeft(parent);
 			else
-				rotateRight(parent);
+				grandParent = rotateRight(parent);
 			sibling = getSiblingNode(node, parent);
 			nearNephew = getNearNephewNode(sibling, parent);
 			farNephew = getFarNephewNode(sibling, parent);
 			// case4또는 case5가 되는지를 확인. 안되면 case3번으로 감
 			if (canMove(node, parent))
-				return moveNode(node, parent);
+				return moveNode(node, parent);  // TODO: grand parent 호출해야 하는 거 아닌가?
 		}
 		// case 3
 		if (isRed(parent) && !isRed(sibling) && !isRed(nearNephew) && !isRed(farNephew))
@@ -446,10 +455,11 @@ public:
 					parent->setLeft(NULL);
 				else
 					parent->setRight(NULL);
-				return parent;
+				return grandParent;
+				// return parent;
 			}
 		}
-		return parent;
+		return grandParent;
 	}
 
 	Node* balance(Node* node)

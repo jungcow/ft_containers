@@ -62,7 +62,7 @@ public:
 		size_++;
 		root_->setLeft(result);
 		// TODO: 색상에 관한건 too specific하다. 좀더 general한 접근이 필요.
-		// root_->getLeft()->setColor(Node::Black);
+		root_->getLeft()->setColor(BalanceNode::Black);
 		return (root_);
 	}
 
@@ -77,6 +77,7 @@ public:
 		if (!result)
 			return 0;
 		root_->setLeft(result);
+		root_->getLeft()->setColor(BalanceNode::Black);
 		size_--;
 		return 1;
 	}
@@ -96,10 +97,10 @@ private:
 
 		std::cout << node->getValue().first << "(" << node->getRank() << ", ";
 		// TODO: 색상에 관한건 too specific하다. 좀더 general한 접근이 필요.
-		// if (node->getColor() == Node::Red)
-		// 	std::cout << "R";
-		// else
-		// 	std::cout << "B";
+		if (node->getColor() == BalanceNode::Red)
+			std::cout << "R";
+		else
+			std::cout << "B";
 		std::cout << ")" << '-';
 		printByInOrderTraversal(node->getRight());
 	}
