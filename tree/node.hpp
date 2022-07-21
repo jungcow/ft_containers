@@ -50,14 +50,15 @@ public:
 	/**
 	 * derived type
 	 */
-	// typedef typename allocator_type::template rebind<BalanceType>::other node_allocator_type;
+	typedef BalanceType BalanceNode;
+	typedef typename allocator_type::template rebind<BalanceType>::other node_allocator_type;
 	// typedef typename node_allocator_type::value_type node_value_type;
 	// typedef typename node_allocator_type::pointer node_pointer;
 	// typedef typename node_allocator_type::reference node_reference;
 	// typedef typename node_allocator_type::const_pointer node_const_pointer;
 	// typedef typename node_allocator_type::const_reference node_const_reference;
 
-	// typedef typename node_allocator_type::size_type node_size_type;
+	typedef typename node_allocator_type::size_type node_size_type;
 	// typedef typename node_allocator_type::difference_type node_difference_type;
 
 public:
@@ -70,6 +71,8 @@ public:
 
 private:
 	size_type rank_;
+	BalanceNode* left_;
+	BalanceNode* right_;
 
 public:
 	Node() : NodeBase(), rank_(1)
@@ -93,81 +96,104 @@ public:
 	{
 	}
 
-	Node& operator=(const Node& other)
+	BalanceNode& operator=(const BalanceNode& other)
 	{
-		return static_cast<BalanceType&>(*this).operator=(static_cast<BalanceType&>(other));
+		return static_cast<BalanceNode&>(*this).operator=(other);
 	}
 
-	Node* getLeft(void) const
+	BalanceNode* getLeft(void) const
 	{
-		return (static_cast<BalanceType&>(*this).getLeft());
+		return left_;
+		// return (static_cast<BalanceNode&>(*this).getLeft());
 	}
-	Node* getRight(void) const
+	BalanceNode* getRight(void) const
 	{
-		return (static_cast<BalanceType&>(*this).getRight());
+		return right_;
+		// return (static_cast<BalanceNode&>(*this).getRight());
 	}
 	size_type getRank(void) const
 	{
 		return rank_;
 	}
 
-	void setLeft(Node* node)
+	void setLeft(BalanceNode* node)
 	{
-		static_cast<BalanceType&>(*this).setLeft(static_cast<BalanceType*>(node));
+		left_ = node;
 	}
-	void setRight(Node* node)
+	void setRight(BalanceNode* node)
 	{
-		static_cast<BalanceType&>(*this).setRight(static_cast<BalanceType*>(node));
+		right_ = node;
 	}
 	void setRank(size_type r)
 	{
 		rank_ = r;
 	}
 
-	Node* find(Node* node, const value_type& value) const
+	BalanceNode* find(BalanceNode* node, const value_type& value) const
 	{
-		return static_cast<BalanceType&>(*this).find(static_cast<BalanceType*>(node), value);
+		if (node == NULL)
+			return NULL;
+
+		if (compareValue(node->getValue(), value))
+			return find(node->getRight(), value);
+		else if (compareValue(value, node->getValue()))
+			return find(node->getLeft(), value);
+		return node;
 	}
 
-	Node* insert(Node* node, const value_type& value)
+	BalanceNode* insert(BalanceNode* node, const value_type& value)
 	{
-		return static_cast<BalanceType&>(*this).insert(static_cast<BalanceType*>(node), value);
+		return static_cast<BalanceNode&>(*this).insert(node, value);
 	}
 
-	Node* erase(Node* node, const value_type& value)
+	BalanceNode* erase(BalanceNode* node, const value_type& value, BalanceNode* parent)
 	{
-		return static_cast<BalanceType&>(*this).erase(static_cast<BalanceType*>(node), value);
+		return static_cast<BalanceNode&>(*this).erase(node, value, parent);
 	}
 
-	// Node* createNode(const value_type& value = value_type())
-	// {
-	// 	return static_cast<BalanceType&>(*this).createNode(value);
-	// }
-
-	// void deleteNode(Node* node)
-	// {
-	// 	return static_cast<BalanceType&>(*this).deleteNode(static_cast<BalanceType*>(node));
-	// }
-
-	// void deleteAllNodes(Node* node)
-	// {
-	// 	return static_cast<BalanceType&>(*this).deleteAllNodes(static_cast<BalanceType*>(node));
-	// }
-
-	size_type calculateNodeRank(Node* node)
+	BalanceNode* getMinNodeFrom(BalanceNode* node)
 	{
-		// BalanceType* bNode = static_cast<BalanceType*>(node);
+		if (node->getLeft() == NULL)
+			return node;
+		return (getMinNodeFrom(node->getLeft()));
+	}
 
+	BalanceNode* eraseMinNodeFrom(BalanceNode* node)
+	{
+		if (node->getLeft() == NULL)
+			return node->getRight();
+		node->setLeft(eraseMinNodeFrom(node->getLeft()));
+		node->setRank(calculateRankFrom(node));
+		return node;
+	}
+
+	BalanceNode* createNode(const value_type& value = value_type())
+	{
+		return static_cast<BalanceNode&>(*this).createNode(value);
+	}
+
+	void deleteNode(BalanceNode* node)
+	{
+		return static_cast<BalanceNode&>(*this).deleteNode(node);
+	}
+
+	void deleteAllNodes(Node* node)
+	{
+		return static_cast<BalanceNode&>(*this).deleteAllNodes(static_cast<BalanceNode*>(node));
+	}
+
+	size_type calculateRankFrom(BalanceNode* node)
+	{
 		size_type lRank = 0;
 		size_type rRank = 0;
-		if (static_cast<BalanceType*>(node)->getLeft())
-			lRank = static_cast<BalanceType*>(node)->getLeft()->getRank();
-		if (static_cast<BalanceType*>(node)->getRight())
-			rRank = static_cast<BalanceType*>(node)->getRight()->getRank();
+		if (node->getLeft())
+			lRank = node->getLeft()->getRank();
+		if (node->getRight())
+			rRank = node->getRight()->getRank();
 		return (lRank + rRank + 1);
 	}
 
-	Node* calculateAllNodesRank(Node* node)
+	BalanceNode* calculateAllNodesRank(BalanceNode* node)
 	{
 		if (!node->getLeft() && !node->getRight())
 		{
@@ -190,17 +216,7 @@ public:
 	{
 		return base::compareValue(lhs, rhs);
 	}
-	// template <class T1, class T2>
-	// friend bool operator<(const typename ft::node::Node<T1, T2>::value_type& lhs,
-	// 					  const typename ft::node::Node<T1, T2>::value_type& rh, ft::node::Node<T1, T2>);
 };
-
-// template <class T1, class T2>
-// bool operator<(const typename ft::node::Node<T1, T2>::value_type& lhs,
-// 			   const typename ft::node::Node<T1, T2>::value_type& rhs, ft::node::Node<T1, T2>)
-// {
-// 	return ft::node::Node<T1, T2>::comparator_(lhs, rhs, ft::node::Node<T1, T2>::base());
-// }
 
 template <class Iterator, class ValueIter, class ValuePointer>
 class ft::node::node_iterator

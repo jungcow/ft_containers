@@ -21,7 +21,8 @@ namespace ft
 		class RBBalance;
 
 	public:
-		typedef typename TNode<RBBalance>::type Node;
+		typedef typename TNode<RBBalance>::type RBNode;
+		// typedef typename TNode<AVLBalance>::type AVLNode;
 
 		typedef RBBalance BalanceNode;
 	};

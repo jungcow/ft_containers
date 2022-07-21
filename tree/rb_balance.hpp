@@ -15,7 +15,8 @@ protected:
 	enum Color
 	{
 		Red,
-		Black
+		Black,
+		DoubleBlack
 	};
 
 public:
@@ -51,6 +52,7 @@ private:
 	Node* left_;
 	Node* right_;
 	Color color_;
+	bool Nil_;
 	node_allocator_type rb_node_allocator_;
 
 public:
@@ -59,6 +61,7 @@ public:
 		  left_(NULL),
 		  right_(NULL),
 		  color_(Red),
+		  Nil_(false),
 		  rb_node_allocator_(node_allocator_type())
 	{
 	}
@@ -68,6 +71,7 @@ public:
 		  left_(NULL),
 		  right_(NULL),
 		  color_(color),
+		  Nil_(false),
 		  rb_node_allocator_(node_allocator_type())
 	{
 	}
@@ -77,6 +81,7 @@ public:
 		  left_(other.getLeft()),
 		  right_(other.getRight()),
 		  color_(other.getColor()),
+		  Nil_(other.isNil()),
 		  rb_node_allocator_(node_allocator_type())
 	{
 	}
@@ -99,6 +104,11 @@ public:
 		return (color_);
 	}
 
+	bool isNil(void) const
+	{
+		return (Nil_);
+	}
+
 	void setLeft(Node* node)
 	{
 		left_ = node;
@@ -112,9 +122,17 @@ public:
 		color_ = color;
 	}
 
+	void setNil(bool nil)
+	{
+		Nil_ = nil;
+	}
+
 	void flipColor(Node* node)
 	{
-		node->setColor(static_cast<Color>(!node->getColor()));
+		if (isRed(node))
+			node->setColor(Black);
+		else if (node->getColor() == Black)
+			node->setColor(Red);
 	}
 
 	void splitNode(Node* node)
@@ -133,6 +151,13 @@ public:
 		return true;
 	}
 
+	bool isLeftChild(Node* node, Node* parent) const
+	{
+		if (parent->getLeft() == node)
+			return true;
+		return false;
+	}
+
 	Node* rotateLeft(Node* node)
 	{
 		Node* tmp = node->getRight();
@@ -143,7 +168,7 @@ public:
 		tmp->setColor(node->getColor());
 		tmp->setRank(node->getRank());
 
-		node->setRank(this->calculateNodeRank(node));
+		node->setRank(this->calculateRankFrom(node));
 		node->setColor(Red);
 		return tmp;
 	}
@@ -158,7 +183,7 @@ public:
 		tmp->setColor(node->getColor());
 		tmp->setRank(node->getRank());
 
-		node->setRank(this->calculateNodeRank(node));
+		node->setRank(this->calculateRankFrom(node));
 		node->setColor(Red);
 		return tmp;
 	}
@@ -170,121 +195,307 @@ public:
 
 		if (isRed(node->getLeft()) && isRed(node->getRight()))
 			splitNode(node);
+		// TODO: base_node:: 말고 this-> 로 고치기
 		if (base_node::compareValue(node->getValue(), value))
 			node->setRight(insert(node->getRight(), value));
 		else if (base_node::compareValue(value, node->getValue()))
 			node->setLeft(insert(node->getLeft(), value));
-		node->setRank(this->calculateNodeRank(node));
+		node->setRank(this->calculateRankFrom(node));
 		return balance(node);
 	}
 
-	Node* erase(Node* node, const value_type& value, Node** parent)
+	Node* erase(Node* node, const value_type& value, Node* parent)
 	{
 		if (node == NULL)
 			return NULL;
 
-		std::cout << "erase key: " << node->getValue().first << std::endl;
 		if (base_node::compareValue(node->getValue(), value))
-			node->setRight(erase(node->getRight(), value, &node));
+			node->setRight(erase(node->getRight(), value, node));
 		else if (base_node::compareValue(value, node->getValue()))
-			node->setLeft(erase(node->getLeft(), value, &node));
+			node->setLeft(erase(node->getLeft(), value, node));
+		else
+			return eraseImpl(node, value, parent);
+		node = fixup(node, parent);
+		node->setRank(this->calculateRankFrom(node));
+		return node;
+	}
+
+	Node* eraseImpl(Node* node, const value_type& value, Node* parent)
+	{
+		Node* toDel;
+		Node* toDelChild;
+		Node* toDelParent;
+		Node* sibling;
+
+		if (!node->getLeft() || !node->getRight())
+		{
+			toDel = node;
+
+			toDelChild = toDel->getLeft() ? toDel->getLeft() : toDel->getRight();
+			if (!toDelChild)
+				toDelChild = createNilNode();
+			toDelParent = parent;
+			changeMyChild(toDel, toDelParent, toDelChild);
+			sibling = getSiblingNode(toDelChild, toDelParent);
+			if (!isRed(toDel) && !isRed(toDelChild))
+				toDelChild->setColor(DoubleBlack);
+			else if (isRed(toDel) && !isRed(toDelChild))
+				toDelChild->setColor(Black);
+			else if (!isRed(toDel) && isRed(toDelChild))
+				toDelChild->setColor(Black);
+			deleteNode(toDel);
+			return (toDelChild);
+		}
 		else
 		{
-			std::cout << "found it! key: " << node->getValue().first << std::endl;
-			if (isLeafNode(node))
-			{
-				std::cout << node->getValue().first << " is leaf node\n";
-				std::cout << node->getValue().first << " 's color is " << node->getColor() << std::endl;
-				if (!isRed(node))
-				{
-					Node* sibling = (*parent)->getRight();  // TODO:  sibling이 NULL인 경우는 없다고 생각했는데 다시 확인해보기
-					if (isRed(sibling->getLeft()) || isRed(sibling->getRight()))
-						return MoveNode(node, parent);
-					return UnionNode(node, parent);
-				}
-				deleteNode(node);
-				return NULL;
-			}
-			// 중위 후속자가 마땅치 않을 경우
-			if (!node->getRight())
-			{
-				if (isRed(node))
-				{
-					Node* tmp = node->getLeft();
-					deleteNode(node);
-					return tmp;
-				}
-				// TODO: 오른쪽 자식이 null인 node가 black일 경우, 왼쪽 자식은 무조건 red -> 이거 확인해보기
-				swapValue(node, node->getLeft());
-				deleteNode(node->getLeft());
-				node->setLeft(NULL);
-			}
-			else
-			{
-				swapValue(node, getMinNodeFrom(node->getRight()));
-				node->setRight(erase(node->getRight(), value, &node));
-			}
+			toDel = getMinNodeFrom(node->getRight());
+			toDelChild = getMinChildNodeFrom(node->getRight());
+			if (!toDelChild)
+				toDelChild = createNilNode();
+			toDelParent = node;
+			if (toDel != node->getRight())
+				toDelParent = getMinParentNodeFrom(node->getRight());
+			changeMyChild(toDel, toDelParent, toDelChild);
+			sibling = getSiblingNode(toDelChild, toDelParent);
+			if (!isRed(toDel) && !isRed(toDelChild))
+				toDelChild->setColor(DoubleBlack);
+			else if (isRed(toDel) && !isRed(toDelChild))
+				toDelChild->setColor(Black);
+			else if (!isRed(toDel) && isRed(toDelChild))
+				toDelChild->setColor(Black);
+			// transplantNode(toDel, node);
+			toDel->setLeft(node->getLeft());
+			toDel->setRight(node->getRight());
+			toDel->setColor(node->getColor());
+			changeMyChild(node, parent, toDel);
+			deleteNode(node);
+			node = toDel;
+			if (toDelChild->getColor() == DoubleBlack)
+				node->setRight(postEraseImpl(node->getRight(), toDelChild->getValue(), node));
+			node = fixup(node, parent);
+			node->setRank(this->calculateRankFrom(node));
+			return node;
 		}
-		node->setRank(this->calculateNodeRank(node));
-		return balance(node);
 	}
 
 public:
-	Node* MoveNode(Node* node, Node** parent)
+	Node* postEraseImpl(Node* node, const value_type& value, Node* parent)
 	{
-		Node* sibling = (*parent)->getRight();
-		Node* lNephew = sibling->getLeft();
-		Node* rNephew = sibling->getRight();
+		if ((!this->compareValue(node->getValue(), value) &&
+			 !this->compareValue(value, node->getValue())) ||
+			node->isNil())
+		{
+			std::cout << std::boolalpha;
+			std::cout << "post Erase Impl, is Nil? " << node->isNil() << std::endl;
+			return node;
+		}
+		node->setLeft(postEraseImpl(node->getLeft(), value, parent));
 
-		if (isRed(lNephew))
-		{
-			//  case 4
-			// lNephew가 red라는 뜻은 NULL이 아니라는 뜻 -> 안터진다.
-			sibling = rotateRight(sibling);
-			rNephew = sibling->getRight();
-		}
-		if (isRed(rNephew))
-		{
-			//  case 5
-			Node* grandParent = rotateLeft(*parent);
-			Node* parentSibling = grandParent->getRight();
-			flipColor(*parent);
-			flipColor(parentSibling);
-			flipColor(node);
-		}
-		deleteNode(node);
-		return NULL;
+		node = fixup(node, parent);
+		node->setRank(this->calculateRankFrom(node));
+		return node;
 	}
 
-	Node* UnionNode(Node* node, Node** parent)
+	Node* fixup(Node* node, Node* parent)
 	{
-		Node* sibling = (*parent)->getRight();
-		Node* lNephew = sibling->getLeft();
-		Node* rNephew = sibling->getRight();
+		std::cout << "fixup node key: " << node->getValue().first << std::endl;
+		std::cout << "fixup node key color: " << node->getColor() << std::endl;
+		if ((node->getLeft() && node->getLeft()->getColor() == DoubleBlack) ||
+			(node->getRight() && node->getRight()->getColor() == DoubleBlack))
+		{
+			// move를 할 수 있으면 move
+			Node* toFixChild;
+			if (node->getLeft() && node->getLeft()->getColor() == DoubleBlack)
+				toFixChild = node->getLeft();
+			else
+				toFixChild = node->getRight();
+			if (canMove(toFixChild, node))
+			{
+				std::cout << "can move!\n";
+				return (moveNode(toFixChild, node));
+			}
+			// move를 할 수 없으면 union
+			std::cout << "only fusion!\n";
+			return (fusionNode(toFixChild, node));
+		}
+		if (node->getLeft() && node->getLeft()->isNil())
+		{
+			deleteNode(node->getLeft());
+			node->setLeft(NULL);
+		}
+		else if (node->getRight() && node->getRight()->isNil())
+		{
+			deleteNode(node->getLeft());
+			node->setRight(NULL);
+		}
+		return node;
+	}
+
+	bool canMove(Node* node, Node* parent)
+	{
+		Node* sibling = getSiblingNode(node, parent);
+
+		if (isRed(sibling->getLeft()) || isRed(sibling->getRight()))
+			return true;
+		return false;
+	}
+
+	Node* moveNode(Node* node, Node* parent)
+	{
+		Node* sibling = getSiblingNode(node, parent);
+		Node* nearNephew;
+		Node* farNephew;
+		bool isLeft;
+
+		std::cout << "move operation start\n";
+		isLeft = isLeftChild(node, parent);
+		if (isLeft)
+		{
+			nearNephew = sibling->getLeft();
+			farNephew = sibling->getRight();
+		}
+		else
+		{
+			nearNephew = sibling->getRight();
+			farNephew = sibling->getLeft();
+		}
+
+		if (isRed(nearNephew) && !isRed(farNephew))
+		{  //  case 4
+			std::cout << "case 4\n";
+			if (isLeft)
+			{
+				sibling = rotateRight(sibling);
+				farNephew = sibling->getRight();
+			}
+			else
+			{
+				sibling = rotateLeft(sibling);
+				farNephew = sibling->getLeft();
+			}
+		}
+		Node* grandParent;
+		if (isRed(farNephew))
+		{  //  case 5
+			std::cout << "case 5\n";
+			Node* parentSibling;
+			if (isLeft)
+			{
+				std::cout << "move operation: rotate left(" << parent->getValue().first << ")\n";
+				grandParent = rotateLeft(parent);
+				std::cout << "move operation: grand parent(" << grandParent->getValue().first << ")\n";
+				parentSibling = grandParent->getRight();
+			}
+			else
+			{
+				grandParent = rotateRight(parent);
+				parentSibling = grandParent->getLeft();
+			}
+			parent->setColor(Black);
+			parentSibling->setColor(Black);
+			(node)->setColor(Black);  // double black에서 black으로 완화시키기
+			std::cout << "move operation done\n";
+		}
+		if ((node)->isNil())
+		{
+			std::cout << "is nil node\n";
+			deleteNode(node);
+			if (isLeft)
+				parent->setLeft(NULL);
+			else
+				parent->setRight(NULL);
+			// return parent;
+			return grandParent;
+		}
+		std::cout << "move operation really done\n";
+		return grandParent;
+	}
+
+	Node* fusionNode(Node* node, Node* parent)
+	{
+		Node* sibling = getSiblingNode(node, parent);
+		Node* nearNephew;
+		Node* farNephew;
+		bool isLeft;
+
+		std::cout << "fusion operation start\n";
+		isLeft = isLeftChild(node, parent);
+		if (isLeft)
+		{
+			nearNephew = sibling->getLeft();
+			farNephew = sibling->getRight();
+		}
+		else
+		{
+			nearNephew = sibling->getRight();
+			farNephew = sibling->getLeft();
+		}
 
 		// case2
-		if (!isRed(*parent) && !isRed(sibling) && !isRed(lNephew) && !isRed(rNephew))
-			flipColor(sibling);
+		if (!isRed(parent) && !isRed(sibling) && !isRed(nearNephew) && !isRed(farNephew))
+		{
+			std::cout << "case2\n";
+			parent->setColor(DoubleBlack);
+			sibling->setColor(Red);
+			(node)->setColor(Black);
+			if ((node)->isNil())
+			{
+				std::cout << "is Nil Node\n";
+				deleteNode(node);
+				std::cout << "case2 end\n";
+				if (isLeft)
+					parent->setLeft(NULL);
+				else
+					parent->setRight(NULL);
+				return parent;
+			}
+			std::cout << "case2\n";
+			return parent;
+		}
 		// case 1
 		if (isRed(sibling))
 		{
-			rotateLeft(*parent);
-			sibling = (*parent)->getRight();
-			lNephew = sibling ? sibling->getLeft() : NULL;
-			rNephew = sibling ? sibling->getRight() : NULL;
+			std::cout << "case1\n";
+			if (isLeft)
+			{
+				rotateLeft(parent);
+				sibling = (parent)->getRight();
+				nearNephew = sibling ? sibling->getLeft() : NULL;
+				farNephew = sibling ? sibling->getRight() : NULL;
+			}
+			else
+			{
+				rotateRight(parent);
+				sibling = (parent)->getLeft();
+				nearNephew = sibling ? sibling->getRight() : NULL;
+				farNephew = sibling ? sibling->getLeft() : NULL;
+			}
+			// case4또는 case5가 되는지를 확인. 안되면 case3번으로 감
+			if (canMove(node, parent))
+				return moveNode(node, parent);
 		}
 		// case 3
-		if (isRed(*parent) && !isRed(sibling) && !isRed(lNephew) && !isRed(rNephew))
+		if (isRed(parent) && !isRed(sibling) && !isRed(nearNephew) && !isRed(farNephew))
 		{
-			flipColor(*parent);
-			flipColor(sibling);
-			flipColor(node);  // -> 여기서 node가 red node가 됨.
+			std::cout << "case3\n";
+			parent->setColor(Black);
+			sibling->setColor(Red);
+			(node)->setColor(Black);
+			if ((node)->isNil())
+			{
+				std::cout << "case 3 I'm NIL Node\n";
+				deleteNode(node);
+				std::cout << "parent key: " << parent->getValue().first << std::endl;
+				if (isLeft)
+					parent->setLeft(NULL);
+				else
+					parent->setRight(NULL);
+				return parent;
+			}
 		}
-		deleteNode(node);
-		return NULL;
+		return parent;
 	}
 
-	// TODO: 확인 필요
 	Node* balance(Node* node)
 	{
 		Node* tmp = node;
@@ -313,25 +524,59 @@ public:
 		return false;
 	}
 
-	Node* swapValue(Node* lhs, Node* rhs)
+	Node* getSiblingNode(Node* node, Node* parent)
 	{
-		value_type tmp = lhs->getValue();
-		lhs->setValue(rhs->getValue());
-		rhs->setValue(tmp);
-		return lhs;
+		Node* sibling;
+
+		if (isLeftChild(node, parent))
+			sibling = parent->getRight();
+		else
+			sibling = parent->getLeft();
+		return sibling;
+	}
+
+	/**
+	 * @param myChild: my child
+	 * @param me: parent of myChild
+	 * @param otherChild: to be my child soon
+	 */
+	void changeMyChild(Node* myChild, Node* me, Node* otherChild)
+	{
+		if (isLeftChild(myChild, me))
+			me->setLeft(otherChild);
+		else
+			me->setRight(otherChild);
 	}
 
 	Node* getMinParentNodeFrom(Node* node) const
 	{
+		if (!node->getLeft())
+			return NULL;  // 노드 바로 아래가 minNode일 경우
 		if (node->getLeft()->getLeft() == NULL)
 			return node;
 		return (getMinParentNodeFrom(node->getLeft()));
+	}
+
+	Node* getMinChildNodeFrom(Node* node) const
+	{
+		if (!node->getLeft())
+			return node->getRight();
+		return (getMinChildNodeFrom(node->getLeft()));
 	}
 
 	Node* createNode(const value_type& value = value_type())
 	{
 		Node* newNode = rb_node_allocator_.allocate(1);
 		rb_node_allocator_.construct(newNode, node_value_type(value));
+		return newNode;
+	}
+
+	Node* createNilNode(const Color& color = Black)
+	{
+		Node* newNode = rb_node_allocator_.allocate(1);
+		rb_node_allocator_.construct(newNode, node_value_type(value_type()));
+		newNode->setNil(true);
+		newNode->setColor(Black);
 		return newNode;
 	}
 
@@ -366,7 +611,7 @@ public:
 			return tmp;
 		}
 		node->setLeft(eraseMinNodeFrom(node->getLeft()));
-		node->setRank(this->calculateNodeRank(node));
+		node->setRank(this->calculateRankFrom(node));
 		return node;
 	}
 
@@ -388,7 +633,7 @@ protected:
 			node->setRight(insert(node->getRight(), value, color));
 		else if (base_node::compareValue(value, node->getValue()))
 			node->setLeft(insert(node->getLeft(), value, color));
-		node->setRank(this->calculateNodeRank(node));
+		node->setRank(this->calculateRankFrom(node));
 		return node;
 	}
 };

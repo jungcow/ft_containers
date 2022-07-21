@@ -22,9 +22,10 @@ class ft::Tree : public Node
 public:
 	typedef typename Node::value_type value_type;
 	typedef typename Node::node_size_type node_size_type;
+	typedef typename Node::BalanceNode BalanceNode;
 
 private:
-	Node* root_;
+	BalanceNode* root_;
 	node_size_type size_;
 
 public:
@@ -48,19 +49,20 @@ public:
 		return size_;
 	}
 
-	Node* find(const value_type& value) const
+	BalanceNode* find(const value_type& value) const
 	{
-		return (find(root_->getLeft(), value));
+		return (Node::find(root_->getLeft(), value));
 	}
 
-	Node* insert(const value_type& value)
+	BalanceNode* insert(const value_type& value)
 	{
-		Node* result = Node::insert(root_->getLeft(), value);
+		BalanceNode* result = Node::insert(root_->getLeft(), value);
 		if (!result)
 			return NULL;
 		size_++;
 		root_->setLeft(result);
-		root_->getLeft()->setColor(Node::Black);
+		// TODO: 색상에 관한건 too specific하다. 좀더 general한 접근이 필요.
+		// root_->getLeft()->setColor(Node::Black);
 		return (root_);
 	}
 
@@ -70,7 +72,8 @@ public:
 		if (empty())
 			return 0;
 
-		Node* result = Node::erase(root_->getLeft(), value, &root_);
+		BalanceNode* result = Node::erase(root_->getLeft(), value, root_);
+		std::cout << "erase finished\n";
 		if (!result)
 			return 0;
 		root_->setLeft(result);
@@ -85,32 +88,33 @@ public:
 	}
 
 private:
-	void printByInOrderTraversal(Node* node) const
+	void printByInOrderTraversal(BalanceNode* node) const
 	{
 		if (node == NULL)
 			return;
 		printByInOrderTraversal(node->getLeft());
 
 		std::cout << node->getValue().first << "(" << node->getRank() << ", ";
-		if (node->getColor() == Node::Red)
-			std::cout << "R";
-		else
-			std::cout << "B";
+		// TODO: 색상에 관한건 too specific하다. 좀더 general한 접근이 필요.
+		// if (node->getColor() == Node::Red)
+		// 	std::cout << "R";
+		// else
+		// 	std::cout << "B";
 		std::cout << ")" << '-';
 		printByInOrderTraversal(node->getRight());
 	}
 
-	Node* createNode(const value_type& value = value_type())
+	BalanceNode* createNode(const value_type& value = value_type())
 	{
 		return Node::createNode(value);
 	}
 
-	void deleteNode(Node* node)
+	void deleteNode(BalanceNode* node)
 	{
 		Node::deleteNode(node);
 	}
 
-	void deleteAllNodes(Node* node)
+	void deleteAllNodes(BalanceNode* node)
 	{
 		Node::deleteAllNodes(node);
 	}
