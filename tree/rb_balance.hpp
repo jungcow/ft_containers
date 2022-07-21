@@ -263,7 +263,6 @@ public:
 				toDelChild->setColor(Black);
 			else if (!isRed(toDel) && isRed(toDelChild))
 				toDelChild->setColor(Black);
-			// transplantNode(toDel, node);
 			toDel->setLeft(node->getLeft());
 			toDel->setRight(node->getRight());
 			toDel->setColor(node->getColor());
@@ -303,7 +302,6 @@ public:
 		if ((node->getLeft() && node->getLeft()->getColor() == DoubleBlack) ||
 			(node->getRight() && node->getRight()->getColor() == DoubleBlack))
 		{
-			// move를 할 수 있으면 move
 			Node* toFixChild;
 			if (node->getLeft() && node->getLeft()->getColor() == DoubleBlack)
 				toFixChild = node->getLeft();
@@ -314,7 +312,6 @@ public:
 				std::cout << "can move!\n";
 				return (moveNode(toFixChild, node));
 			}
-			// move를 할 수 없으면 union
 			std::cout << "only fusion!\n";
 			return (fusionNode(toFixChild, node));
 		}
@@ -343,54 +340,33 @@ public:
 	Node* moveNode(Node* node, Node* parent)
 	{
 		Node* sibling = getSiblingNode(node, parent);
-		Node* nearNephew;
-		Node* farNephew;
-		bool isLeft;
+		Node* nearNephew = getNearNephewNode(sibling, parent);
+		Node* farNephew = getFarNephewNode(sibling, parent);
+		bool isLeft = isLeftChild(node, parent);
 
 		std::cout << "move operation start\n";
-		isLeft = isLeftChild(node, parent);
-		if (isLeft)
-		{
-			nearNephew = sibling->getLeft();
-			farNephew = sibling->getRight();
-		}
-		else
-		{
-			nearNephew = sibling->getRight();
-			farNephew = sibling->getLeft();
-		}
-
 		if (isRed(nearNephew) && !isRed(farNephew))
 		{  //  case 4
 			std::cout << "case 4\n";
 			if (isLeft)
-			{
 				sibling = rotateRight(sibling);
-				farNephew = sibling->getRight();
-			}
 			else
-			{
 				sibling = rotateLeft(sibling);
-				farNephew = sibling->getLeft();
-			}
+			farNephew = getFarNephewNode(sibling, parent);
 		}
+
 		Node* grandParent;
+		Node* parentSibling;
 		if (isRed(farNephew))
 		{  //  case 5
 			std::cout << "case 5\n";
-			Node* parentSibling;
 			if (isLeft)
-			{
-				std::cout << "move operation: rotate left(" << parent->getValue().first << ")\n";
 				grandParent = rotateLeft(parent);
-				std::cout << "move operation: grand parent(" << grandParent->getValue().first << ")\n";
-				parentSibling = grandParent->getRight();
-			}
 			else
-			{
 				grandParent = rotateRight(parent);
-				parentSibling = grandParent->getLeft();
-			}
+			// std::cout << "move operation: rotate left(" << parent->getValue().first << ")\n";
+			// std::cout << "move operation: grand parent(" << grandParent->getValue().first << ")\n";
+			parentSibling = getSiblingNode(parent, grandParent);
 			parent->setColor(Black);
 			parentSibling->setColor(Black);
 			(node)->setColor(Black);  // double black에서 black으로 완화시키기
@@ -404,7 +380,6 @@ public:
 				parent->setLeft(NULL);
 			else
 				parent->setRight(NULL);
-			// return parent;
 			return grandParent;
 		}
 		std::cout << "move operation really done\n";
@@ -414,23 +389,11 @@ public:
 	Node* fusionNode(Node* node, Node* parent)
 	{
 		Node* sibling = getSiblingNode(node, parent);
-		Node* nearNephew;
-		Node* farNephew;
-		bool isLeft;
+		Node* nearNephew = getNearNephewNode(sibling, parent);
+		Node* farNephew = getFarNephewNode(sibling, parent);
+		bool isLeft = isLeftChild(node, parent);
 
 		std::cout << "fusion operation start\n";
-		isLeft = isLeftChild(node, parent);
-		if (isLeft)
-		{
-			nearNephew = sibling->getLeft();
-			farNephew = sibling->getRight();
-		}
-		else
-		{
-			nearNephew = sibling->getRight();
-			farNephew = sibling->getLeft();
-		}
-
 		// case2
 		if (!isRed(parent) && !isRed(sibling) && !isRed(nearNephew) && !isRed(farNephew))
 		{
@@ -457,19 +420,12 @@ public:
 		{
 			std::cout << "case1\n";
 			if (isLeft)
-			{
 				rotateLeft(parent);
-				sibling = (parent)->getRight();
-				nearNephew = sibling ? sibling->getLeft() : NULL;
-				farNephew = sibling ? sibling->getRight() : NULL;
-			}
 			else
-			{
 				rotateRight(parent);
-				sibling = (parent)->getLeft();
-				nearNephew = sibling ? sibling->getRight() : NULL;
-				farNephew = sibling ? sibling->getLeft() : NULL;
-			}
+			sibling = getSiblingNode(node, parent);
+			nearNephew = getNearNephewNode(sibling, parent);
+			farNephew = getFarNephewNode(sibling, parent);
 			// case4또는 case5가 되는지를 확인. 안되면 case3번으로 감
 			if (canMove(node, parent))
 				return moveNode(node, parent);
@@ -533,6 +489,19 @@ public:
 		else
 			sibling = parent->getLeft();
 		return sibling;
+	}
+
+	Node* getNearNephewNode(Node* sibling, Node* parent)
+	{
+		if (isLeftChild(sibling, parent))
+			return sibling->getRight();
+		return sibling->getLeft();
+	}
+	Node* getFarNephewNode(Node* sibling, Node* parent)
+	{
+		if (isLeftChild(sibling, parent))
+			return sibling->getLeft();
+		return sibling->getRight();
 	}
 
 	/**
