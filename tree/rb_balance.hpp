@@ -228,8 +228,10 @@ public:
 		Node* toDelParent;
 		Node* sibling;
 
+		std::cout << "erase Impl key: " << node->getValue().first << std::endl;
 		if (!node->getLeft() || !node->getRight())
 		{
+			std::cout << "erase Impl case 1\n";
 			toDel = node;
 
 			toDelChild = toDel->getLeft() ? toDel->getLeft() : toDel->getRight();
@@ -244,10 +246,13 @@ public:
 			else if (!isRed(toDel) && isRed(toDelChild))
 				toDelChild->setColor(Black);
 			deleteNode(toDel);
+			std::cout << "double black? " << toDelChild->getColor() << std::endl;
 			return (toDelChild);
 		}
 		else
 		{
+			std::cout << "erase Impl case 2\n";
+
 			toDel = getMinNodeFrom(node->getRight());
 			toDelChild = getMinChildNodeFrom(node->getRight());
 			if (!toDelChild)
@@ -399,7 +404,7 @@ public:
 		Node* sibling = getSiblingNode(node, parent);
 		Node* nearNephew = getNearNephewNode(sibling, parent);
 		Node* farNephew = getFarNephewNode(sibling, parent);
-		Node* grandParent;
+		Node* grandParent = NULL;
 		bool isLeft = isLeftChild(node, parent);
 
 		std::cout << "fusion operation start\n";
@@ -455,11 +460,12 @@ public:
 					parent->setLeft(NULL);
 				else
 					parent->setRight(NULL);
-				return grandParent;
+				// grandParent는 case1을 지나치고 온 경우, parent는 바로 case3번에 온 경우
+				return grandParent ? grandParent : parent;
 				// return parent;
 			}
 		}
-		return grandParent;
+		return grandParent ? grandParent : parent;
 	}
 
 	Node* balance(Node* node)
