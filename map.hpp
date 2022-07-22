@@ -308,7 +308,7 @@ namespace ft
 			return base_;
 		}
 
-		inner_reference operator*() const
+		const_inner_reference operator*() const
 		{
 			return (*base_);
 		}

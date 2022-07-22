@@ -222,7 +222,7 @@ public:
 		return (node);
 	}
 
-	bool compareValue(const value_type& lhs, const value_type& rhs)
+	bool compareValue(const value_type& lhs, const value_type& rhs) const
 	{
 		return base::compareValue(lhs, rhs);
 	}
@@ -284,7 +284,7 @@ public:
 		return base_;
 	}
 
-	inner_reference operator*() const
+	const_inner_reference operator*() const
 	{
 		return (base_->getValue());
 	}
