@@ -150,6 +150,20 @@ public:
 		return true;
 	}
 
+	bool isBlack(Node* node) const
+	{
+		if (node == NULL || !isRed(node) || node->getColor() != DoubleBlack)
+			return true;
+		return false;
+	}
+
+	bool isDoubleBlack(Node* node) const
+	{
+		if (node == NULL || isRed(node) || isBlack(node))
+			return false;
+		return true;
+	}
+
 	bool isLeftChild(Node* node, Node* parent) const
 	{
 		if (parent->getLeft() == node)
@@ -195,9 +209,9 @@ public:
 		if (isRed(node->getLeft()) && isRed(node->getRight()))
 			splitNode(node);
 		// TODO: base_node:: 말고 this-> 로 고치기
-		if (base_node::compareValue(node->getValue(), value))
+		if (this->compareValue(node->getValue(), value))
 			node->setRight(insert(node->getRight(), value));
-		else if (base_node::compareValue(value, node->getValue()))
+		else if (this->compareValue(value, node->getValue()))
 			node->setLeft(insert(node->getLeft(), value));
 		node->setRank(this->calculateRankFrom(node));
 		return balance(node);
@@ -208,14 +222,12 @@ public:
 		if (node == NULL)
 			return NULL;
 
-		if (base_node::compareValue(node->getValue(), value))
+		if (this->compareValue(node->getValue(), value))
 			node->setRight(erase(node->getRight(), value, node));
-		else if (base_node::compareValue(value, node->getValue()))
+		else if (this->compareValue(value, node->getValue()))
 			node->setLeft(erase(node->getLeft(), value, node));
 		else
 			return eraseImpl(node, value, parent);
-		std::cout << "erase key: " << node->getValue().first << std::endl;
-		std::cout << "erase parent key: " << parent->getValue().first << std::endl;
 		node = fixup(node, parent);
 		node->setRank(this->calculateRankFrom(node));
 		return node;
@@ -228,10 +240,8 @@ public:
 		Node* toDelParent;
 		Node* sibling;
 
-		std::cout << "erase Impl key: " << node->getValue().first << std::endl;
 		if (!node->getLeft() || !node->getRight())
 		{
-			std::cout << "erase Impl case 1\n";
 			toDel = node;
 
 			toDelChild = toDel->getLeft() ? toDel->getLeft() : toDel->getRight();
@@ -247,17 +257,13 @@ public:
 			else if (!isRed(toDel) && isRed(toDelChild))
 				toDelChild->setColor(Black);
 
-			std::cout << "earse impl) delete node key: " << node->getValue().first << std::endl;
 			deleteNode(toDel);
 			std::cout << std::boolalpha;
-			std::cout << "double black? " << (toDelChild->getColor() == 2) << std::endl;
 			return (toDelChild);
 		}
 		else
 		{
-			std::cout << "erase Impl case 2\n";
-
-			toDel = getMinNodeFrom(node->getRight());
+			toDel = this->getMinNodeFrom(node->getRight());
 			toDelChild = getMinChildNodeFrom(node->getRight());
 			if (!toDelChild)
 				toDelChild = createNilNode();
@@ -296,8 +302,6 @@ public:
 			 !this->compareValue(value, node->getValue())) ||
 			node->isNil())
 		{
-			std::cout << std::boolalpha;
-			std::cout << "post Erase Impl, is Nil? " << node->isNil() << std::endl;
 			return node;
 		}
 		node->setLeft(postEraseImpl(node->getLeft(), value, parent));
@@ -309,8 +313,6 @@ public:
 
 	Node* fixup(Node* node, Node* parent)
 	{
-		std::cout << "fixup node key: " << node->getValue().first << std::endl;
-		std::cout << "fixup node key color: " << node->getColor() << std::endl;
 		if ((node->getLeft() && node->getLeft()->getColor() == DoubleBlack) ||
 			(node->getRight() && node->getRight()->getColor() == DoubleBlack))
 		{
@@ -320,22 +322,20 @@ public:
 			else
 				toFixChild = node->getRight();
 			if (canMove(toFixChild, node))
-			{
-				std::cout << "can move!\n";
 				return (moveNode(toFixChild, node));
-			}
-			std::cout << "only fusion!\n";
 			return (fusionNode(toFixChild, node));
 		}
 		if (node->getLeft() && node->getLeft()->isNil())
 		{
 			deleteNode(node->getLeft());
 			node->setLeft(NULL);
+			// node->setRank(this->calculateRankFrom(node));
 		}
 		else if (node->getRight() && node->getRight()->isNil())
 		{
 			deleteNode(node->getRight());
 			node->setRight(NULL);
+			// node->setRank(this->calculateRankFrom(node));
 		}
 		return node;
 	}
@@ -356,10 +356,8 @@ public:
 		Node* farNephew = getFarNephewNode(sibling, parent);
 		bool isLeft = isLeftChild(node, parent);
 
-		std::cout << "move operation start\n";
 		if (isRed(nearNephew) && !isRed(farNephew))
 		{  //  case 4
-			std::cout << "case 4\n";
 			if (isLeft)
 			{
 				sibling = rotateRight(sibling);
@@ -377,30 +375,24 @@ public:
 		Node* parentSibling;
 		if (isRed(farNephew))
 		{  //  case 5
-			std::cout << "case 5\n";
 			if (isLeft)
 				grandParent = rotateLeft(parent);
 			else
 				grandParent = rotateRight(parent);
-			// std::cout << "move operation: rotate left(" << parent->getValue().first << ")\n";
-			// std::cout << "move operation: grand parent(" << grandParent->getValue().first << ")\n";
 			parentSibling = getSiblingNode(parent, grandParent);
 			parent->setColor(Black);
 			parentSibling->setColor(Black);
 			(node)->setColor(Black);  // double black에서 black으로 완화시키기
-			std::cout << "move operation done\n";
 		}
 		if ((node)->isNil())
 		{
-			std::cout << "is nil node\n";
 			deleteNode(node);
 			if (isLeft)
 				parent->setLeft(NULL);
 			else
 				parent->setRight(NULL);
-			return grandParent;
+			parent->setRank(this->calculateRankFrom(parent));
 		}
-		std::cout << "move operation really done\n";
 		return grandParent;
 	}
 
@@ -412,32 +404,24 @@ public:
 		Node* grandParent = NULL;
 		bool isLeft = isLeftChild(node, parent);
 
-		std::cout << "fusion operation start\n";
-		// case2
 		if (!isRed(parent) && !isRed(sibling) && !isRed(nearNephew) && !isRed(farNephew))
-		{
-			std::cout << "case2\n";
+		{  // case2
 			parent->setColor(DoubleBlack);
 			sibling->setColor(Red);
 			(node)->setColor(Black);
 			if ((node)->isNil())
 			{
-				std::cout << "is Nil Node\n";
 				deleteNode(node);
-				std::cout << "case2 end\n";
 				if (isLeft)
 					parent->setLeft(NULL);
 				else
 					parent->setRight(NULL);
-				return parent;
 			}
-			std::cout << "case2\n";
 			return parent;
 		}
-		// case 1
+
 		if (isRed(sibling))
-		{
-			std::cout << "case1\n";
+		{  // case 1
 			if (isLeft)
 				grandParent = rotateLeft(parent);
 			else
@@ -445,7 +429,6 @@ public:
 			sibling = getSiblingNode(node, parent);
 			nearNephew = getNearNephewNode(sibling, parent);
 			farNephew = getFarNephewNode(sibling, parent);
-			// case4또는 case5가 되는지를 확인. 안되면 case3번으로 감
 			if (canMove(node, parent))
 			{
 				if (isLeft)
@@ -453,27 +436,23 @@ public:
 				else
 					grandParent->setRight(moveNode(node, parent));
 				return grandParent;
-			}  // TODO: grand parent 호출해야 하는 거 아닌가?
+			}
 		}
-		// case 3
 		if (isRed(parent) && !isRed(sibling) && !isRed(nearNephew) && !isRed(farNephew))
-		{
-			std::cout << "case3\n";
+		{  // case 3
 			parent->setColor(Black);
 			sibling->setColor(Red);
 			(node)->setColor(Black);
 			if ((node)->isNil())
 			{
-				std::cout << "case 3 I'm NIL Node\n";
 				deleteNode(node);
-				std::cout << "parent key: " << parent->getValue().first << std::endl;
 				if (isLeft)
 					parent->setLeft(NULL);
 				else
 					parent->setRight(NULL);
+				parent->setRank(this->calculateRankFrom(parent));
 				// grandParent는 case1을 지나치고 온 경우, parent는 바로 case3번에 온 경우
 				return grandParent ? grandParent : parent;
-				// return parent;
 			}
 		}
 		return grandParent ? grandParent : parent;
@@ -592,12 +571,12 @@ public:
 		rb_node_allocator_.deallocate(node, 1);
 	}
 
-	Node* getMinNodeFrom(Node* node)
-	{
-		if (node->getLeft() == NULL)
-			return node;
-		return (getMinNodeFrom(node->getLeft()));
-	}
+	// Node* getMinNodeFrom(Node* node)
+	// {
+	// 	if (node->getLeft() == NULL)
+	// 		return node;
+	// 	return (getMinNodeFrom(node->getLeft()));
+	// }
 
 	Node* eraseMinNodeFrom(Node* node)
 	{
@@ -625,9 +604,9 @@ protected:
 			newNode->setColor(color);
 			return (newNode);
 		}
-		if (base_node::compareValue(node->getValue(), value))
+		if (this->compareValue(node->getValue(), value))
 			node->setRight(insert(node->getRight(), value, color));
-		else if (base_node::compareValue(value, node->getValue()))
+		else if (this->compareValue(value, node->getValue()))
 			node->setLeft(insert(node->getLeft(), value, color));
 		node->setRank(this->calculateRankFrom(node));
 		return node;
