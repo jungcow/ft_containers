@@ -61,23 +61,21 @@ public:
 			return NULL;
 		size_++;
 		root_->setLeft(result);
-		// TODO: 색상에 관한건 too specific하다. 좀더 general한 접근이 필요.
-		root_->getLeft()->setColor(BalanceNode::Black);
+		setRootNode(root_->getLeft());
 		return (root_);
 	}
 
 	node_size_type erase(const value_type& value)
 	{
-		std::cout << type(value) << std::endl;
+		std::cout << "erase key: " << value.first << std::endl;
 		if (empty())
 			return 0;
 
 		BalanceNode* result = Node::erase(root_->getLeft(), value, root_);
-		std::cout << "erase finished\n";
 		if (!result)
 			return 0;
 		root_->setLeft(result);
-		root_->getLeft()->setColor(BalanceNode::Black);
+		setRootNode(root_->getLeft());
 		size_--;
 		return 1;
 	}
@@ -88,6 +86,16 @@ public:
 		std::cout << "\n";
 	}
 
+	bool isFollowedAllRules() const
+	{
+		bool result = true;
+
+		checkBlackNodeCount(root_->getLeft(), &result);
+		if (result)
+			checkTwoRedNodesContinuously(root_->getLeft(), &result);
+		return result;
+	}
+
 private:
 	void printByInOrderTraversal(BalanceNode* node) const
 	{
@@ -95,14 +103,33 @@ private:
 			return;
 		printByInOrderTraversal(node->getLeft());
 
-		std::cout << node->getValue().first << "(" << node->getRank() << ", ";
-		// TODO: 색상에 관한건 too specific하다. 좀더 general한 접근이 필요.
-		if (node->getColor() == BalanceNode::Red)
-			std::cout << "R";
-		else
-			std::cout << "B";
-		std::cout << ")" << '-';
+		printNode(node);
+
 		printByInOrderTraversal(node->getRight());
+	}
+
+	int checkBlackNodeCount(BalanceNode* node, bool* result) const
+	{
+		int l, r;
+		if (node == NULL)
+			return 1;
+		l = checkBlackNodeCount(node->getLeft(), result);
+		r = checkBlackNodeCount(node->getRight(), result);
+		if (l != r)
+			*result = false;
+		return l + (node->getColor());
+	}
+
+	void checkTwoRedNodesContinuously(BalanceNode* node, bool* result) const
+	{
+		if (node == NULL || !node->getLeft() || !node->getRight())
+			return;
+		checkTwoRedNodesContinuously(node->getLeft(), result);
+		checkTwoRedNodesContinuously(node->getRight(), result);
+		if (node->getColor() == BalanceNode::Red && node->getLeft()->getColor() == BalanceNode::Red)
+			*result = false;
+		if (node->getColor() == BalanceNode::Red && node->getRight()->getColor() == BalanceNode::Red)
+			*result = false;
 	}
 
 	BalanceNode* createNode(const value_type& value = value_type())
@@ -118,6 +145,16 @@ private:
 	void deleteAllNodes(BalanceNode* node)
 	{
 		Node::deleteAllNodes(node);
+	}
+
+	void setRootNode(BalanceNode* node)
+	{
+		Node::setRootNode(node);
+	}
+
+	void printNode(BalanceNode* node) const
+	{
+		Node::printNode(node);
 	}
 };
 

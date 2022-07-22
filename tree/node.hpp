@@ -177,9 +177,19 @@ public:
 		return static_cast<BalanceNode&>(*this).deleteNode(node);
 	}
 
-	void deleteAllNodes(Node* node)
+	void deleteAllNodes(BalanceNode* node)
 	{
-		return static_cast<BalanceNode&>(*this).deleteAllNodes(static_cast<BalanceNode*>(node));
+		return static_cast<BalanceNode&>(*this).deleteAllNodes(node);
+	}
+
+	void setRootNode(BalanceNode* node)
+	{
+		return static_cast<BalanceNode&>(*this).setRootNode(node);
+	}
+
+	void printNode(BalanceNode* node) const
+	{
+		return static_cast<const BalanceNode&>(*this).printNode(node);
 	}
 
 	size_type calculateRankFrom(BalanceNode* node)

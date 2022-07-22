@@ -77,7 +77,7 @@ namespace ft
 	public:
 		explicit map(const key_compare& comp = key_compare(),
 					 const allocator_type& alloc = allocator_type())
-			: compare_key_(comp), allocator_(alloc), size_(0)
+			: compare_key_(comp), size_(0), allocator_(alloc)
 		{
 		}
 #if 0
@@ -110,7 +110,10 @@ namespace ft
 #endif
 		size_type erase(const key_type& k)
 		{
-			return mapData_.erase(ft::make_pair(k, mapped_type()));
+			size_type i = mapData_.erase(ft::make_pair(k, mapped_type()));
+			std::cout << std::boolalpha;
+			std::cout << "is all alright? " << mapData_.isFollowedAllRules() << std::endl;
+			return i;
 		}
 #if 0
 		void erase(iterator first, iterator last);
@@ -122,7 +125,10 @@ namespace ft
 #endif
 		ft::pair<iterator, bool> insert(const value_type& val)
 		{
-			return ft::make_pair(node_iterator(mapData_.insert(val)), true);
+			ft::pair<iterator, bool> res = ft::make_pair(node_iterator(mapData_.insert(val)), true);
+			std::cout << std::boolalpha;
+			std::cout << "is all alright? " << mapData_.isFollowedAllRules() << std::endl;
+			return res;
 		}
 #if 0
 		iterator insert(iterator position, const value_type& val);
