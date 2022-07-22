@@ -51,12 +51,12 @@ namespace ft
 		typedef ft::node::NodeBase<pointer, pointer, value_compare, allocator_type> node_base;
 		typedef ft::node::NodeBase<const_pointer, pointer, value_compare, allocator_type> const_node_base;
 
-		typedef typename ft::NodeWrapper<node_base>::Node node_type;
-		typedef typename ft::NodeWrapper<const_node_base>::Node const_node_type;
+		typedef typename ft::NodeWrapper<node_base>::RBNode node_type;
+		typedef typename ft::NodeWrapper<const_node_base>::RBNode const_node_type;
 
 		typedef typename ft::NodeWrapper<node_base>::BalanceNode balance_node_type;
 
-		typedef ft::Tree<balance_node_type> map_tree;
+		typedef ft::Tree<node_type> map_tree;
 
 		typedef typename node_type::iterator node_iterator;
 		typedef typename const_node_type::iterator const_node_iterator;
@@ -107,7 +107,12 @@ namespace ft
 		ft::pair<iterator, iterator> equal_range(const key_type& k);
 
 		void erase(iterator position);
-		size_type erase(const key_type& k);
+#endif
+		size_type erase(const key_type& k)
+		{
+			return mapData_.erase(ft::make_pair(k, mapped_type()));
+		}
+#if 0
 		void erase(iterator first, iterator last);
 
 		iterator find(const key_type& k);

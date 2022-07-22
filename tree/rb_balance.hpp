@@ -238,6 +238,7 @@ public:
 			if (!toDelChild)
 				toDelChild = createNilNode();
 			toDelParent = parent;
+
 			changeMyChild(toDel, toDelParent, toDelChild);
 			if (!isRed(toDel) && !isRed(toDelChild))
 				toDelChild->setColor(DoubleBlack);
@@ -245,8 +246,11 @@ public:
 				toDelChild->setColor(Black);
 			else if (!isRed(toDel) && isRed(toDelChild))
 				toDelChild->setColor(Black);
+
+			std::cout << "earse impl) delete node key: " << node->getValue().first << std::endl;
 			deleteNode(toDel);
-			std::cout << "double black? " << toDelChild->getColor() << std::endl;
+			std::cout << std::boolalpha;
+			std::cout << "double black? " << (toDelChild->getColor() == 2) << std::endl;
 			return (toDelChild);
 		}
 		else
@@ -273,6 +277,7 @@ public:
 			toDel->setRight(node->getRight());
 			toDel->setColor(node->getColor());
 			changeMyChild(node, parent, toDel);
+
 			deleteNode(node);
 			node = toDel;
 
@@ -329,7 +334,7 @@ public:
 		}
 		else if (node->getRight() && node->getRight()->isNil())
 		{
-			deleteNode(node->getLeft());
+			deleteNode(node->getRight());
 			node->setRight(NULL);
 		}
 		return node;
@@ -442,7 +447,13 @@ public:
 			farNephew = getFarNephewNode(sibling, parent);
 			// case4또는 case5가 되는지를 확인. 안되면 case3번으로 감
 			if (canMove(node, parent))
-				return moveNode(node, parent);  // TODO: grand parent 호출해야 하는 거 아닌가?
+			{
+				if (isLeft)
+					grandParent->setLeft(moveNode(node, parent));
+				else
+					grandParent->setRight(moveNode(node, parent));
+				return grandParent;
+			}  // TODO: grand parent 호출해야 하는 거 아닌가?
 		}
 		// case 3
 		if (isRed(parent) && !isRed(sibling) && !isRed(nearNephew) && !isRed(farNephew))
