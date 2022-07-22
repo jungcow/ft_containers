@@ -71,6 +71,10 @@ public:
 	{
 		return (val_);
 	}
+	reference getValue(void)
+	{
+		return (val_);
+	}
 
 	void setValue(const_reference value)
 	{

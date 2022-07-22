@@ -13,7 +13,7 @@
 
 namespace ft
 {
-	template <class Iterator, class VIter, class VPointer>
+	template <class Iterator, class NodePointer, class VIter, class VPointer>
 	class map_iterator;
 
 	template <class Key,
@@ -23,7 +23,7 @@ namespace ft
 	class map
 	{
 	private:
-		template <class Iterator, class VIter, class VPointer>
+		template <class Iterator, class NodePointer, class VIter, class VPointer>
 		friend class ft::map_iterator;
 
 	public:
@@ -48,13 +48,19 @@ namespace ft
 		typedef typename allocator_type::const_reference const_reference;
 
 	private:
+		/**
+		 * Node and Tree type
+		 */
 		typedef ft::node::NodeBase<pointer, pointer, value_compare, allocator_type> node_base;
 		typedef ft::node::NodeBase<const_pointer, pointer, value_compare, allocator_type> const_node_base;
 
 		typedef typename ft::NodeWrapper<node_base>::RBNode node_type;
 		typedef typename ft::NodeWrapper<const_node_base>::RBNode const_node_type;
 
-		typedef typename ft::NodeWrapper<node_base>::BalanceNode balance_node_type;
+		typedef typename ft::NodeWrapper<node_base>::node_allocator_type node_allocator_type;
+		typedef typename ft::NodeWrapper<node_base>::node_size_type node_size_type;
+		typedef typename ft::NodeWrapper<node_base>::node_value_type node_value_type;
+		// typedef typename ft::NodeWrapper<node_base>::BalanceNode balance_node_type;
 
 		typedef ft::Tree<node_type> map_tree;
 
@@ -62,14 +68,17 @@ namespace ft
 		typedef typename const_node_type::iterator const_node_iterator;
 
 	public:
-		typedef map_iterator<node_iterator, pointer, pointer> iterator;
-		typedef map_iterator<const_node_iterator, const_pointer, pointer> const_iterator;
+		/**
+		 * iterator type
+		 */
+		typedef map_iterator<node_iterator, node_type*, pointer, pointer> iterator;
+		typedef map_iterator<const_node_iterator, const_node_type*, const_pointer, pointer> const_iterator;
 
 		typedef ft::reverse_iterator<iterator> reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
 	private:
-		map_tree mapData_;
+		map_tree data_;
 		key_compare compare_key_;
 		size_type size_;
 		allocator_type allocator_;
@@ -253,7 +262,7 @@ namespace ft
 	 * @param VIter: value iterator, here is ft::pair<Key, T>
 	 * @param VPointer: value pointer, used to be compatible with const pointer
 	 */
-	template <class Iterator, class VIter, class VPointer>
+	template <class Iterator, class NodePointer, class VIter, class VPointer>
 	class map_iterator
 	{
 	private:
@@ -279,9 +288,9 @@ namespace ft
 			std::cout << "map iterator default constructor\n";
 		}
 
-		template <class Iter, class I>
+		template <class Iter, class Np, class I>
 		map_iterator(const map_iterator<
-					 Iter, I, typename ft::enable_if<ft::is_same<I, VPointer>::value, VPointer>::type>& other)
+					 Iter, Np, I, typename ft::enable_if<ft::is_same<I, VPointer>::value, VPointer>::type>& other)
 			: base_(other.base())
 		{
 			std::cout << "map iterator copy constructor\n";
@@ -291,6 +300,12 @@ namespace ft
 			: base_(otherIter)
 		{
 			std::cout << "map iterator iterator constructor\n";
+		}
+
+		explicit map_iterator(const NodePointer& node)  // node_iterator로 생성
+			: base_(node)
+		{
+			std::cout << "map iterator node constructor\n";
 		}
 
 		map_iterator& operator=(const map_iterator& other)
@@ -313,28 +328,33 @@ namespace ft
 			return (*base_);
 		}
 
+		inner_reference operator*()
+		{
+			return (*base_);
+		}
+
 		inner_pointer operator->() const
 		{
 			return (base_.operator->());
 		}
 
-		template <class Iter, class Vi, class Vp>
-		friend bool operator==(const map_iterator<Iter, Vi, Vp>& lhs, const map_iterator<Iter, Vi, Vp>& rhs);
-		template <class Iter, class Vi, class Vp>
-		friend bool operator!=(const map_iterator<Iter, Vi, Vp>& lhs, const map_iterator<Iter, Vi, Vp>& rhs);
+		template <class Iter, class Np, class Vi, class Vp>
+		friend bool operator==(const map_iterator<Iter, Np, Vi, Vp>& lhs, const map_iterator<Iter, Np, Vi, Vp>& rhs);
+		template <class Iter, class Np, class Vi, class Vp>
+		friend bool operator!=(const map_iterator<Iter, Np, Vi, Vp>& lhs, const map_iterator<Iter, Np, Vi, Vp>& rhs);
 
 		/**
 		 * ++a, a++, *a++
 		 * --a, a--, *a--
 		 */
 	};
-	template <class Iter, class Vi, class Vp>
-	bool operator==(const map_iterator<Iter, Vi, Vp>& lhs, const map_iterator<Iter, Vi, Vp>& rhs)
+	template <class Iter, class Np, class Vi, class Vp>
+	bool operator==(const map_iterator<Iter, Np, Vi, Vp>& lhs, const map_iterator<Iter, Np, Vi, Vp>& rhs)
 	{
 		return (lhs.base_ == rhs.base_);
 	}
-	template <class Iter, class Vi, class Vp>
-	bool operator!=(const map_iterator<Iter, Vi, Vp>& lhs, const map_iterator<Iter, Vi, Vp>& rhs)
+	template <class Iter, class Np, class Vi, class Vp>
+	bool operator!=(const map_iterator<Iter, Np, Vi, Vp>& lhs, const map_iterator<Iter, Np, Vi, Vp>& rhs)
 	{
 		return !(lhs == rhs);
 	}

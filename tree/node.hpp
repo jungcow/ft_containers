@@ -52,11 +52,11 @@ public:
 	 */
 	typedef BalanceType BalanceNode;
 	typedef typename allocator_type::template rebind<BalanceType>::other node_allocator_type;
-	// typedef typename node_allocator_type::value_type node_value_type;
-	// typedef typename node_allocator_type::pointer node_pointer;
-	// typedef typename node_allocator_type::reference node_reference;
-	// typedef typename node_allocator_type::const_pointer node_const_pointer;
-	// typedef typename node_allocator_type::const_reference node_const_reference;
+	typedef typename node_allocator_type::value_type node_value_type;
+	typedef typename node_allocator_type::pointer node_pointer;
+	typedef typename node_allocator_type::reference node_reference;
+	typedef typename node_allocator_type::const_pointer node_const_pointer;
+	typedef typename node_allocator_type::const_reference node_const_reference;
 
 	typedef typename node_allocator_type::size_type node_size_type;
 	// typedef typename node_allocator_type::difference_type node_difference_type;
@@ -285,6 +285,10 @@ public:
 	}
 
 	const_inner_reference operator*() const
+	{
+		return (base_->getValue());
+	}
+	inner_reference operator*()
 	{
 		return (base_->getValue());
 	}
