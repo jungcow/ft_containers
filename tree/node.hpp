@@ -12,7 +12,7 @@ namespace ft
 		template <class NodeBase, class BalanceType>
 		class Node;
 
-		template <class Iterator, class ValueIter, class ValuePointer>
+		template <class Iterator, class Balance, class ValueIter, class ValuePointer>
 		class node_iterator;
 	}
 }
@@ -62,8 +62,8 @@ public:
 	// typedef typename node_allocator_type::difference_type node_difference_type;
 
 public:
-	typedef node_iterator<Node*, value_iterator_type, value_pointer_type> iterator;
-	typedef node_iterator<const Node*, value_iterator_type, value_pointer_type> const_iterator;
+	typedef node_iterator<Node*, BalanceType*, value_iterator_type, value_pointer_type> iterator;
+	typedef node_iterator<const Node*, BalanceType*, value_iterator_type, value_pointer_type> const_iterator;
 
 	// Node(BalanceType) {
 	// 	std::cout << "conversion constructor\n";
@@ -75,11 +75,11 @@ private:
 	BalanceNode* right_;
 
 public:
-	Node() : NodeBase(), rank_(1)
+	Node() : NodeBase(), rank_(1), left_(NULL), right_(NULL)
 	{
 	}
 
-	Node(const value_type& value) : NodeBase(value), rank_(1)
+	Node(const value_type& value) : NodeBase(value), rank_(1), left_(NULL), right_(NULL)
 	{
 	}
 
@@ -88,7 +88,9 @@ public:
 					typename ft::enable_if<ft::is_same<Pointer, value_pointer_type>::value,
 										   value_pointer_type>::type>& other)
 		: NodeBase(other),
-		  rank_(other.getRank())
+		  rank_(other.getRank()),
+		  left_(other.getLeft()),
+		  right_(other.getRight())
 	{
 	}
 
@@ -104,7 +106,6 @@ public:
 	BalanceNode* getLeft(void) const
 	{
 		return left_;
-		// return (static_cast<BalanceNode&>(*this).getLeft());
 	}
 	BalanceNode* getRight(void) const
 	{
@@ -228,7 +229,7 @@ public:
 	}
 };
 
-template <class Iterator, class ValueIter, class ValuePointer>
+template <class Iterator, class Balance, class ValueIter, class ValuePointer>
 class ft::node::node_iterator
 {
 private:
@@ -258,8 +259,8 @@ public:
 		std::cout << "node iterator default constructor\n";
 	}
 
-	template <class P, class Vp>
-	node_iterator(const node_iterator<P, Vp,
+	template <class P, class B, class Vp>
+	node_iterator(const node_iterator<P, B, Vp,
 									  typename ft::enable_if<ft::is_same<Vp, ValuePointer>::value, ValuePointer>::type>& other)
 		: base_(reinterpret_cast<Iterator>(other.base()))  // TODO: 확인하기
 	{
@@ -279,6 +280,10 @@ public:
 
 	~node_iterator() {}
 
+	Iterator base(void)
+	{
+		return base_;
+	}
 	Iterator base(void) const
 	{
 		return base_;
@@ -293,28 +298,47 @@ public:
 		return (base_->getValue());
 	}
 
-	inner_pointer operator->() const
+	const_inner_pointer operator->() const
+	{
+		return &(base_->getValue());
+	}
+	inner_pointer operator->()
 	{
 		return &(base_->getValue());
 	}
 
-	template <class I, class V, class Vp>
-	friend bool operator==(const node_iterator<I, V, Vp>& lhs, const node_iterator<I, V, Vp>& rhs);
-	template <class I, class V, class Vp>
-	friend bool operator!=(const node_iterator<I, V, Vp>& lhs, const node_iterator<I, V, Vp>& rhs);
+	size_t rank() const
+	{
+		return base_->getRank();
+	}
+
+	Balance left() const
+	{
+		return base_->getLeft();
+	}
+
+	// node_iterator& operator++()
+	// {
+
+	// }
+
+	template <class I, class Bp, class V, class Vp>
+	friend bool operator==(const node_iterator<I, Bp, V, Vp>& lhs, const node_iterator<I, Bp, V, Vp>& rhs);
+	template <class I, class Bp, class V, class Vp>
+	friend bool operator!=(const node_iterator<I, Bp, V, Vp>& lhs, const node_iterator<I, Bp, V, Vp>& rhs);
 };
 
 namespace ft
 {
 	namespace node
 	{
-		template <class I, class V, class Vp>
-		bool operator==(const node_iterator<I, V, Vp>& lhs, const node_iterator<I, V, Vp>& rhs)
+		template <class I, class Bp, class V, class Vp>
+		bool operator==(const node_iterator<I, Bp, V, Vp>& lhs, const node_iterator<I, Bp, V, Vp>& rhs)
 		{
 			return (lhs.base_ == rhs.base_);
 		}
-		template <class I, class V, class Vp>
-		bool operator!=(const node_iterator<I, V, Vp>& lhs, const node_iterator<I, V, Vp>& rhs)
+		template <class I, class Bp, class V, class Vp>
+		bool operator!=(const node_iterator<I, Bp, V, Vp>& lhs, const node_iterator<I, Bp, V, Vp>& rhs)
 		{
 			return !(lhs == rhs);
 		}

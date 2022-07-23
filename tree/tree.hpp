@@ -39,6 +39,27 @@ public:
 		deleteAllNodes(root_);
 	}
 
+	BalanceNode* getRoot(void) const
+	{
+		return root_;
+	}
+
+	BalanceNode* getFirst(void) const
+	{
+		BalanceNode* node = root_->getLeft();
+		while (node && node->getLeft())
+			node = node->getLeft();
+		return node;
+	}
+
+	BalanceNode* getLast(void) const
+	{
+		BalanceNode* node = root_->getLeft();
+		while (node && node->getRight())
+			node = node->getRight();
+		return node;
+	}
+
 	bool empty() const
 	{
 		return size_ == 0;
@@ -78,6 +99,25 @@ public:
 		setRootNode(root_->getLeft());
 		size_--;
 		return 1;
+	}
+
+	BalanceNode* OS_Select(BalanceNode* node, size_t i)
+	{
+		if (i < 1 || !node)
+			return NULL;
+
+		size_t r;
+		if (!node->getLeft())
+			r = 1;
+		else
+			r = node->getLeft()->getRank() + 1;
+		std::cout << "i: " << i << ", r: " << r << std::endl;
+		if (i == r)
+			return node;
+		else if (i < r)
+			return OS_Select(node->getLeft(), i);
+		else
+			return OS_Select(node->getRight(), i - r);
 	}
 
 	void printByInOrderTraversal() const

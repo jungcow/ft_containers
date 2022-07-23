@@ -84,7 +84,7 @@ int main(void)
 		mp.print();
 		mp.erase('j');
 		mp.print();
-		mp.erase('l'); // duplicated
+		mp.erase('l');  // duplicated
 		mp.print();
 		mp.erase('m');
 		mp.print();
@@ -98,7 +98,50 @@ int main(void)
 		mp.print();
 		mp.erase('k');
 	}
-	system("leaks a.out");
+	{
+		ft::map<char, int> mp;
+
+		for (int i = 0; i < 24; i++)
+		{
+			mp.insert(ft::make_pair('a' + i, i));
+			std::cout << "size: " << mp.size() << std::endl;
+		}
+
+		std::cout << (*mp.begin()).first << std::endl;
+		std::cout << (*mp.end()).first << std::endl;
+		std::cout << "find: " << mp.count('k') << std::endl;
+		std::cout << "find: " << mp.count('z') << std::endl;
+		std::cout << "maxsize: " << mp.max_size() << std::endl;
+		mp['z'] = 26;
+		mp['a'] = 26;
+		std::cout << "z: " <<  mp['z'] << std::endl;
+		std::cout << "a: " << mp['a'] << std::endl;
+		ft::map<char, int>::iterator mpi = mp.begin();
+		mp.print();
+		// ++mpi;
+		std::cout << "*a++: " <<  (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+	}
+	{
+		// std::map<char, int> mp;
+		// for (int i = 0; i < 24; i++)
+		// {
+		// 	mp.insert(std::make_pair('a' + i, i));
+		// }
+		// std::map<char, int>::iterator mpi = mp.insert(mp.begin(), std::pair<char, int>('z', 26));
+
+		// std::cout << (*mpi).first << std::endl;
+		// std::cout << (*mp.begin()).first << std::endl;
+
+		// for (std::map<char, int>::iterator it = mp.begin(); it != mp.end(); it++)
+		// {
+		// 	std::cout << (*it).first << std::endl;
+		// }
+	}
+	// system("leaks a.out");
 
 	return (0);
 }
