@@ -146,18 +146,25 @@ namespace ft
 		ft::pair<const_iterator, const_iterator> equal_range(const key_type& k) const;
 		ft::pair<iterator, iterator> equal_range(const key_type& k);
 
-		void erase(iterator position);
 #endif
+		void erase(iterator position)
+		{
+			data_.erase(*position);
+		}
+
 		size_type erase(const key_type& k)
 		{
-			size_type i = data_.erase(ft::make_pair(k, mapped_type()));
-			std::cout << std::boolalpha;
-			std::cout << "is all alright? " << data_.isFollowedAllRules() << std::endl;
-			return i;
+			return static_cast<size_type>(data_.erase(ft::make_pair(k, mapped_type())));
 		}
-#if 0
-		void erase(iterator first, iterator last);
-#endif
+		void erase(iterator first, iterator last)
+		{
+			--last;
+			for (; last != first; last--)
+			{
+				data_.erase(*last);
+			}
+		}
+
 		iterator find(const key_type& k)
 		{
 			balance_node_type* node = data_.find(value_type(k, mapped_type()));

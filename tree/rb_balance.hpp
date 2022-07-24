@@ -194,15 +194,18 @@ public:
 		return balance(node);
 	}
 
-	Node* erase(Node* node, const value_type& value, Node* parent)
+	Node* erase(Node* node, const value_type& value, Node* parent, bool& erased)
 	{
 		if (node == NULL)
+		{
+			erased = false;
 			return NULL;
+		}
 
 		if (this->compareValue(node->getValue(), value))
-			node->setRight(erase(node->getRight(), value, node));
+			node->setRight(erase(node->getRight(), value, node, erased));
 		else if (this->compareValue(value, node->getValue()))
-			node->setLeft(erase(node->getLeft(), value, node));
+			node->setLeft(erase(node->getLeft(), value, node, erased));
 		else
 			return eraseImpl(node, parent);
 		node = fixup(node);

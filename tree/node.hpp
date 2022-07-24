@@ -174,9 +174,9 @@ public:
 		return static_cast<BalanceNode&>(*this).insert(node, value, inserted);
 	}
 
-	BalanceNode* erase(BalanceNode* node, const value_type& value, BalanceNode* parent)
+	BalanceNode* erase(BalanceNode* node, const value_type& value, BalanceNode* parent, bool& erased)
 	{
-		return static_cast<BalanceNode&>(*this).erase(node, value, parent);
+		return static_cast<BalanceNode&>(*this).erase(node, value, parent, erased);
 	}
 
 	BalanceNode* getMinNodeFrom(BalanceNode* node)

@@ -107,19 +107,17 @@ public:
 		return (inserted);
 	}
 
-	node_size_type erase(const value_type& value)
+	bool erase(const value_type& value)
 	{
-		std::cout << "erase key: " << value.first << std::endl;
-		if (empty())
-			return 0;
+		bool erased = true;
 
-		BalanceNode* result = Node::erase(root_->getLeft(), value, root_);
-		if (!result)
-			return 0;
-		root_->setLeft(result);
+		if (empty())
+			return false;
+		root_->setLeft(Node::erase(root_->getLeft(), value, root_, erased));
+		if (erased)
+			size_--;
 		setRootNode(root_->getLeft());
-		size_--;
-		return 1;
+		return (erased);
 	}
 
 	node_size_type getOrder(const value_type& value) const
