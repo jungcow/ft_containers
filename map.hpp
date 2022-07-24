@@ -141,12 +141,16 @@ namespace ft
 		{
 			return const_iterator(data_.getFoot(), &data_);
 		}
-#if 0
 
-		ft::pair<const_iterator, const_iterator> equal_range(const key_type& k) const;
-		ft::pair<iterator, iterator> equal_range(const key_type& k);
+		ft::pair<const_iterator, const_iterator> equal_range(const key_type& k) const
+		{
+			return ft::pair<const_iterator, const_iterator>(this->lower_bound(k), this->upper_bound(k));
+		}
+		ft::pair<iterator, iterator> equal_range(const key_type& k)
+		{
+			return ft::pair<iterator, iterator>(this->lower_bound(k), this->upper_bound(k));
+		}
 
-#endif
 		void erase(iterator position)
 		{
 			data_.erase(*position);
