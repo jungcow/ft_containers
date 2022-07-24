@@ -87,7 +87,7 @@ public:
 
 	bool insert(const value_type& value)
 	{
-		bool inserted = true;
+		bool inserted = false;
 
 		root_->setLeft(Node::insert(root_->getLeft(), value, inserted));
 		if (inserted)
@@ -98,7 +98,7 @@ public:
 
 	bool insert(BalanceNode* node, const value_type& value)
 	{
-		bool inserted = true;
+		bool inserted = false;
 
 		root_->setLeft(Node::insert(node, value, inserted));
 		if (inserted)
@@ -127,7 +127,9 @@ public:
 
 	BalanceNode* OS_Select(BalanceNode* node, size_t i)
 	{
-		if (i < 1 || i > size_ || !node)
+		if (i == size_ + 1)
+			return foot_;
+		if (i < 1 || !node)
 			return NULL;
 
 		size_t r;

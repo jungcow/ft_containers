@@ -283,18 +283,16 @@ private:
 public:
 	node_iterator()
 	{
-		std::cout << "node iterator default constructor\n";
 	}
 
 	template <class P, class Vp>
 	node_iterator(const node_iterator<P, Vp,
 									  typename ft::enable_if<ft::is_same<Vp, ValuePointer>::value, ValuePointer>::type>& other)
-		: base_(reinterpret_cast<Iterator>(other.base()))  // TODO: 확인하기
+		: base_(reinterpret_cast<Iterator>(other.base()))
 	{
-		std::cout << "node iterator copy constructor\n";
 	}
 
-	explicit node_iterator(const Iterator& otherNode)
+	explicit node_iterator(const Iterator otherNode)
 		: base_(otherNode)
 	{
 	}

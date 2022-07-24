@@ -180,7 +180,10 @@ public:
 	Node* insert(Node* node, const value_type& value, bool& inserted)
 	{
 		if (node == NULL)
+		{
+			inserted = true;
 			return (createNode(value));
+		}
 
 		if (isRed(node->getLeft()) && isRed(node->getRight()))
 			splitNode(node);
@@ -188,8 +191,6 @@ public:
 			node->setRight(insert(node->getRight(), value, inserted));
 		else if (this->compareValue(value, node->getValue()))
 			node->setLeft(insert(node->getLeft(), value, inserted));
-		else
-			inserted = false;
 		node->setRank(this->calculateRankFrom(node));
 		return balance(node);
 	}
