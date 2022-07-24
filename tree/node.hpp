@@ -12,7 +12,7 @@ namespace ft
 		template <class NodeBase, class BalanceType>
 		class Node;
 
-		template <class Iterator, class Balance, class ValueIter, class ValuePointer>
+		template <class Iterator, class ValueIter, class ValuePointer>
 		class node_iterator;
 	}
 }
@@ -62,12 +62,8 @@ public:
 	// typedef typename node_allocator_type::difference_type node_difference_type;
 
 public:
-	typedef node_iterator<Node*, BalanceType*, value_iterator_type, value_pointer_type> iterator;
-	typedef node_iterator<const Node*, BalanceType*, value_iterator_type, value_pointer_type> const_iterator;
-
-	// Node(BalanceType) {
-	// 	std::cout << "conversion constructor\n";
-	// }
+	typedef node_iterator<BalanceType*, value_iterator_type, value_pointer_type> iterator;
+	typedef node_iterator<const BalanceType*, value_iterator_type, value_pointer_type> const_iterator;
 
 private:
 	node_size_type rank_;
@@ -173,9 +169,9 @@ public:
 		return node;
 	}
 
-	BalanceNode* insert(BalanceNode* node, const value_type& value)
+	BalanceNode* insert(BalanceNode* node, const value_type& value, bool& inserted)
 	{
-		return static_cast<BalanceNode&>(*this).insert(node, value);
+		return static_cast<BalanceNode&>(*this).insert(node, value, inserted);
 	}
 
 	BalanceNode* erase(BalanceNode* node, const value_type& value, BalanceNode* parent)
@@ -260,7 +256,7 @@ public:
 	}
 };
 
-template <class Iterator, class Balance, class ValueIter, class ValuePointer>
+template <class Iterator, class ValueIter, class ValuePointer>
 class ft::node::node_iterator
 {
 private:
@@ -282,7 +278,7 @@ public:
 	typedef typename iterator::iterator_category iterator_category;
 
 private:
-	Iterator base_;  // same with Node*
+	Iterator base_;  // same with BalanceNode*
 
 public:
 	node_iterator()
@@ -290,8 +286,8 @@ public:
 		std::cout << "node iterator default constructor\n";
 	}
 
-	template <class P, class B, class Vp>
-	node_iterator(const node_iterator<P, B, Vp,
+	template <class P, class Vp>
+	node_iterator(const node_iterator<P, Vp,
 									  typename ft::enable_if<ft::is_same<Vp, ValuePointer>::value, ValuePointer>::type>& other)
 		: base_(reinterpret_cast<Iterator>(other.base()))  // TODO: 확인하기
 	{
@@ -343,33 +339,28 @@ public:
 		return base_->getRank();
 	}
 
-	Balance left() const
+	Iterator left() const
 	{
 		return base_->getLeft();
 	}
 
-	// node_iterator& operator++()
-	// {
-
-	// }
-
-	template <class I, class Bp, class V, class Vp>
-	friend bool operator==(const node_iterator<I, Bp, V, Vp>& lhs, const node_iterator<I, Bp, V, Vp>& rhs);
-	template <class I, class Bp, class V, class Vp>
-	friend bool operator!=(const node_iterator<I, Bp, V, Vp>& lhs, const node_iterator<I, Bp, V, Vp>& rhs);
+	template <class I, class V, class Vp>
+	friend bool operator==(const node_iterator<I, V, Vp>& lhs, const node_iterator<I, V, Vp>& rhs);
+	template <class I, class V, class Vp>
+	friend bool operator!=(const node_iterator<I, V, Vp>& lhs, const node_iterator<I, V, Vp>& rhs);
 };
 
 namespace ft
 {
 	namespace node
 	{
-		template <class I, class Bp, class V, class Vp>
-		bool operator==(const node_iterator<I, Bp, V, Vp>& lhs, const node_iterator<I, Bp, V, Vp>& rhs)
+		template <class I, class V, class Vp>
+		bool operator==(const node_iterator<I, V, Vp>& lhs, const node_iterator<I, V, Vp>& rhs)
 		{
 			return (lhs.base_ == rhs.base_);
 		}
-		template <class I, class Bp, class V, class Vp>
-		bool operator!=(const node_iterator<I, Bp, V, Vp>& lhs, const node_iterator<I, Bp, V, Vp>& rhs)
+		template <class I, class V, class Vp>
+		bool operator!=(const node_iterator<I, V, Vp>& lhs, const node_iterator<I, V, Vp>& rhs)
 		{
 			return !(lhs == rhs);
 		}

@@ -177,7 +177,7 @@ public:
 		return true;
 	}
 
-	Node* insert(Node* node, const value_type& value)
+	Node* insert(Node* node, const value_type& value, bool& inserted)
 	{
 		if (node == NULL)
 			return (createNode(value));
@@ -185,9 +185,11 @@ public:
 		if (isRed(node->getLeft()) && isRed(node->getRight()))
 			splitNode(node);
 		if (this->compareValue(node->getValue(), value))
-			node->setRight(insert(node->getRight(), value));
+			node->setRight(insert(node->getRight(), value, inserted));
 		else if (this->compareValue(value, node->getValue()))
-			node->setLeft(insert(node->getLeft(), value));
+			node->setLeft(insert(node->getLeft(), value, inserted));
+		else
+			inserted = false;
 		node->setRank(this->calculateRankFrom(node));
 		return balance(node);
 	}

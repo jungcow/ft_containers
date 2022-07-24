@@ -85,15 +85,26 @@ public:
 		return (Node::find(root_->getLeft(), value));
 	}
 
-	BalanceNode* insert(const value_type& value)
+	bool insert(const value_type& value)
 	{
-		BalanceNode* result = Node::insert(root_->getLeft(), value);
-		if (!result)
-			return NULL;
-		size_++;
-		root_->setLeft(result);
+		bool inserted = true;
+
+		root_->setLeft(Node::insert(root_->getLeft(), value, inserted));
+		if (inserted)
+			size_++;
 		setRootNode(root_->getLeft());
-		return (root_);
+		return (inserted);
+	}
+
+	bool insert(BalanceNode* node, const value_type& value)
+	{
+		bool inserted = true;
+
+		root_->setLeft(Node::insert(node, value, inserted));
+		if (inserted)
+			size_++;
+		setRootNode(root_->getLeft());
+		return (inserted);
 	}
 
 	node_size_type erase(const value_type& value)

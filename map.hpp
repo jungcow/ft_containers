@@ -60,7 +60,9 @@ namespace ft
 		typedef typename ft::NodeWrapper<node_base>::node_allocator_type node_allocator_type;
 		typedef typename ft::NodeWrapper<node_base>::node_size_type node_size_type;
 		typedef typename ft::NodeWrapper<node_base>::node_value_type node_value_type;
-		// typedef typename ft::NodeWrapper<node_base>::BalanceNode balance_node_type;
+
+		typedef typename ft::NodeWrapper<node_base>::BalanceNode balance_node_type;
+		typedef const typename ft::NodeWrapper<node_base>::BalanceNode const_balance_node_type;
 
 		typedef ft::Tree<node_type> map_tree;
 
@@ -71,8 +73,8 @@ namespace ft
 		/**
 		 * iterator type
 		 */
-		typedef map_iterator<node_iterator, node_type*, map_tree*, pointer, pointer> iterator;
-		typedef map_iterator<const_node_iterator, const_node_type*, map_tree*, const_pointer, pointer> const_iterator;
+		typedef map_iterator<node_iterator, balance_node_type*, map_tree*, pointer, pointer> iterator;
+		typedef map_iterator<const_node_iterator, const_balance_node_type*, map_tree*, const_pointer, pointer> const_iterator;
 
 		typedef ft::reverse_iterator<iterator> reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
@@ -80,13 +82,14 @@ namespace ft
 	private:
 		map_tree data_;
 		key_compare compare_key_;
+		value_compare compare_value_;
 		size_type size_;
 		allocator_type allocator_;
 
 	public:
 		explicit map(const key_compare& comp = key_compare(),
 					 const allocator_type& alloc = allocator_type())
-			: compare_key_(comp), size_(0), allocator_(alloc)
+			: compare_key_(comp), compare_value_(value_compare(compare_key_)), size_(0), allocator_(alloc)
 		{
 		}
 
@@ -157,7 +160,7 @@ namespace ft
 #endif
 		iterator find(const key_type& k)
 		{
-			node_type* node = data_.find(value_type(k, mapped_type()));
+			balance_node_type* node = data_.find(value_type(k, mapped_type()));
 
 			if (node == NULL)
 				return end();
@@ -165,7 +168,7 @@ namespace ft
 		}
 		const_iterator find(const key_type& k) const
 		{
-			const_node_type* node = data_.find(value_type(k, mapped_type()));
+			const_balance_node_type* node = data_.find(value_type(k, mapped_type()));
 
 			if (node == NULL)
 				return end();
@@ -179,28 +182,73 @@ namespace ft
 
 		ft::pair<iterator, bool> insert(const value_type& val)
 		{
-			ft::pair<iterator, bool> res = ft::make_pair(iterator(data_.insert(val), &data_), true);
-			std::cout << std::boolalpha;
-			std::cout << "is all alright? " << data_.isFollowedAllRules() << std::endl;
-			return res;
+			bool inserted;
+
+			inserted = data_.insert(val);
+			return ft::pair<iterator, bool>(iterator(data_.find(val), &data_), inserted);
 		}
 
-		// iterator insert(iterator position, const value_type& val)
-		// {
-		// }
-#if 0
+		iterator insert(iterator position, const value_type& val)
+		{
+			iterator tmp = position;
+			balance_node_type* node;
+
+			if (position == end())
+				--position;
+			if (compare_value_(*position, val))
+			{
+				++tmp;
+				if (tmp == end() || compare_value_(val, *tmp))
+					data_.insert(position.base().base(), val);
+				else
+					data_.insert(val);
+			}
+			else if (compare_value_(val, *position))
+			{
+				if (position == begin())
+					data_.insert(position.base().base(), val);
+				if (compare_value_(*(--tmp), val))
+					data_.insert(position.base().base(), val);
+				else
+					data_.insert(val);
+			}
+			else
+				return position;
+			node = data_.find(val);
+			if (!node)
+				return end();
+			return iterator(node, &data_);
+		}
+
 		template <class InputIterator>
-		void insert(InputIterator first, InputIterator last);
-#endif
+		void insert(InputIterator first, InputIterator last)
+		{
+			for (; first != last; first++)
+			{
+				data_.insert(*first);
+			}
+		}
+
 		key_compare key_comp() const
 		{
 			return compare_key_;
 		}
 
-#if 0
-		iterator lower_bound(const key_type& k);
-		const_iterator lower_bound(const key_type& k) const;
-#endif
+		iterator lower_bound(const key_type& k)
+		{
+			balance_node_type* node = data_.find(value_type(k, mapped_type()));
+			if (!node)
+				return end();
+			return iterator(node, &data_);
+		}
+		const_iterator lower_bound(const key_type& k) const
+		{
+			const_balance_node_type* node = data_.find(value_type(k, mapped_type()));
+			if (!node)
+				return end();
+			return const_iterator(node, &data_);
+		}
+
 		size_type max_size() const throw()
 		{
 			return (std::numeric_limits<node_size_type>::max() /
@@ -242,12 +290,23 @@ namespace ft
 			data_.printByInOrderTraversal();
 		}
 #if 0
-
 		void swap(map& x);
-
-		iterator upper_bound(const key_type& k);
-		const_iterator upper_bound(const key_type& k) const;
 #endif
+		iterator upper_bound(const key_type& k)
+		{
+			balance_node_type* node = data_.find(value_type(k, mapped_type()));
+			if (!node)
+				return end();
+			return ++(iterator(node, &data_));
+		}
+		const_iterator upper_bound(const key_type& k) const
+		{
+			const_balance_node_type* node = data_.find(value_type(k, mapped_type()));
+			if (!node)
+				return end();
+			return ++(const_iterator(node, &data_));
+		}
+
 		value_compare value_comp() const
 		{
 			return (value_compare(compare_key_));
