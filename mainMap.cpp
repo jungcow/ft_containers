@@ -124,8 +124,29 @@ int main(void)
 		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
 		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
 		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << reinterpret_cast<void*>(&mpi) << std::endl;
 
-		std::cout << "*a:  " << (*(mpi)).first << std::endl;
+		--mpi;
+		// std::cout << "*a:  " << (*(mpi)).first << std::endl;
 
 		std::cout << "*a--: " << (*(mpi--)).first << std::endl;
 		std::cout << "*a--: " << (*(mpi--)).first << std::endl;
@@ -135,6 +156,9 @@ int main(void)
 		std::cout << "*a--: " << (*(mpi--)).first << std::endl;
 		std::cout << "*a--: " << (*(mpi--)).first << std::endl;
 		std::cout << "*a--: " << (*(mpi--)).first << std::endl;
+		// std::cout << "*a--: " << (*(mpi--)).first << std::endl;
+		std::cout << (*(mp.find('c'))).second << std::endl;
+		std::cout << (*(mp.find('y'))).first << std::endl;
 	}
 	{
 		// std::map<char, int> mp;

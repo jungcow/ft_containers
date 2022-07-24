@@ -70,7 +70,7 @@ public:
 	// }
 
 private:
-	size_type rank_;
+	node_size_type rank_;
 	BalanceNode* left_;
 	BalanceNode* right_;
 
@@ -112,14 +112,14 @@ public:
 		return right_;
 	}
 
-	size_type getRank(void) const
+	node_size_type getRank(void) const
 	{
 		return rank_;
 	}
 
-	size_t getOrder(BalanceNode* node, const value_type& value) const
+	node_size_type getOrder(BalanceNode* node, const value_type& value) const
 	{
-		size_t order;
+		node_size_type order;
 
 		order = 0;
 		while (node)
@@ -156,7 +156,7 @@ public:
 	{
 		right_ = node;
 	}
-	void setRank(size_type r)
+	void setRank(node_size_type r)
 	{
 		rank_ = r;
 	}
@@ -224,10 +224,10 @@ public:
 		return static_cast<const BalanceNode&>(*this).printNode(node);
 	}
 
-	size_type calculateRankFrom(BalanceNode* node)
+	node_size_type calculateRankFrom(BalanceNode* node)
 	{
-		size_type lRank = 0;
-		size_type rRank = 0;
+		node_size_type lRank = 0;
+		node_size_type rRank = 0;
 		if (node->getLeft())
 			lRank = node->getLeft()->getRank();
 		if (node->getRight())
@@ -243,8 +243,8 @@ public:
 			return node;
 		}
 
-		size_type lRank = 0;
-		size_type rRank = 0;
+		node_size_type lRank = 0;
+		node_size_type rRank = 0;
 
 		if (node->getLeft())
 			lRank = calculateAllNodesRank(node->getLeft())->getRank();

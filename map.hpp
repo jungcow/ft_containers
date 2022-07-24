@@ -122,8 +122,8 @@ namespace ft
 		size_type count(const key_type& k) const
 		{
 			if (data_.find(ft::make_pair(k, mapped_type())))
-				return 1;
-			return 0;
+				return static_cast<size_type>(true);
+			return static_cast<size_type>(false);
 		}
 
 		bool empty() const
@@ -132,11 +132,11 @@ namespace ft
 		}
 		iterator end()
 		{
-			return iterator(data_.getLast(), &data_);
+			return iterator(data_.getFoot(), &data_);
 		}
 		const_iterator end() const
 		{
-			return const_iterator(data_.getLast(), &data_);
+			return const_iterator(data_.getFoot(), &data_);
 		}
 #if 0
 
@@ -154,11 +154,24 @@ namespace ft
 		}
 #if 0
 		void erase(iterator first, iterator last);
-
-		iterator find(const key_type& k);
-		const_iterator find(const key_type& k) const;
-
 #endif
+		iterator find(const key_type& k)
+		{
+			node_type* node = data_.find(value_type(k, mapped_type()));
+
+			if (node == NULL)
+				return end();
+			return iterator(node, &data_);
+		}
+		const_iterator find(const key_type& k) const
+		{
+			const_node_type* node = data_.find(value_type(k, mapped_type()));
+
+			if (node == NULL)
+				return end();
+			return const_iterator(node, &data_);
+		}
+
 		allocator_type get_allocator() const
 		{
 			return allocator_;
@@ -405,7 +418,10 @@ namespace ft
 
 		map_iterator& operator++()
 		{
-			base_ = Iterator(tree_->OS_Select(tree_->getRoot()->getLeft(), ++order_));
+			if (order_ == tree_->size())
+				base_ = Iterator(tree_->getFoot());
+			else
+				base_ = Iterator(tree_->OS_Select(tree_->getRoot()->getLeft(), ++order_));
 			return (*this);
 		}
 		map_iterator operator++(int)

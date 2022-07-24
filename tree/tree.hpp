@@ -26,12 +26,16 @@ public:
 
 private:
 	BalanceNode* root_;
+	BalanceNode* foot_;
 	node_size_type size_;
 
 public:
 	Tree() : root_(NULL), size_(0)
 	{
 		root_ = createNode();
+		foot_ = createNode();
+		foot_->setRank(size_ + 1);
+		root_->setRight(foot_);
 	}
 
 	~Tree()
@@ -43,10 +47,15 @@ public:
 	{
 		return root_;
 	}
+	BalanceNode* getFoot(void) const
+	{
+		return foot_;
+	}
 
 	BalanceNode* getFirst(void) const
 	{
 		BalanceNode* node = root_->getLeft();
+
 		while (node && node->getLeft())
 			node = node->getLeft();
 		return node;
@@ -55,6 +64,7 @@ public:
 	BalanceNode* getLast(void) const
 	{
 		BalanceNode* node = root_->getLeft();
+
 		while (node && node->getRight())
 			node = node->getRight();
 		return node;
@@ -101,7 +111,7 @@ public:
 		return 1;
 	}
 
-	size_t getOrder(const value_type& value) const
+	node_size_type getOrder(const value_type& value) const
 	{
 		return getOrder(root_->getLeft(), value);
 	}
@@ -141,7 +151,7 @@ public:
 	}
 
 private:
-	size_t getOrder(BalanceNode* node, const value_type& value) const
+	node_size_type getOrder(BalanceNode* node, const value_type& value) const
 	{
 		return Node::getOrder(node, value);
 	}

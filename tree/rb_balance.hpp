@@ -48,8 +48,6 @@ public:  // TODO: 지정자 확인하기
 	typedef typename node_allocator_type::difference_type node_difference_type;
 
 private:
-	// Node* left_;
-	// Node* right_;
 	Color color_;
 	bool Nil_;
 	node_allocator_type rb_node_allocator_;
@@ -57,8 +55,6 @@ private:
 public:
 	RBBalance()
 		: base_node(),
-		//   left_(NULL),
-		//   right_(NULL),
 		  color_(Red),
 		  Nil_(false),
 		  rb_node_allocator_(node_allocator_type())
@@ -67,8 +63,6 @@ public:
 
 	RBBalance(const value_type& value, const Color& color = Red)
 		: base_node(value),
-		//   left_(NULL),
-		//   right_(NULL),
 		  color_(color),
 		  Nil_(false),
 		  rb_node_allocator_(node_allocator_type())
@@ -77,8 +71,6 @@ public:
 
 	RBBalance(const RBBalance& other)
 		: base_node(other),
-		//   left_(other.getLeft()),
-		//   right_(other.getRight()),
 		  color_(other.getColor()),
 		  Nil_(other.getNil()),
 		  rb_node_allocator_(node_allocator_type())
@@ -88,15 +80,6 @@ public:
 	~RBBalance()
 	{
 	}
-
-	// Node* getLeft(void) const
-	// {
-	// 	return (left_);
-	// }
-	// Node* getRight(void) const
-	// {
-	// 	return (right_);
-	// }
 
 	Color getColor(void) const
 	{
@@ -115,14 +98,6 @@ public:
 		return true;
 	}
 
-	// void setLeft(Node* node)
-	// {
-	// 	left_ = node;
-	// }
-	// void setRight(Node* node)
-	// {
-	// 	right_ = node;
-	// }
 	void setColor(const Color& color)
 	{
 		color_ = color;
