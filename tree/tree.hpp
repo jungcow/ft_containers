@@ -101,9 +101,14 @@ public:
 		return 1;
 	}
 
+	size_t getOrder(const value_type& value) const
+	{
+		return getOrder(root_->getLeft(), value);
+	}
+
 	BalanceNode* OS_Select(BalanceNode* node, size_t i)
 	{
-		if (i < 1 || !node)
+		if (i < 1 || i > size_ || !node)
 			return NULL;
 
 		size_t r;
@@ -111,7 +116,6 @@ public:
 			r = 1;
 		else
 			r = node->getLeft()->getRank() + 1;
-		std::cout << "i: " << i << ", r: " << r << std::endl;
 		if (i == r)
 			return node;
 		else if (i < r)
@@ -137,6 +141,11 @@ public:
 	}
 
 private:
+	size_t getOrder(BalanceNode* node, const value_type& value) const
+	{
+		return Node::getOrder(node, value);
+	}
+
 	void printByInOrderTraversal(BalanceNode* node) const
 	{
 		if (node == NULL)

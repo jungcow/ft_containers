@@ -114,16 +114,27 @@ int main(void)
 		std::cout << "maxsize: " << mp.max_size() << std::endl;
 		mp['z'] = 26;
 		mp['a'] = 26;
-		std::cout << "z: " <<  mp['z'] << std::endl;
+		std::cout << "z: " << mp['z'] << std::endl;
 		std::cout << "a: " << mp['a'] << std::endl;
 		ft::map<char, int>::iterator mpi = mp.begin();
 		mp.print();
-		// ++mpi;
-		std::cout << "*a++: " <<  (*(mpi++)).first << std::endl;
+		++mpi;
 		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
 		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
 		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
 		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+		std::cout << "*a++: " << (*(mpi++)).first << std::endl;
+
+		std::cout << "*a:  " << (*(mpi)).first << std::endl;
+
+		std::cout << "*a--: " << (*(mpi--)).first << std::endl;
+		std::cout << "*a--: " << (*(mpi--)).first << std::endl;
+		std::cout << "*a--: " << (*(mpi--)).first << std::endl;
+		std::cout << "*a--: " << (*(mpi--)).first << std::endl;
+		std::cout << "*a--: " << (*(mpi--)).first << std::endl;
+		std::cout << "*a--: " << (*(mpi--)).first << std::endl;
+		std::cout << "*a--: " << (*(mpi--)).first << std::endl;
+		std::cout << "*a--: " << (*(mpi--)).first << std::endl;
 	}
 	{
 		// std::map<char, int> mp;

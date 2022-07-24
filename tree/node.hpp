@@ -110,11 +110,42 @@ public:
 	BalanceNode* getRight(void) const
 	{
 		return right_;
-		// return (static_cast<BalanceNode&>(*this).getRight());
 	}
+
 	size_type getRank(void) const
 	{
 		return rank_;
+	}
+
+	size_t getOrder(BalanceNode* node, const value_type& value) const
+	{
+		size_t order;
+
+		order = 0;
+		while (node)
+		{
+			if (compareValue(value, node->getValue()))
+			{
+				node = node->getLeft();
+			}
+			else if (compareValue(node->getValue(), value))
+			{
+				if (!node->getLeft())
+					order += 1;
+				else
+					order += node->getLeft()->getRank() + 1;
+				node = node->getRight();
+			}
+			else
+			{
+				if (!node->getLeft())
+					order += 1;
+				else
+					order += node->getLeft()->getRank() + 1;
+				break;
+			}
+		}
+		return order;
 	}
 
 	void setLeft(BalanceNode* node)

@@ -356,14 +356,13 @@ namespace ft
 		explicit map_iterator(const Iterator& otherIter, const TreePointer& tree)  // node_iterator로 생성
 			: base_(otherIter), tree_(tree)
 		{
-			//TODO: order 구하기
-			order_ = tree_.getOrder(*base);
+			order_ = tree_.getOrder(*otherIter);
 		}
 
 		explicit map_iterator(const NodePointer& node, const TreePointer& tree)  // node_iterator로 생성
-			: base_(node), tree_(tree)
+			: base_(node), tree_(tree), order_(0)
 		{
-			order_ = tree_.getOrder(*base);
+			order_ = tree_->getOrder(*base_);
 		}
 
 		map_iterator& operator=(const map_iterator& other)
@@ -406,16 +405,7 @@ namespace ft
 
 		map_iterator& operator++()
 		{
-			size_t rank = base_.left()
-							  ? base_.left()->getRank() + 1
-							  : 1;
-			// std::cout << "before: " << (*base_).first << "(" << rank << ")" << std::endl;
-			base_ = Iterator(tree_->OS_Select(tree_->getRoot()->getLeft(), rank + 1));
-			if (base_.left())
-				rank = base_.left()->getRank() + 1;
-			else
-				rank = 1;
-			std::cout << "after: " << (*base_).first << "(" << rank << ")" << std::endl;
+			base_ = Iterator(tree_->OS_Select(tree_->getRoot()->getLeft(), ++order_));
 			return (*this);
 		}
 		map_iterator operator++(int)
@@ -424,26 +414,33 @@ namespace ft
 			++(*this);
 			return (tmp);
 		}
-		/**
-		 * ++a, a++, *a++
-		 * --a, a--, *a--
-		 */
+		map_iterator& operator--()
+		{
+			base_ = Iterator(tree_->OS_Select(tree_->getRoot()->getLeft(), --order_));
+			return (*this);
+		}
+		map_iterator operator--(int)
+		{
+			map_iterator tmp = *this;
+			--(*this);
+			return (tmp);
+		}
 
-		// template <class Iter, class Np, class Vi, class Vp>
-		// friend bool operator==(const map_iterator<Iter, Np, Vi, Vp>& lhs, const map_iterator<Iter, Np, Vi, Vp>& rhs);
-		// template <class Iter, class Np, class Vi, class Vp>
-		// friend bool operator!=(const map_iterator<Iter, Np, Vi, Vp>& lhs, const map_iterator<Iter, Np, Vi, Vp>& rhs);
+		template <class Iter, class Np, class Tp, class Vi, class Vp>
+		friend bool operator==(const map_iterator<Iter, Np, Tp, Vi, Vp>& lhs, const map_iterator<Iter, Np, Tp, Vi, Vp>& rhs);
+		template <class Iter, class Np, class Tp, class Vi, class Vp>
+		friend bool operator!=(const map_iterator<Iter, Np, Tp, Vi, Vp>& lhs, const map_iterator<Iter, Np, Tp, Vi, Vp>& rhs);
 	};
-	// template <class Iter, class Np, class Vi, class Vp>
-	// bool operator==(const map_iterator<Iter, Np, Vi, Vp>& lhs, const map_iterator<Iter, Np, Vi, Vp>& rhs)
-	// {
-	// 	return (lhs.base_ == rhs.base_);
-	// }
-	// template <class Iter, class Np, class Vi, class Vp>
-	// bool operator!=(const map_iterator<Iter, Np, Vi, Vp>& lhs, const map_iterator<Iter, Np, Vi, Vp>& rhs)
-	// {
-	// 	return !(lhs == rhs);
-	// }
+	template <class Iter, class Np, class Tp, class Vi, class Vp>
+	bool operator==(const map_iterator<Iter, Np, Tp, Vi, Vp>& lhs, const map_iterator<Iter, Np, Tp, Vi, Vp>& rhs)
+	{
+		return (lhs.base_ == rhs.base_);
+	}
+	template <class Iter, class Np, class Tp, class Vi, class Vp>
+	bool operator!=(const map_iterator<Iter, Np, Tp, Vi, Vp>& lhs, const map_iterator<Iter, Np, Tp, Vi, Vp>& rhs)
+	{
+		return !(lhs == rhs);
+	}
 }
 
 #endif
